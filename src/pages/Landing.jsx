@@ -54,8 +54,8 @@ export default function Landing({ user, profile }) {
       <header className="landing-topbar">
         <div className="container landing-topbar-row">
           <div className="logo">
-            <div className="logo-icon"><img src="/icon-192.png" alt="ID4Drive"/></div>
-            ID4Drive
+            <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
+            DrivePad
           </div>
           <div className="topbar-actions">
             <a
@@ -395,7 +395,7 @@ export default function Landing({ user, profile }) {
         {/* FOOTER */}
         <div className="footer">
           <button className="footer-cta" onClick={goAuth}>🚗 Записатись зараз</button>
-          <div>© 2026 ID4Drive. Школа водіння в Києві.</div>
+          <div>© 2026 DrivePad. Школа водіння.</div>
         </div>
 
       </div>

@@ -41,7 +41,7 @@ export default function App() {
   useEffect(() => {
     if (!user) return
     return onForegroundMessage((payload) => {
-      const title = payload.notification?.title || 'ID4Drive'
+      const title = payload.notification?.title || 'DrivePad'
       const body = payload.notification?.body || ''
       const url = payload.data?.url || '/'
       if (Notification.permission !== 'granted') return
@@ -52,7 +52,7 @@ export default function App() {
             body,
             icon: '/icon-192.png',
             badge: '/icon-192.png',
-            tag: 'id4drive-notif',
+            tag: 'drivepad-notif',
             requireInteraction: true,
             data: { url },
           })

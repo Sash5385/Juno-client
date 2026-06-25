@@ -109,7 +109,7 @@ export default function PublicSchedule({ onBook }) {
             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
           <div style={{ minWidth:0 }}>
-            <div style={{ fontWeight:900, fontSize:18, color:'var(--text)', lineHeight:1.1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>ID4Drive</div>
+            <div style={{ fontWeight:900, fontSize:18, color:'var(--text)', lineHeight:1.1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>DrivePad</div>
             <div style={{ fontSize:10, color:'var(--dim)', marginTop:1 }}>Онлайн-запис</div>
           </div>
         </div>

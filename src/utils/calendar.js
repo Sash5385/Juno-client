@@ -14,7 +14,7 @@ export function googleCalendarLink(booking) {
     action: 'TEMPLATE',
     text: serviceName || 'Урок водіння',
     dates: `${startStr}/${endStr}`,
-    details: 'ID4Drive — урок з інструктором',
+    details: 'DrivePad — урок з інструктором',
     location: 'вул. Верховинна, 44',
   })
   return `https://calendar.google.com/calendar/render?${params}`
@@ -26,12 +26,12 @@ export function downloadICS(booking) {
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//ID4Drive//ID4Drive//UK',
+    'PRODID:-//DrivePad//DrivePad//UK',
     'BEGIN:VEVENT',
     `DTSTART;TZID=Europe/Kyiv:${startStr}`,
     `DTEND;TZID=Europe/Kyiv:${endStr}`,
     `SUMMARY:${serviceName || 'Урок водіння'}`,
-    'DESCRIPTION:ID4Drive — урок з інструктором',
+    'DESCRIPTION:DrivePad — урок з інструктором',
     'LOCATION:вул. Верховинна\\, 44',
     `UID:${id || date + time.replace(':', '')}@id4drive`,
     'END:VEVENT',
