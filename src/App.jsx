@@ -11,6 +11,7 @@ import Auth from './pages/Auth'
 import Cabinet from './pages/Cabinet'
 import Landing from './pages/Landing'
 import PublicSchedule from './pages/PublicSchedule'
+import BookPublic from './pages/BookPublic'
 
 export default function App() {
   const navigate = useNavigate()
@@ -113,6 +114,9 @@ export default function App() {
   return (
     <>
     <Routes>
+      {/* Публічна сторінка запису до інструктора — без авторизації */}
+      <Route path="/book/:slug" element={<BookPublic />} />
+
       {/* Лендінг — тільки для не авторизованих */}
       <Route path="/" element={
         user && profile
