@@ -1,7 +1,7 @@
 ﻿import { useState, useEffect } from 'react'
-import { ref, get, update } from 'firebase/database'
+import { get, update } from 'firebase/database'
 import type { User } from 'firebase/auth'
-import { db } from '../firebase'
+import { iRef } from '../firebase/db'
 
 export interface UserProfile {
   serviceType: 'school' | 'private' | null
@@ -17,7 +17,7 @@ export function useProfile(user: User | null) {
 
   useEffect(() => {
     if (!user) { setLoading(false); return }
-    get(ref(db, `users/${user.uid}/profile`)).then((snap) => {
+    get(iRef(`users/${user.uid}/profile`)).then((snap) => {
       if (snap.exists()) {
         const v = snap.val()
         setProfile({
@@ -35,13 +35,13 @@ export function useProfile(user: User | null) {
 
   async function saveServiceType(serviceType: 'school' | 'private') {
     if (!user) return
-    await update(ref(db, `users/${user.uid}/profile`), { serviceType })
+    await update(iRef(`users/${user.uid}/profile`), { serviceType })
     setProfile(p => p ? { ...p, serviceType } : p)
   }
 
   async function saveQuestionnaire(data: { drivingExperience: string; lessonGoals: string[]; wantsFilming: boolean }) {
     if (!user) return
-    await update(ref(db, `users/${user.uid}/profile`), { ...data, questionnaireCompleted: true })
+    await update(iRef(`users/${user.uid}/profile`), { ...data, questionnaireCompleted: true })
     setProfile(p => p ? { ...p, ...data, questionnaireCompleted: true } : p)
   }
 

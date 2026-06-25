@@ -1,6 +1,7 @@
 ﻿import { useState } from 'react'
-import { ref, set, push, update } from 'firebase/database'
-import { auth, db } from '../firebase'
+import { set, push, update } from 'firebase/database'
+import { auth } from '../firebase'
+import { iRef } from '../firebase/db'
 import type { TimeSlot } from '../types'
 import Step2DateTime from './Step2DateTime'
 import Step3Form from './Step3Form'
@@ -51,7 +52,7 @@ export default function BookingPage() {
     setSubmitting(true)
     setError('')
     try {
-      const bookingRef = push(ref(db, `bookings/${uid}`))
+      const bookingRef = push(iRef(`bookings/${uid}`))
       const id = bookingRef.key ?? ''
       await set(bookingRef, {
         id, userId: uid,
@@ -70,12 +71,12 @@ export default function BookingPage() {
         status: 'confirmed',
         createdAt: Date.now(),
       })
-      await update(ref(db, `timeslots/${data.date}/${data.slot.id}`), { available: false })
+      await update(iRef(`timeslots/${data.date}/${data.slot.id}`), { available: false })
       if (data.durationHours === 2) {
         const [h, m] = data.slot.time.split(':').map(Number)
         const next = `${String(h + 1).padStart(2, '0')}:${String(m).padStart(2, '0')}`
         const nextId = `slot${next.replace(':', '')}`
-        await update(ref(db, `timeslots/${data.date}/${nextId}`), { available: false })
+        await update(iRef(`timeslots/${data.date}/${nextId}`), { available: false })
       }
       setDone(true)
     } catch (e: any) {

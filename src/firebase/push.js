@@ -1,7 +1,6 @@
 import { getMessaging, getToken, onMessage } from 'firebase/messaging'
 import { app } from './config'
-import { ref, set } from 'firebase/database'
-import { db } from './config'
+import { iRef } from './db'
 
 // ⚠️ ЗГЕНЕРУЙ VAPID KEY В Firebase Console:
 // Project Settings → Cloud Messaging → Web Push certificates → Generate key pair
@@ -41,8 +40,8 @@ export async function requestNotificationPermission(uid) {
     const swReg = await getFirebaseSwReg()
     const token = await getToken(msg, { vapidKey: VAPID_KEY, ...(swReg ? { serviceWorkerRegistration: swReg } : {}) })
     if (token && uid) {
-      await set(ref(db, `users/${uid}/fcmTokens/web/token`), token)
-      await set(ref(db, `studentTokens/${uid}`), token)
+      await set(iRef(`users/${uid}/fcmTokens/web/token`), token)
+      await set(iRef(`studentTokens/${uid}`), token)
     }
     return token
   } catch (e) {

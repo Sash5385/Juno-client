@@ -1,7 +1,7 @@
 import { useMemo, useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { ref, onValue } from "firebase/database";
-import { db } from "../../firebase/config";
+import { onValue } from "firebase/database";
+import { iRef } from "../../firebase/db";
 import "./ProgressTab.css";
 
 export default function ProgressTab({ user, profile, bookingsData }) {
@@ -14,7 +14,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
   const [examPassed, setExamPassed] = useState(null);
   useEffect(() => {
     if (!user?.uid || !isSchool) return;
-    const r = ref(db, `users/${user.uid}/internalExam/passed`);
+    const r = iRef(`users/${user.uid}/internalExam/passed`);
     const unsub = onValue(r, snap => setExamPassed(snap.exists() ? snap.val() : undefined));
     return () => unsub();
   }, [user?.uid, isSchool]);
