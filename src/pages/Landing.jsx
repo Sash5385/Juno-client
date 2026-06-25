@@ -1,48 +1,14 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import TestTab from './cabinet/TestTab'
 import './Landing.css'
 
-const REVIEWS_URL = 'https://europe-west1-id4drive-booking-44182.cloudfunctions.net/getGoogleReviews'
-
-const STATIC_REVIEWS = [
-  { name: 'Пшик Вероніка', initials: 'ПВ', color: 'linear-gradient(165deg,#c084fc,#7c3aed)', date: '21 січня 2026', text: 'Дякую дуже Олександру за професіоналізм, холодний розум, спокій та супер класне навчання! Навчалась з нуля, здала практику з другого разу. Завдячую вам! ☺️' },
-  { name: 'Ірина', initials: 'ІР', color: 'linear-gradient(165deg,#ff7a5c,#ff5a3c)', date: '9 квітня 2026', text: 'Олександр, дуже Вам дякую за кожен урок! За кожне пояснення! За спокійну атмосферу! Доходило не зразу, але завдяки вашим зусиллям — я здала!' },
-  { name: 'Ірина Леснік', initials: 'ІЛ', color: 'linear-gradient(165deg,#2dd4bf,#0d9488)', date: '6 лютого 2026', text: 'Олександре, щиро дякую вам за урок водіння! Дуже приємно навчатися з таким спокійним, уважним і підтримуючим інструктором. Завдяки вам з\'являється впевненість за кермом і бажання рухатися далі. Дякую за терпіння, пояснення й позитивну атмосферу — це дуже цінно' },
-  { name: 'Ірина', initials: 'ІР', color: 'linear-gradient(165deg,#ff7a5c,#ff5a3c)', date: '9 квітня 2026', text: 'Комфортно. Спокійно. Ви справжній професіонал' },
-  { name: 'Марчук Вікторія', initials: 'МВ', color: 'linear-gradient(165deg,#fb923c,#ea580c)', date: '3 лютого 2026', text: 'Чудовий інструктор. Все чітко та зрозуміло пояснює. Дуже ввічливий' },
-  { name: 'Лящинська Світлана', initials: 'ЛС', color: 'linear-gradient(165deg,#5b9bff,#2563eb)', date: '10 лютого 2026', text: 'Благодаря Вам, сегодня у меня на 0,001% лучше получилось, и я стала чуть меньше бояться' },
-]
-
-const AVATAR_COLORS = [
-  'linear-gradient(165deg,#ff7a5c,#ff5a3c)',
-  'linear-gradient(165deg,#fb923c,#ea580c)',
-  'linear-gradient(165deg,#5b9bff,#2563eb)',
-  'linear-gradient(165deg,#c084fc,#7c3aed)',
-  'linear-gradient(165deg,#2dd4bf,#0d9488)',
-]
-
-function initials(name) {
-  return (name || '').split(' ').map(w => w[0]).join('').slice(0, 2).toUpperCase()
-}
-
-function starsStr(rating) {
-  return '★'.repeat(rating) + '☆'.repeat(5 - rating)
-}
 
 export default function Landing({ user, profile }) {
   const { theme, toggle } = useTheme()
   const nav = useNavigate()
-  const [reviews, setReviews] = useState([])
   const [termsOpen, setTermsOpen] = useState(false)
-
-  useEffect(() => {
-    fetch(REVIEWS_URL)
-      .then(r => r.json())
-      .then(data => { if (Array.isArray(data) && data.length) setReviews(data.filter(r => r.author_name !== 'Ольга Войцещук').slice(0, 5)) })
-      .catch(() => {})
-  }, [])
 
   const goAuth = () => nav(user && profile ? '/cabinet' : '/schedule')
   const goRegister = () => nav(user && profile ? '/cabinet' : '/auth')
@@ -241,42 +207,6 @@ export default function Landing({ user, profile }) {
             </div>
           </div>
         </section>
-
-        {/* REVIEWS */}
-        <section className="lsection">
-          <div className="lsection-title">Відгуки</div>
-          <h2>Що кажуть учні</h2>
-        </section>
-        <div className="reviews-scroll">
-          {STATIC_REVIEWS.map((r, i) => (
-            <div className="review-card" key={`s${i}`}>
-              <div className="review-stars">★★★★★</div>
-              <div className="review-text">"{r.text}"</div>
-              <div className="review-author">
-                <div className="review-avatar" style={{background: r.color}}>{r.initials}</div>
-                <div><div className="review-name">{r.name}</div><div className="review-date">{r.date}</div></div>
-              </div>
-            </div>
-          ))}
-          {reviews.map((r, i) => (
-            <div className="review-card" key={`g${i}`}>
-              <div className="review-stars" style={{color: r.rating >= 4 ? '#f7c948' : '#ff5a3c'}}>
-                {starsStr(r.rating)}
-              </div>
-              <div className="review-text">"{r.text}"</div>
-              <div className="review-author">
-                {r.profile_photo_url
-                  ? <img src={r.profile_photo_url} className="review-avatar" style={{objectFit:'cover', background:'none'}} alt={r.author_name} />
-                  : <div className="review-avatar" style={{background: AVATAR_COLORS[i % AVATAR_COLORS.length]}}>{initials(r.author_name)}</div>
-                }
-                <div>
-                  <div className="review-name">{r.author_name}</div>
-                  <div className="review-date">{r.relative_time_description}</div>
-                </div>
-              </div>
-            </div>
-          ))}
-        </div>
 
         {/* CONTACTS */}
         <section className="lsection">
