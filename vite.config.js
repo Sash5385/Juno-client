@@ -9,8 +9,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'ID4Drive — Школа водіння',
-        short_name: 'ID4Drive',
+        name: 'DrivePad — Запис на уроки',
+        short_name: 'DrivePad',
         description: 'Онлайн-запис на уроки водіння',
         theme_color: '#ff5a3c',
         background_color: '#1c1d21',
