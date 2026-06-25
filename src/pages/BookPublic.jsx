@@ -238,27 +238,59 @@ export default function BookPublic() {
   if (step === 3 && doneData) return (
     <div style={{ minHeight:'100vh', background:BG, display:'flex', alignItems:'center', justifyContent:'center', padding:20 }}>
       <div style={{ textAlign:'center', color:TEXT, maxWidth:360, width:'100%' }}>
-        <div style={{ fontSize:56, marginBottom:16 }}>✅</div>
-        <div style={{ fontSize:22, fontWeight:800, marginBottom:8, color:GREEN }}>Записано!</div>
-        <div style={{ fontSize:14, color:DIM, marginBottom:24, lineHeight:1.6 }}>
-          {doneData.svc.name}<br/>
-          {new Date(doneData.date+'T12:00:00').toLocaleDateString('uk-UA', { weekday:'long', day:'numeric', month:'long' })} о {doneData.time}
+        <div style={{ fontSize:56, marginBottom:12 }}>✅</div>
+        <div style={{ fontSize:22, fontWeight:800, marginBottom:4, color:GREEN }}>Записано!</div>
+        <div style={{ fontSize:13, color:DIM, marginBottom:20 }}>Збережіть деталі нижче</div>
+
+        {/* Booking summary card */}
+        <div style={{ padding:'16px', background:SURF, borderRadius:16, border:`1px solid ${BRD}`, marginBottom:16, textAlign:'left' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', fontSize:13, marginBottom:10 }}>
+            <span style={{ color:DIM }}>Послуга</span>
+            <span style={{ fontWeight:700 }}>{doneData.svc.name}</span>
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', fontSize:13, marginBottom:10 }}>
+            <span style={{ color:DIM }}>Дата</span>
+            <span style={{ fontWeight:700 }}>
+              {new Date(doneData.date+'T12:00:00').toLocaleDateString('uk-UA', { weekday:'short', day:'numeric', month:'long' })}
+            </span>
+          </div>
+          <div style={{ display:'flex', justifyContent:'space-between', fontSize:13, marginBottom:10 }}>
+            <span style={{ color:DIM }}>Час</span>
+            <span style={{ fontWeight:800, fontSize:15 }}>{doneData.time}</span>
+          </div>
+          <div style={{ height:1, background:'rgba(255,255,255,0.06)', margin:'10px 0' }} />
+          <div style={{ display:'flex', justifyContent:'space-between', fontSize:12 }}>
+            <span style={{ color:DIM }}>Ваш телефон</span>
+            <span style={{ fontWeight:600, color:DIM }}>{phone}</span>
+          </div>
         </div>
+
         {instrProfile?.phone && (
-          <div style={{ padding:'14px 16px', background:SURF, borderRadius:14, border:`1px solid ${BRD}`, marginBottom:16 }}>
-            <div style={{ fontSize:12, color:DIM, marginBottom:4 }}>Зв'яжіться з інструктором</div>
-            <a href={`tel:${instrProfile.phone}`} style={{ fontSize:17, fontWeight:700, color:ACCENT, textDecoration:'none' }}>
+          <div style={{ padding:'12px 16px', background:SURF, borderRadius:14, border:`1px solid ${BRD}`, marginBottom:16 }}>
+            <div style={{ fontSize:12, color:DIM, marginBottom:4 }}>Скасування або питання — інструктор</div>
+            <a href={`tel:${instrProfile.phone}`} style={{ fontSize:16, fontWeight:700, color:ACCENT, textDecoration:'none' }}>
               {instrProfile.phone}
             </a>
           </div>
         )}
-        <button
-          onClick={() => { setStep(1); setSelectedDate(null); setSelectedTime(null); setName(''); setPhone('') }}
-          style={{ width:'100%', padding:'13px', borderRadius:14, border:'none', cursor:'pointer',
-            background:'rgba(255,255,255,0.06)', color:TEXT, fontSize:14, fontWeight:700 }}
-        >
-          Записатись ще раз
-        </button>
+
+        <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+          <a
+            href={`/my/${slug}?phone=${encodeURIComponent(phone)}`}
+            style={{ display:'block', width:'100%', padding:'13px', borderRadius:14, border:`1px solid ${BRD}`,
+              background:SURF, color:GREEN, fontSize:14, fontWeight:700, textAlign:'center', textDecoration:'none',
+              boxSizing:'border-box' }}
+          >
+            Переглянути мої записи
+          </a>
+          <button
+            onClick={() => { setStep(1); setSelectedDate(null); setSelectedTime(null); setName(''); setPhone('') }}
+            style={{ width:'100%', padding:'13px', borderRadius:14, border:'none', cursor:'pointer',
+              background:'rgba(255,255,255,0.06)', color:DIM, fontSize:14, fontWeight:700 }}
+          >
+            Записатись ще раз
+          </button>
+        </div>
       </div>
     </div>
   )
