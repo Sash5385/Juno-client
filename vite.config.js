@@ -1,0 +1,75 @@
+import { defineConfig } from 'vite'
+import react from '@vitejs/plugin-react'
+import { VitePWA } from 'vite-plugin-pwa'
+
+export default defineConfig({
+  plugins: [
+    react(),
+    VitePWA({
+      registerType: 'prompt',
+      includeAssets: ['favicon.svg'],
+      manifest: {
+        name: 'ID4Drive — Школа водіння',
+        short_name: 'ID4Drive',
+        description: 'Онлайн-запис на уроки водіння',
+        theme_color: '#ff5a3c',
+        background_color: '#1c1d21',
+        display: 'standalone',
+        orientation: 'portrait',
+        lang: 'uk',
+        start_url: '/',
+        icons: [
+          {
+            src: '/icon-192.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: '/icon-512.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      },
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+        runtimeCaching: [
+          {
+            urlPattern: /^\/manifest\.json/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'manifest-cache',
+              expiration: { maxEntries: 1, maxAgeSeconds: 0 }
+            }
+          },
+          {
+            urlPattern: /\.(css)$/,
+            handler: 'NetworkFirst',
+            options: {
+              cacheName: 'css-cache',
+              expiration: { maxEntries: 10, maxAgeSeconds: 3600 }
+            }
+          },
+          {
+            urlPattern: /^https:\/\/firebasestorage\.googleapis\.com/,
+            handler: 'CacheFirst',
+            options: {
+              cacheName: 'firebase-storage',
+              expiration: { maxEntries: 50, maxAgeSeconds: 60 * 60 * 24 * 7 }
+            }
+          }
+        ]
+      }
+    })
+  ],
+  server: {
+    port: 5173,
+    host: true
+  }
+})
