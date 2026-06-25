@@ -15,9 +15,10 @@ const GREEN = "#34d399"
 
 export default function BookPublic() {
   const { slug } = useParams()
+  const [iid, setIid] = useState(null)
 
   // Build a Firebase ref for this instructor's namespace
-  const mkRef = (path) => ref(db, path ? `instructors/${slug}/${path}` : `instructors/${slug}`)
+  const mkRef = (path) => ref(db, path ? `instructors/${iid}/${path}` : `instructors/${iid}`)
 
   const [notFound, setNotFound]         = useState(false)
   const [instrProfile, setInstrProfile] = useState(null)
@@ -39,33 +40,43 @@ export default function BookPublic() {
   const [doneData, setDoneData]         = useState(null)
   const timeSectionRef = useRef(null)
 
-  // Load instructor profile + settings + services
+  // Resolve slug → iid
   useEffect(() => {
     if (!slug) return
-    get(ref(db, `instructors/${slug}/admin_settings/profile`)).then(snap => {
+    get(ref(db, `slugs/${slug}`)).then(snap => {
+      if (!snap.exists()) { setNotFound(true); return }
+      setIid(snap.val().iid)
+    }).catch(() => setNotFound(true))
+  }, [slug])
+
+  // Load instructor profile + settings + services
+  useEffect(() => {
+    if (!iid) return
+    get(mkRef('admin_settings/profile')).then(snap => {
       if (!snap.exists()) { setNotFound(true); return }
       setInstrProfile(snap.val())
     }).catch(() => setNotFound(true))
 
-    get(ref(db, `instructors/${slug}/admin_settings`)).then(snap => {
+    get(mkRef('admin_settings')).then(snap => {
       if (snap.exists()) setSettings(snap.val())
     }).catch(() => {})
 
-    get(ref(db, `instructors/${slug}/admin_data/services`)).then(snap => {
+    get(mkRef('admin_data/services')).then(snap => {
       if (!snap.exists()) return
       const val = snap.val()
       const arr = (Array.isArray(val) ? val : Object.values(val)).filter(s => s?.active && !s.archived)
       setServices(arr)
       if (arr.length) setSelectedSvc(arr[0])
     }).catch(() => {})
-  }, [slug])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [iid])
 
   // Month availability subscription
   useEffect(() => {
-    if (!slug) return
+    if (!iid) return
     setMonthAvail({})
     const prefix = `${viewMonth.getFullYear()}-${String(viewMonth.getMonth()+1).padStart(2,'0')}-`
-    const r = ref(db, `instructors/${slug}/timeslots`)
+    const r = ref(db, `instructors/${iid}/timeslots`)
     const handler = onValue(r, snap => {
       const all = snap.val() || {}
       const result = {}
@@ -80,20 +91,20 @@ export default function BookPublic() {
       setMonthAvail(result)
     })
     return () => off(r, 'value', handler)
-  }, [slug, viewMonth])
+  }, [iid, viewMonth])
 
   // Slots for selected date
   useEffect(() => {
-    if (!slug || !selectedDate) { setSlots({}); return }
+    if (!iid || !selectedDate) { setSlots({}); return }
     setSlotsLoading(true)
     const dateStr = formatDateYMD(selectedDate)
-    const r = ref(db, `instructors/${slug}/timeslots/${dateStr}`)
+    const r = ref(db, `instructors/${iid}/timeslots/${dateStr}`)
     const handler = onValue(r, snap => {
       setSlots(snap.exists() ? snap.val() : {})
       setSlotsLoading(false)
     })
     return () => off(r, 'value', handler)
-  }, [slug, selectedDate])
+  }, [iid, selectedDate])
 
   // Scroll to time section after date pick
   useEffect(() => {
@@ -157,7 +168,7 @@ export default function BookPublic() {
       const slotId  = `slot${selectedTime.replace(':', '')}`
 
       // Atomic slot claim via transaction
-      const slotRef = ref(db, `instructors/${slug}/timeslots/${dateStr}/${slotId}`)
+      const slotRef = ref(db, `instructors/${iid}/timeslots/${dateStr}/${slotId}`)
       const txResult = await runTransaction(slotRef, cur => {
         if (cur && cur.available === false) return undefined // abort — taken
         return { ...(cur || {}), available: false, time: selectedTime }
@@ -171,7 +182,7 @@ export default function BookPublic() {
         const [h, m] = selectedTime.split(':').map(Number)
         const nMin = h * 60 + m + 60
         const nId  = `slot${String(Math.floor(nMin/60)).padStart(2,'0')}${String(nMin%60).padStart(2,'0')}`
-        await update(ref(db, `instructors/${slug}/timeslots/${dateStr}`), {
+        await update(ref(db, `instructors/${iid}/timeslots/${dateStr}`), {
           [`${nId}/available`]: false,
           [`${nId}/time`]: `${String(Math.floor(nMin/60)).padStart(2,'0')}:${String(nMin%60).padStart(2,'0')}`,
         }).catch(() => {})
@@ -179,7 +190,7 @@ export default function BookPublic() {
 
       // Write booking (guest, no auth — phone is identifier)
       const uid        = 'guest_' + phone.replace(/\D/g, '')
-      const bookingRef = push(ref(db, `instructors/${slug}/bookings/${uid}`))
+      const bookingRef = push(ref(db, `instructors/${iid}/bookings/${uid}`))
       await set(bookingRef, {
         id:           bookingRef.key,
         userId:       uid,
@@ -204,6 +215,13 @@ export default function BookPublic() {
       setSubmitting(false)
     }
   }
+
+  // ─── LOADING (resolving slug) ──────────────────────────────────
+  if (!iid && !notFound) return (
+    <div style={{ minHeight:'100vh', background:BG, display:'flex', alignItems:'center', justifyContent:'center' }}>
+      <div className="spinner" />
+    </div>
+  )
 
   // ─── 404 ───────────────────────────────────────────────────────
   if (notFound) return (
