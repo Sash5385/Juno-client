@@ -1,4 +1,4 @@
-const VERSION_KEY = 'id4drive-app-version'
+const VERSION_KEY = 'drivepad-app-version'
 const CHECK_INTERVAL = 60000 // 1 minute
 
 export function initAutoUpdate() {

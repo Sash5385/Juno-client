@@ -33,7 +33,7 @@ export function downloadICS(booking) {
     `SUMMARY:${serviceName || 'Урок водіння'}`,
     'DESCRIPTION:DrivePad — урок з інструктором',
     'LOCATION:вул. Верховинна\\, 44',
-    `UID:${id || date + time.replace(':', '')}@id4drive`,
+    `UID:${id || date + time.replace(':', '')}@drivepad`,
     'END:VEVENT',
     'END:VCALENDAR',
   ].join('\r\n')
@@ -41,7 +41,7 @@ export function downloadICS(booking) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `id4drive-${date}.ics`
+  a.download = `drivepad-${date}.ics`
   a.click()
   URL.revokeObjectURL(url)
 }
