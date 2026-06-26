@@ -66,13 +66,6 @@ export function subscribeSlotsForDate(date, callback) {
 }
 
 // в”Ђв”Ђв”Ђ BOOKINGS в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-export async function getMyBookings(uid) {
-  const snap = await get(iRef(`bookings/${uid}`))
-  if (!snap.exists()) return []
-  const data = snap.val()
-  return Object.entries(data).map(([id, b]) => ({ id, ...b }))
-}
-
 export function subscribeMyBookings(uid, _phone, callback) {
   const r = iRef(`bookings/${uid}`)
   const handler = onValue(r, snap => {
