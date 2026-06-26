@@ -1,6 +1,6 @@
 {
-  "name": "id4drive-functions",
-  "description": "Firebase Cloud Functions for ID4Drive",
+  "name": "drivepad-functions",
+  "description": "Firebase Cloud Functions for DrivePad",
   "scripts": {
     "serve": "firebase emulators:start --only functions",
     "deploy": "firebase deploy --only functions"
