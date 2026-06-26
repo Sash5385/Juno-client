@@ -24,13 +24,13 @@ messaging.onBackgroundMessage(async (payload) => {
   const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
   if (clientList.some(c => c.visibilityState === 'visible')) return
 
-  const title = payload.notification?.title || 'ID4Drive'
-  const url = payload.data?.url || 'https://id4drive.pro/cabinet'
+  const title = payload.notification?.title || 'DrivePad'
+  const url = payload.data?.url || 'https://drivepad.pro/cabinet'
   const options = {
     body: payload.notification?.body || '',
     icon: '/icon-192.png',
     badge: '/icon-192.png',
-    tag: 'id4drive-notif',
+    tag: 'drivepad-notif',
     requireInteraction: true,
     vibrate: [200, 100, 200],
     data: { url, ...(payload.data || {}) },
@@ -41,12 +41,12 @@ messaging.onBackgroundMessage(async (payload) => {
 self.addEventListener('notificationclick', (e) => {
   e.notification.close()
   const data = e.notification.data || {}
-  const target = data.url || 'https://id4drive.pro/cabinet'
-  const fullUrl = target.startsWith('http') ? target : ('https://id4drive.pro' + target)
+  const target = data.url || 'https://drivepad.pro/cabinet'
+  const fullUrl = target.startsWith('http') ? target : ('https://drivepad.pro' + target)
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
       for (const c of list) {
-        if (c.url.startsWith('https://id4drive.pro') && 'focus' in c) {
+        if (c.url.startsWith('https://drivepad.pro') && 'focus' in c) {
           c.focus()
           return c.navigate(fullUrl)
         }
