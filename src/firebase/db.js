@@ -396,3 +396,21 @@ export function clearNotification(uid, notifId) {
 export function clearAllNotifications(uid) {
   return remove(iRef(`notifications/${uid}`))
 }
+
+export async function sendWelcomeIfEnabled(uid) {
+  try {
+    const [settingsSnap, userSnap] = await Promise.all([
+      get(iRef('admin_settings/autoWelcome')),
+      get(iRef(`users/${uid}/welcomeSent`)),
+    ])
+    if (!settingsSnap.exists() || settingsSnap.val()?.enabled === false) return
+    if (userSnap.exists()) return
+    const _n = new Date()
+    const _dl = `${String(_n.getDate()).padStart(2,'0')}.${String(_n.getMonth()+1).padStart(2,'0')}`
+    const _tl = `${String(_n.getHours()).padStart(2,'0')}:${String(_n.getMinutes()).padStart(2,'0')}`
+    await Promise.all([
+      push(iRef(`notifications/${uid}`), { type:'system', title:'Вітаємо! 🎉', body:'Ваш профіль підключено. Забронюйте перший урок у вкладці «Запис».', date:_dl, time:_tl, ts:Date.now() }),
+      update(iRef(`users/${uid}`), { welcomeSent: true }),
+    ])
+  } catch (_) {}
+}
