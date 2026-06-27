@@ -90,6 +90,10 @@ export async function confirmAttendance(uid, bookingId) {
   await update(iRef(`bookings/${uid}/${bookingId}`), { studentConfirmed: true })
 }
 
+export async function rateBooking(uid, bookingId, rating) {
+  await update(iRef(`bookings/${uid}/${bookingId}`), { rating })
+}
+
 export async function cancelBooking(uid, bookingId, { isReschedule = false } = {}) {
   const snap = await get(iRef(`bookings/${uid}/${bookingId}`))
   const booking = snap.val()
