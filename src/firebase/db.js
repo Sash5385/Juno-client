@@ -106,6 +106,10 @@ export async function saveGoals(uid, bookingId, goals) {
   await update(iRef(`bookings/${uid}/${bookingId}`), { goals: goals.length ? goals : null })
 }
 
+export async function saveStudentNote(uid, bookingId, note) {
+  await update(iRef(`bookings/${uid}/${bookingId}`), { studentNote: note || null })
+}
+
 export async function cancelBooking(uid, bookingId, { isReschedule = false } = {}) {
   const snap = await get(iRef(`bookings/${uid}/${bookingId}`))
   const booking = snap.val()
