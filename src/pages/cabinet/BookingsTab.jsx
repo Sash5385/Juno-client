@@ -1,6 +1,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
+import { useBackClose } from '../../hooks/useBackButton'
 import { cancelBooking, confirmAttendance, rateBooking, saveStudentNote, saveGoals, createBooking, markSlotsUnavailable, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
@@ -35,6 +36,7 @@ function lessonCountdown(b) {
 
 // ─── RESCHEDULE MODAL ────────────────────────────────────────────
 function RescheduleModal({ booking, user, profile, onClose, onDone }) {
+  useBackClose(true, onClose)
   const { showToast: showModalToast, ToastEl: ModalToastEl } = useToast()
   const isVipStudent = profile?.isVip === true
   const [today] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
