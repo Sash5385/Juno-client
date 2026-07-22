@@ -8,20 +8,10 @@ import { getInitials, formatPhone } from "../../utils/format";
 import { APP_VERSION } from "../../version.js";
 import "./ProfileTab.css";
 
-const TSCS = [
-  { id: "8041", name: "ТСЦ 8041", area: "вул. Перемоги 20" },
-  { id: "8042", name: "ТСЦ 8042", area: "вул. Мрії 19" },
-];
-
 const EXPERIENCES = [
   { id: "no_license", name: "Не маю посвідчення, збираюсь складати іспит" },
   { id: "has_license", name: "Маю посвідчення, не маю досвіду водіння" },
 ];
-
-const TSC_LABELS = {
-  "8041": "ТСЦ 8041 — вул. Перемоги 20",
-  "8042": "ТСЦ 8042 — вул. Мрії 19",
-};
 
 const STUDENT_TYPE_LABELS = {
   school: "Автошкола",
@@ -57,7 +47,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
     setForm({
       name: profile.name || "",
       studentType: profile.studentType || "school",
-      tscCenter: profile.tscCenter || "8041",
       experience: profile.experience || "no_license",
       filmingConsent: profile.filmingConsent ?? true,
     });
@@ -79,7 +68,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       await updateUserProfile(user.uid, {
         name: form.name.trim(),
         studentType: form.studentType,
-        tscCenter: form.studentType === "school" ? form.tscCenter : null,
         experience: form.experience,
         filmingConsent: form.filmingConsent,
       });
@@ -141,12 +129,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               <span className="key">Тип учня</span>
               <span className="val">{STUDENT_TYPE_LABELS[profile.studentType] || "—"}</span>
             </div>
-            {profile.studentType === "school" && (
-              <div className="profile-row">
-                <span className="key">ТСЦ</span>
-                <span className="val">{TSC_LABELS[profile.tscCenter] || profile.tscCenter || "—"}</span>
-              </div>
-            )}
             {profile.studentType === "private" && (
               <div className="profile-row">
                 <span className="key">Досвід</span>
@@ -180,24 +162,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
                 </button>
               ))}
             </div>
-
-            {form.studentType === "school" && (
-              <>
-                <label className="edit-label">ТСЦ</label>
-                <div className="edit-list">
-                  {TSCS.map(t => (
-                    <button
-                      key={t.id}
-                      className={`edit-item${form.tscCenter === t.id ? " selected" : ""}`}
-                      onClick={() => setForm(f => ({ ...f, tscCenter: t.id }))}
-                    >
-                      <span className="edit-item-title">{t.name}</span>
-                      <span className="edit-item-sub">{t.area}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
 
             {form.studentType === "private" && (
               <>
