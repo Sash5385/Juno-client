@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
-import { cancelBooking, confirmAttendance, rateBooking, saveStudentNote, saveGoals, createBooking, markSlotsUnavailable, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
+import { cancelBooking, rateBooking, saveStudentNote, saveGoals, createBooking, markSlotsUnavailable, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import './BookingsTab.css'
@@ -286,15 +286,6 @@ export default function BookingsTab({ user, profile, bookingsData }) {
     setTimeout(() => setToast(null), 3200)
   }
 
-  const handleConfirmAttendance = async (booking) => {
-    try {
-      await confirmAttendance(user.uid, booking.id)
-      showToast('Присутність підтверджено', 'success')
-    } catch (e) {
-      showToast('Помилка: ' + e.message, 'error')
-    }
-  }
-
   const handleCancel = async (booking) => {
     if (!cancelAllowed || hoursUntilLesson(booking) < cancelCutoff) {
       showToast(`Скасувати урок можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до інструктора.`, 'error')
@@ -348,7 +339,9 @@ export default function BookingsTab({ user, profile, bookingsData }) {
           </div>
           <div className="booking-meta">📍 Верховинна, 44</div>
           <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-            <div className={`booking-status ${statusClass}`}>{statusText}</div>
+            {(b.status === 'confirmed' || b.status === 'cancelled') && (
+              <div className={`booking-status ${statusClass}`}>{statusText}</div>
+            )}
             {b.isPaid && <div style={{fontSize:10,fontWeight:700,color:"#63d37b",padding:"2px 7px",borderRadius:6,background:"rgba(99,211,120,0.12)"}}>✓ Оплачено</div>}
             {!isPast && b.status === 'confirmed' && lessonCountdown(b) && (
               <div style={{fontSize:10,fontWeight:700,color:'#fb923c',padding:'2px 7px',borderRadius:6,background:'rgba(251,146,60,0.1)'}}>⏱ {lessonCountdown(b)}</div>
@@ -419,17 +412,6 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 }}>🎯 Цілі уроку</button>
               )}
             </div>
-          )}
-          {!isPast && b.status !== 'cancelled' && !b.studentConfirmed && (
-            <button
-              style={{ marginTop: 6, fontSize: 12, padding: '4px 10px',
-                background: 'rgba(76, 175, 80, 0.15)', color: '#4caf50',
-                border: '1px solid rgba(76, 175, 80, 0.3)', borderRadius: 8,
-                cursor: 'pointer', fontWeight: 600 }}
-              onClick={() => handleConfirmAttendance(b)}
-            >
-              ✅ Підтверджую присутність
-            </button>
           )}
           {!isPast && b.status !== 'cancelled' && b.studentConfirmed && (
             <div className="booking-meta" style={{ color: '#4caf50', marginTop: 4 }}>
