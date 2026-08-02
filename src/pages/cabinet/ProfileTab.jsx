@@ -1,6 +1,4 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { signOut } from "../../firebase/auth";
 import { updateUserProfile, getAdminSettings } from "../../firebase/db";
 import { useTheme } from "../../hooks/useTheme";
 import { useToast } from "../../hooks/useToast";
@@ -29,7 +27,6 @@ const EXPERIENCE_LABELS = {
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const { theme, setTheme } = useTheme();
   const { showToast, ToastEl } = useToast();
-  const navigate = useNavigate();
 
   const [instructorProfile, setInstructorProfile] = useState(null);
   useEffect(() => {
@@ -79,13 +76,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
     } finally {
       setSaving(false);
     }
-  };
-
-  const [logoutPending, setLogoutPending] = useState(false);
-
-  const handleLogout = async () => {
-    await signOut();
-    navigate("/", { replace: true });
   };
 
   const forceUpdate = async () => {
@@ -297,17 +287,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         {APP_VERSION}
       </div>
 
-
-      {!logoutPending ? (
-        <button className="logout-btn" onClick={() => setLogoutPending(true)}>
-          Вийти з акаунту
-        </button>
-      ) : (
-        <div style={{ display: "flex", gap: 10, justifyContent: "center", padding: "8px 0" }}>
-          <button className="logout-btn" style={{ flex: 1 }} onClick={handleLogout}>Так, вийти</button>
-          <button className="edit-cancel" style={{ flex: 1 }} onClick={() => setLogoutPending(false)}>Скасувати</button>
-        </div>
-      )}
       {ToastEl}
     </div>
   );
