@@ -566,7 +566,15 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 </div>
                 <div>
                   <div style={{fontSize:10, fontWeight:800, lineHeight:1.3}}>{svc.name}</div>
-                  <div style={{fontSize:9, color:'var(--dim)', marginTop:1}}>
+                  {/* Тривалість окремим підписом — назва послуги (редагується в
+                      адмінці) не завжди містить "1 год"/"2 год", і без цього
+                      підпису дві плитки з однаковою назвою виглядають однаково. */}
+                  <div style={{fontSize:14, fontWeight:900, color:'#fff', marginTop:2}}>
+                    {svc.duration % 60 === 0
+                      ? `${svc.duration / 60} ${pluralize(svc.duration / 60, ['година', 'години', 'годин'])}`
+                      : `${svc.duration} хв`}
+                  </div>
+                  <div style={{fontSize:12, fontWeight:700, color:'var(--dim)', marginTop:1}}>
                     {isLocked ? (svc.type === 'school' ? 'недоступно' : 'після 40 уроків') : discountPct > 0 ? `${applyDiscount(svc.price)} ₴ (−${discountPct}%)` : `${svc.price} ₴`}
                   </div>
                 </div>
