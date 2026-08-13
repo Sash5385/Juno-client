@@ -26,12 +26,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const schoolLimitReached = bookingsData.canBookPrivate // schoolHours >= 40
   // private student: only private; school student: school until 40h, then only private
   const canPrivate = isPrivateStudent || schoolLimitReached
-  const canSchool = !isPrivateStudent && !schoolLimitReached
   const isVipStudent = profile?.isVip === true
   const discountPct = profile?.discount || 0
   const applyDiscount = (price) => discountPct > 0 ? Math.round(price * (1 - discountPct / 100)) : price
-  const [services, setServices] = useState([])
-  const [servicesLoaded, setServicesLoaded] = useState(false)
   const [selectedService, setSelectedService] = useState(null)
   const [today] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
   const [viewMonth, setViewMonth] = useState(() => {
@@ -69,15 +66,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     getAdminSettings().then(s => setAdminSettings(s)).catch(() => {})
     getAdminServices().then(list => {
       const final = list.length > 0 ? list : FALLBACK_SERVICES
-      setServices(final)
       const defaultSvc = final.find(s => canPrivate ? s.type === 'private' : s.type === 'school') || final[0]
       setSelectedService(defaultSvc)
-      setServicesLoaded(true)
     }).catch(() => {
-      setServices(FALLBACK_SERVICES)
       const defaultSvc = FALLBACK_SERVICES.find(s => canPrivate ? s.type === 'private' : s.type === 'school') || FALLBACK_SERVICES[0]
       setSelectedService(defaultSvc)
-      setServicesLoaded(true)
     })
   }, [])
 
@@ -567,64 +560,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         </div>
       )}
 
-      {/* 1. ПОСЛУГА */}
-      <div className="section-title" style={{color:'#ffffff', fontSize:13, textAlign:'center'}}>1. Послуга</div>
-      {!servicesLoaded ? (
-        <div style={{textAlign:'center', padding:'16px', color:'var(--dim)', fontSize:'13px'}}>Завантаження...</div>
-      ) : (
-        <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:8}}>
-          {[...services].sort((a,b) => a.duration - b.duration || (a.type === 'school' ? -1 : 1)).map(svc => {
-            const isLocked = (svc.type === 'private' && !canPrivate) || (svc.type === 'school' && !canSchool)
-            const isSelected = selectedService?.id === svc.id
-            const svcColor = svc.colorId === 'green' ? '#7ed957' : svc.colorId === 'yellow' ? '#f7c948' : svc.colorId === 'blue' ? '#5b9bff' : svc.colorId === 'purple' ? '#c084fc' : svc.colorId === 'red' ? '#ff5a3c' : svc.colorId === 'teal' ? '#2dd4bf' : svc.colorId === 'pink' ? '#f472b6' : svc.colorId === 'orange' ? '#fb923c' : svc.colorId === 'indigo' ? '#818cf8' : svc.colorId === 'lime' ? '#a3e635' : '#7ed957'
-            return (
-              <div
-                key={svc.id}
-                className={`svc-tile${isSelected ? ' selected' : ''}${isLocked ? ' locked' : ''}`}
-                style={{
-                  display:'flex', flexDirection:'column', alignItems:'center', gap:4, padding:'8px 6px',
-                  textAlign:'center', borderRadius:12, position:'relative',
-                  borderColor: isSelected ? svcColor : 'transparent',
-                  boxShadow: isSelected ? `0 0 0 2px ${svcColor}55, var(--shadow)` : undefined,
-                }}
-                onClick={() => !isLocked && setSelectedService(svc)}
-              >
-                {isSelected && (
-                  <svg style={{position:'absolute', top:8, right:8}} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={svcColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                    <polyline points="20 6 9 17 4 12"/>
-                  </svg>
-                )}
-                <div style={{
-                  width:28, height:28, borderRadius:8,
-                  background:`linear-gradient(155deg,${svcColor}cc,${svcColor}44)`,
-                  border:`1.5px solid ${svcColor}55`,
-                  display:'flex', alignItems:'center', justifyContent:'center',
-                  fontSize:13, boxShadow:`-2px 4px 10px rgba(0,0,0,0.4),inset 1px 1px 0 rgba(255,255,255,0.2)`
-                }}>
-                  {isLocked ? '🔒' : svc.type === 'school' ? '🎓' : '🚙'}
-                </div>
-                <div>
-                  <div style={{fontSize:10, fontWeight:800, lineHeight:1.3}}>{stripDurationSuffix(svc.name)}</div>
-                  {/* Тривалість окремим підписом — назва послуги (редагується в
-                      адмінці) не завжди містить "1 год"/"2 год", і без цього
-                      підпису дві плитки з однаковою назвою виглядають однаково. */}
-                  <div style={{fontSize:14, fontWeight:900, color:'#fff', marginTop:2}}>
-                    {svc.duration % 60 === 0
-                      ? `${svc.duration / 60} ${pluralize(svc.duration / 60, ['година', 'години', 'годин'])}`
-                      : `${svc.duration} хв`}
-                  </div>
-                  <div style={{fontSize:12, fontWeight:700, color:'var(--dim)', marginTop:1}}>
-                    {isLocked ? (svc.type === 'school' ? 'недоступно' : 'після 40 уроків') : discountPct > 0 ? `${applyDiscount(svc.price)} ₴ (−${discountPct}%)` : `${svc.price} ₴`}
-                  </div>
-                </div>
-              </div>
-            )
-          })}
-        </div>
-      )}
-
-      {/* 2. ДАТА */}
-      <div className="section-title" style={{color:'#ffffff', fontSize:13, textAlign:'center'}}>2. Дата</div>
+      {/* 1. ДАТА */}
+      <div className="section-title" style={{color:'#ffffff', fontSize:13, textAlign:'center'}}>1. Дата</div>
       <div className="cal-card" onTouchStart={handleCalTouchStart} onTouchEnd={handleCalTouchEnd}>
         <div className="cal-head">
           <button className="cal-nav-btn" onClick={prevMonth}>‹</button>
