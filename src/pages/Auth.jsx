@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { sendSmsCode, verifySmsCode, resetRecaptcha, getSmsErrorMessage, renderRecaptcha, isIOSDevice, isInAppBrowser } from '../firebase/auth'
-import { signInWithEmail, signUpWithEmail, sendPasswordReset, signInWithGoogle } from '../firebase/auth-email'
+import { signInWithEmail, signUpWithEmail, sendPasswordReset, signInWithGoogle, getGoogleRedirectResult } from '../firebase/auth-email'
 import { saveUserProfile, getUserProfile, sendWelcomeIfEnabled } from '../firebase/db'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
@@ -257,18 +257,23 @@ export default function Auth({ user, profile, onProfileSaved }) {
   }
 
   // ─── GOOGLE ──────────────────────────────────────────
+  const completeGoogleSignIn = async (u) => {
+    const existing = await getUserProfile(u.uid)
+    if (existing) {
+      if (onProfileSaved) await onProfileSaved()
+      nav('/cabinet')
+    } else {
+      setStep('survey')
+    }
+  }
+
   const handleGoogleSignIn = async () => {
     setGoogleError('')
     setGoogleLoading(true)
     try {
       const u = await signInWithGoogle()
-      const existing = await getUserProfile(u.uid)
-      if (existing) {
-        if (onProfileSaved) await onProfileSaved()
-        nav('/cabinet')
-      } else {
-        setStep('survey')
-      }
+      if (!u) return // signInWithRedirect — сторінка вже переходить на Google
+      await completeGoogleSignIn(u)
     } catch (e) {
       console.error(e)
       if (e.code === 'auth/popup-closed-by-user' || e.code === 'auth/cancelled-popup-request') return
@@ -281,6 +286,18 @@ export default function Auth({ user, profile, onProfileSaved }) {
       setGoogleLoading(false)
     }
   }
+
+  // Повернення з signInWithRedirect (мобільні браузери, де popup недоступний).
+  useEffect(() => {
+    getGoogleRedirectResult()
+      .then(u => { if (u) { setGoogleLoading(true); return completeGoogleSignIn(u) } })
+      .catch(e => {
+        console.error(e)
+        setGoogleError('Не вдалось увійти через Google. Спробуй SMS або Email')
+      })
+      .finally(() => setGoogleLoading(false))
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   const getEmailErrorMessage = (code) => {
     switch (code) {
