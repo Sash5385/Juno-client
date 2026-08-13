@@ -11,11 +11,6 @@ import './Auth.css'
 const iosDevice = isIOSDevice()
 const inAppBrowser = isInAppBrowser()
 
-const EXPERIENCES = [
-  { id: 'no_license', name: 'Не маю посвідчення, збираюсь складати іспит' },
-  { id: 'has_license', name: 'Маю посвідчення, не маю досвіду водіння' },
-]
-
 const TERMS_TEXT = `Умови відвідування уроків водіння
 
 1. Скасування та перенесення:
@@ -676,39 +671,6 @@ export default function Auth({ user, profile, onProfileSaved }) {
                   value={surveyPhone}
                   onChange={e=>setSurveyPhone(e.target.value.replace(/\D/g,'').slice(0,9))}
                 />
-              </div>
-            </div>
-          )}
-
-          <div className="field">
-            <div className="field-label">Тип навчання</div>
-            <div className="choice-grid">
-              {[
-                {id:'school', icon:'🎓', title:'Автошкола', desc:'40 годин', bg:'linear-gradient(165deg,#5b9bff,#2563eb)'},
-                {id:'private', icon:'🚗', title:'Приватний урок', desc:'Індивідуальне навчання', bg:'linear-gradient(165deg,#fb923c,#ea580c)'},
-              ].map(t=>(
-                <div key={t.id} className={`tile-pick${studentType===t.id?' selected':''}`} onClick={()=>setStudentType(t.id)}>
-                  <div className="ico" style={{background:t.bg}}>{t.icon}</div>
-                  <div className="tile-title">{t.title}</div>
-                  <div className="tile-desc">{t.desc}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-
-          {studentType === 'private' && (
-            <div className="field">
-              <div className="field-label">Досвід водіння</div>
-              <div className="select-list">
-                {EXPERIENCES.map(ex=>(
-                  <div key={ex.id} className={`select-item${experience===ex.id?' selected':''}`} onClick={()=>setExperience(ex.id)}>
-                    <div className="select-radio"/>
-                    <div className="select-info">
-                      <div className="select-title">{ex.name}</div>
-                    </div>
-                  </div>
-                ))}
               </div>
             </div>
           )}

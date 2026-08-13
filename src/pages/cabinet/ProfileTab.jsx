@@ -6,24 +6,6 @@ import { getInitials, formatPhone } from "../../utils/format";
 import { APP_VERSION } from "../../version.js";
 import "./ProfileTab.css";
 
-const EXPERIENCES = [
-  { id: "no_license", name: "Не маю посвідчення, збираюсь складати іспит" },
-  { id: "has_license", name: "Маю посвідчення, не маю досвіду водіння" },
-];
-
-const STUDENT_TYPE_LABELS = {
-  school: "Автошкола",
-  private: "Приватний урок",
-};
-
-const EXPERIENCE_LABELS = {
-  no_license: "Не маю посвідчення, збираюсь складати іспит",
-  has_license: "Маю посвідчення, не маю досвіду водіння",
-  novice: "Початківець",
-  basic: "Базовий",
-  licensed: "З правами",
-};
-
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const { theme, setTheme } = useTheme();
   const { showToast, ToastEl } = useToast();
@@ -129,16 +111,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               <span className="val">{profile.name || "—"}</span>
             </div>
             <div className="profile-row">
-              <span className="key">Тип учня</span>
-              <span className="val">{STUDENT_TYPE_LABELS[profile.studentType] || "—"}</span>
-            </div>
-            {profile.studentType === "private" && (
-              <div className="profile-row">
-                <span className="key">Досвід</span>
-                <span className="val">{EXPERIENCE_LABELS[profile.experience] || profile.experience || "—"}</span>
-              </div>
-            )}
-            <div className="profile-row">
               <span className="key">Зйомка відео/аудіо для реклами</span>
               <span className="val">{profile.filmingConsent ? "Так" : "Ні"}</span>
             </div>
@@ -152,36 +124,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
             />
-
-            <label className="edit-label">Тип учня</label>
-            <div className="edit-tiles">
-              {["school", "private"].map(t => (
-                <button
-                  key={t}
-                  className={`edit-tile${form.studentType === t ? " selected" : ""}`}
-                  onClick={() => setForm(f => ({ ...f, studentType: t }))}
-                >
-                  {STUDENT_TYPE_LABELS[t]}
-                </button>
-              ))}
-            </div>
-
-            {form.studentType === "private" && (
-              <>
-                <label className="edit-label">Досвід</label>
-                <div className="edit-list">
-                  {EXPERIENCES.map(ex => (
-                    <button
-                      key={ex.id}
-                      className={`edit-item${form.experience === ex.id ? " selected" : ""}`}
-                      onClick={() => setForm(f => ({ ...f, experience: ex.id }))}
-                    >
-                      <span className="edit-item-title">{ex.name}</span>
-                    </button>
-                  ))}
-                </div>
-              </>
-            )}
 
             <div className="edit-toggle-row">
               <span className="key">Зйомка відео/аудіо для реклами</span>

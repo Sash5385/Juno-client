@@ -31,14 +31,6 @@ export default function Landing({ user, profile }) {
             DrivePad
           </div>
           <div className="topbar-actions">
-            <a
-              href="https://zhaivoronok.com.ua"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="btn-school"
-            >
-              АВТОШКОЛА
-            </a>
             <button className="btn-login" onClick={goRegister}>
               {user ? 'Кабінет' : 'Увійти'}
             </button>
