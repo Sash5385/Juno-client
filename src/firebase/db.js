@@ -6,11 +6,25 @@ import { db } from './config'
 const IID = import.meta.env.VITE_INSTRUCTOR_ID || ''
 export const iRef = (path) => ref(db, path ? `instructors/${IID}/${path}` : `instructors/${IID}`)
 
+// ─── ACCESS CONTROL ─────────────────────────────────────
+// Заблокований адміном учень не бачить явного повідомлення про блок —
+// замість цього розклад виглядає повністю зайнятим, а приєднання до черги
+// мовчки нічого не записує. Прапорець виставляється в getUserProfile()
+// (викликається завжди тільки для поточного залогіненого користувача).
+let _blocked = false
+function maskSlotsIfBlocked(slotsObj) {
+  if (!_blocked || !slotsObj) return slotsObj
+  const out = {}
+  Object.entries(slotsObj).forEach(([k, s]) => { out[k] = { ...s, available: false } })
+  return out
+}
+
 // в”Ђв”Ђв”Ђ USERS в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 export async function getUserProfile(uid) {
   const snap = await get(iRef(`users/${uid}`))
-  if (!snap.exists()) return null
+  if (!snap.exists()) { _blocked = false; return null }
   const data = snap.val()
+  _blocked = !!data.blocked
   return { ...(data.profile || {}), isVip: data.isVip || false, discount: data.discount || 0, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 }
 }
 
@@ -29,7 +43,7 @@ export async function updateUserProfile(uid, patch) {
 export async function getSlotsForDate(date) {
   // date Сѓ С„РѕСЂРјР°С‚С– YYYY-MM-DD
   const snap = await get(iRef(`timeslots/${date}`))
-  return snap.exists() ? snap.val() : {}
+  return maskSlotsIfBlocked(snap.exists() ? snap.val() : {})
 }
 
 function classifyDay(slotsObj) {
@@ -50,7 +64,7 @@ export function subscribeMonthAvailability(year, month, callback) {
     const all = snap.val() || {}
     const result = {}
     Object.entries(all).forEach(([date, slotsObj]) => {
-      if (date.startsWith(prefix)) result[date] = classifyDay(slotsObj)
+      if (date.startsWith(prefix)) result[date] = classifyDay(maskSlotsIfBlocked(slotsObj))
     })
     callback(result)
   })
@@ -60,7 +74,7 @@ export function subscribeMonthAvailability(year, month, callback) {
 export function subscribeSlotsForDate(date, callback) {
   const r = iRef(`timeslots/${date}`)
   const handler = onValue(r, snap => {
-    callback(snap.exists() ? snap.val() : {})
+    callback(maskSlotsIfBlocked(snap.exists() ? snap.val() : {}))
   })
   return () => off(r, 'value', handler)
 }
@@ -75,6 +89,7 @@ export function subscribeMyBookings(uid, _phone, callback) {
 }
 
 export async function createBooking(uid, booking) {
+  if (_blocked) throw new Error('Не вдалося виконати запис, спробуйте пізніше')
   const r = push(iRef(`bookings/${uid}`))
   const clean = Object.fromEntries(Object.entries(booking).filter(([,v]) => v !== undefined))
   await set(r, {
@@ -147,6 +162,7 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
 
 // в”Ђв”Ђв”Ђ QUEUE (Р»РёСЃС‚ РѕС‡С–РєСѓРІР°РЅРЅСЏ) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 export async function joinQueue(uid, date, time, studentType, durationHours = 1, name = '', phone = '') {
+  if (_blocked) throw new Error('Не вдалося приєднатись до черги, спробуйте пізніше')
   const slotKey = `${date}_${time}`
   await set(iRef(`queue/${slotKey}/entries/${uid}`), {
     uid,
@@ -209,6 +225,7 @@ export function getCompletedHours(bookings) {
 // Атомарно займає початковий слот через транзакцію.
 // Повертає true якщо вдалось зайняти, false якщо слот уже зайнятий іншим.
 export async function claimSlot(date, startTime) {
+  if (_blocked) return false
   const slotId = `slot${startTime.replace(':', '')}`
   const slotRef = iRef(`timeslots/${date}/${slotId}`)
   const result = await runTransaction(slotRef, current => {
