@@ -7,6 +7,7 @@ import { auth } from './firebase/config'
 import { getUserProfile, updateUserProfile, createBooking, markSlotsUnavailable, claimSlot } from './firebase/db'
 import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
 import { useAppUpdate } from './hooks/useAppUpdate'
+import { useLicense, isLicenseBlocked } from './hooks/useLicense'
 import { useToast } from './hooks/useToast'
 import { consumeBackHandler } from './hooks/useBackButton'
 import { APP_VERSION } from './version.js'
@@ -15,8 +16,6 @@ import Auth from './pages/Auth'
 import Cabinet from './pages/Cabinet'
 import Landing from './pages/Landing'
 import PublicSchedule from './pages/PublicSchedule'
-import BookPublic from './pages/BookPublic'
-import GuestBookings from './pages/GuestBookings'
 
 export default function App() {
   const navigate = useNavigate()
@@ -24,6 +23,7 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
+  const license = useLicense()
   const pendingBookingRef = useRef(null)
   const { needRefresh, updateServiceWorker, isUpdating } = useAppUpdate()
 
@@ -139,15 +139,24 @@ export default function App() {
     )
   }
 
+  if (isLicenseBlocked(license)) {
+    return (
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'center',
+        minHeight:'100vh', background:'var(--bg)', padding:20, textAlign:'center'
+      }}>
+        <div>
+          <div style={{ fontSize:40, marginBottom:12 }}>🔒</div>
+          <p>Сервіс тимчасово недоступний.</p>
+          <p>Зверніться до інструктора.</p>
+        </div>
+      </div>
+    )
+  }
+
   return (
     <>
     <Routes>
-      {/* Публічна сторінка запису до інструктора — без авторизації */}
-      <Route path="/book/:slug" element={<BookPublic />} />
-
-      {/* Мої записи для гостей (без авторизації) */}
-      <Route path="/my/:slug" element={<GuestBookings />} />
-
       {/* Лендінг — тільки для не авторизованих */}
       <Route path="/" element={
         user && profile

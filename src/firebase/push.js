@@ -1,13 +1,28 @@
 import { getMessaging, getToken, onMessage } from 'firebase/messaging'
-import { set } from 'firebase/database'
-import { app } from './config'
-import { iRef } from './db'
+import { ref, set } from 'firebase/database'
+import { app, db } from './config'
 
 // ⚠️ ЗГЕНЕРУЙ VAPID KEY В Firebase Console:
 // Project Settings → Cloud Messaging → Web Push certificates → Generate key pair
 const VAPID_KEY = 'BFT1t7hXhEcSsHdotLlG5xoIFNrdS11vU_jsHiD1UUMsskVINBW2het8ogOKioGTPK8X_-u1ivEQM0n0Dh6Zvqk'
 
 let messaging = null
+
+// Стабільний id цього браузера/пристрою — щоб токени з різних пристроїв
+// (ПК і телефон одного учня) не перезаписували один одного в БД.
+function getDeviceId() {
+  const KEY = 'id4_device_id'
+  try {
+    let id = localStorage.getItem(KEY)
+    if (!id) {
+      id = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10)
+      localStorage.setItem(KEY, id)
+    }
+    return id
+  } catch {
+    return 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10)
+  }
+}
 
 export async function getFirebaseSwReg() {
   if (!('serviceWorker' in navigator)) return undefined
@@ -41,7 +56,9 @@ export async function requestNotificationPermission(uid) {
     const swReg = await getFirebaseSwReg()
     const token = await getToken(msg, { vapidKey: VAPID_KEY, ...(swReg ? { serviceWorkerRegistration: swReg } : {}) })
     if (token && uid) {
-      await set(iRef(`users/${uid}/fcmTokens/web/token`), token)
+      const deviceId = getDeviceId()
+      await set(ref(db, `users/${uid}/fcmTokens/${deviceId}`), token)
+      await set(ref(db, `studentTokens/${uid}/${deviceId}`), token)
     }
     return token
   } catch (e) {

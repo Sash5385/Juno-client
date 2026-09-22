@@ -3,8 +3,7 @@
 } from 'firebase/database'
 import { db } from './config'
 
-const IID = import.meta.env.VITE_INSTRUCTOR_ID || ''
-export const iRef = (path) => ref(db, path ? `instructors/${IID}/${path}` : `instructors/${IID}`)
+export const iRef = (path) => ref(db, path || '/')
 
 // ─── ACCESS CONTROL ─────────────────────────────────────
 // Заблокований адміном учень не бачить явного повідомлення про блок —
