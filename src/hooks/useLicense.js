@@ -1,14 +1,15 @@
 import { useState, useEffect } from "react";
-import { ref, onValue } from "firebase/database";
-import { db } from "../firebase/config";
+import { onValue } from "firebase/database";
+import { iRef } from "../firebase/db";
 
 // undefined = ще завантажується, null = вузла license нема в базі (доступ
 // дозволено як і раніше — фіча вимкнена, поки для інстансу не заведено ліцензію)
-export function useLicense() {
+export function useLicense(iid) {
   const [license, setLicense] = useState(undefined);
   useEffect(() => {
-    return onValue(ref(db, "license"), snap => setLicense(snap.val()), () => setLicense(null));
-  }, []);
+    if (!iid) { setLicense(undefined); return; }
+    return onValue(iRef("license"), snap => setLicense(snap.val()), () => setLicense(null));
+  }, [iid]);
   return license;
 }
 

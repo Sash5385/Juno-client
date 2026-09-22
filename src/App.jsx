@@ -1,10 +1,13 @@
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom'
+import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
 import { useEffect, useState, useRef } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { auth } from './firebase/config'
-import { getUserProfile, updateUserProfile, createBooking, markSlotsUnavailable, claimSlot } from './firebase/db'
+import {
+  getUserProfile, updateUserProfile, createBooking, markSlotsUnavailable, claimSlot,
+  setCurrentTenant, loadStoredTenant, resolveSlug,
+} from './firebase/db'
 import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
 import { useAppUpdate } from './hooks/useAppUpdate'
 import { useLicense, isLicenseBlocked } from './hooks/useLicense'
@@ -19,15 +22,45 @@ import PublicSchedule from './pages/PublicSchedule'
 
 export default function App() {
   const navigate = useNavigate()
+  const location = useLocation()
   const { showToast, ToastEl } = useToast()
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-  const license = useLicense()
+  // undefined = ще визначаємо, null = посилання-інструктора нема, string = iid
+  const [tenantIid, setTenantIid] = useState(undefined)
+  const license = useLicense(tenantIid)
   const pendingBookingRef = useRef(null)
   const { needRefresh, updateServiceWorker, isUpdating } = useAppUpdate()
 
+  // Визначаємо, до якого інструктора підключений цей студент — застосунок
+  // мультитенантний, спільний для студентів РІЗНИХ інструкторів. Джерело:
+  // посилання-запрошення /i/{slug} (одноразово прив'язує пристрій до
+  // інструктора) або збережений з попереднього візиту iid.
   useEffect(() => {
+    const m = location.pathname.match(/^\/i\/([^/]+)/)
+    if (m) {
+      const slug = decodeURIComponent(m[1])
+      resolveSlug(slug).then(iid => {
+        if (iid) {
+          setCurrentTenant(iid, slug)
+          setTenantIid(iid)
+        } else {
+          setTenantIid(null)
+        }
+        const rest = location.pathname.slice(m[0].length) || '/'
+        navigate(rest + location.search, { replace: true })
+      }).catch(() => setTenantIid(null))
+      return
+    }
+    const stored = loadStoredTenant()
+    setTenantIid(stored ? stored.iid : null)
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (tenantIid === undefined) return // ще визначаємо інструктора
+    if (!tenantIid) { setLoading(false); return } // посилання-інструктора нема
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u)
       if (u) {
@@ -47,7 +80,7 @@ export default function App() {
       setLoading(false)
     })
     return unsub
-  }, [])
+  }, [tenantIid])
 
   useEffect(() => {
     if (!user) return
@@ -135,6 +168,21 @@ export default function App() {
         minHeight:'100vh', background:'var(--bg)'
       }}>
         <div className="spinner" />
+      </div>
+    )
+  }
+
+  if (!tenantIid) {
+    return (
+      <div style={{
+        display:'flex', alignItems:'center', justifyContent:'center',
+        minHeight:'100vh', background:'var(--bg)', padding:20, textAlign:'center'
+      }}>
+        <div>
+          <div style={{ fontSize:40, marginBottom:12 }}>🔗</div>
+          <p>Це посилання недійсне або застаріле.</p>
+          <p>Зверніться до вашого інструктора за коректним посиланням для запису.</p>
+        </div>
       </div>
     )
   }

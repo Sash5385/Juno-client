@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { updateUserProfile, getAdminSettings } from "../../firebase/db";
+import { updateUserProfile, getAdminSettings, getCurrentSlug } from "../../firebase/db";
 import { useTheme } from "../../hooks/useTheme";
 import { useToast } from "../../hooks/useToast";
 import { getInitials, formatPhone } from "../../utils/format";
@@ -190,7 +190,8 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         <div style={{display:"flex",gap:8,marginBottom:8}}>
           <button
             onClick={() => {
-              const link = `https://drivepad.pro/?ref=${user.uid}`;
+              const slug = getCurrentSlug();
+              const link = slug ? `https://drivepad.pro/i/${slug}/?ref=${user.uid}` : `https://drivepad.pro/?ref=${user.uid}`;
               navigator.clipboard.writeText(link)
                 .then(() => showToast("Посилання скопійовано!"))
                 .catch(() => showToast("Скопіюйте: " + link));
@@ -203,7 +204,8 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           {typeof navigator !== 'undefined' && navigator.share && (
             <button
               onClick={() => {
-                const link = `https://drivepad.pro/?ref=${user.uid}`;
+                const slug = getCurrentSlug();
+                const link = slug ? `https://drivepad.pro/i/${slug}/?ref=${user.uid}` : `https://drivepad.pro/?ref=${user.uid}`;
                 navigator.share({ title: 'DrivePad', text: 'Запишись на уроки водіння!', url: link }).catch(() => {});
               }}
               className="edit-save"

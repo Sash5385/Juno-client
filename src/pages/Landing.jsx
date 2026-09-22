@@ -11,10 +11,14 @@ export default function Landing({ user, profile }) {
   const nav = useNavigate()
   const [termsOpen, setTermsOpen] = useState(false)
 
-  const [instructorPhone, setInstructorPhone] = useState('+380989225442')
+  const [instructorProfile, setInstructorProfile] = useState(null)
   useEffect(() => {
-    getAdminSettings().then(s => { if (s.profile?.phone) setInstructorPhone(s.profile.phone) }).catch(() => {})
+    getAdminSettings().then(s => { if (s.profile) setInstructorProfile(s.profile) }).catch(() => {})
   }, [])
+  const instructorName = instructorProfile?.name || 'Інструктор'
+  const instructorPhone = instructorProfile?.phone || ''
+  const instructorAddress = instructorProfile?.address || ''
+  const instructorExperience = instructorProfile?.experience || 0
   const iPhoneDigits = instructorPhone.replace(/\D/g, '')
 
   const goAuth = () => nav(user && profile ? '/cabinet' : '/schedule')
@@ -46,16 +50,14 @@ export default function Landing({ user, profile }) {
           <p>Онлайн-запис на уроки водіння в Києві.<br/>Автошкола та приватні уроки.</p>
           <button className="hero-cta" onClick={goAuth}>📅 Записатись на урок</button>
 
-          <div className="hero-stats">
-            <div className="stat-card">
-              <div className="stat-num">20+</div>
-              <div className="stat-lbl">років досвіду</div>
+          {instructorExperience > 0 && (
+            <div className="hero-stats">
+              <div className="stat-card">
+                <div className="stat-num">{instructorExperience}+</div>
+                <div className="stat-lbl">років досвіду</div>
+              </div>
             </div>
-            <div className="stat-card">
-              <div className="stat-num">2000+</div>
-              <div className="stat-lbl">учнів</div>
-            </div>
-          </div>
+          )}
         </section>
 
         {/* SERVICES */}
@@ -192,26 +194,27 @@ export default function Landing({ user, profile }) {
         {/* INSTRUCTOR */}
         <section className="lsection">
           <div className="lsection-title">Інструктор</div>
-          <h2>Олександр</h2>
+          <h2>{instructorName}</h2>
           <div className="instructor-card">
-            <img src="/instructor.png" className="instructor-avatar" alt="Олександр" />
+            <div className="instructor-avatar" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,background:'var(--accent-bg, #eee)'}}>🧑‍🏫</div>
             <div className="instructor-info">
-              <div className="instructor-name">Олександр</div>
+              <div className="instructor-name">{instructorName}</div>
               <div className="instructor-role">Інструктор з водіння</div>
               <div className="instructor-meta">
-                <span>📍 Київ, Верховинна 44</span>
-                <span>🚗 Стаж 20+ років</span>
-                <span>✅ Сертифікований</span>
+                {instructorAddress && <span>📍 {instructorAddress}</span>}
+                {instructorExperience > 0 && <span>🚗 Стаж {instructorExperience}+ років</span>}
               </div>
             </div>
           </div>
         </section>
 
         {/* CONTACTS */}
+        {(instructorPhone || instructorAddress) && (
         <section className="lsection">
           <div className="lsection-title">Контакти</div>
           <h2>Звʼязатись зі мною</h2>
           <div className="contacts">
+            {instructorPhone && (
             <div className="contact-icon-row">
               <a href={`tel:${instructorPhone}`} className="contact-icon-btn contact-icon-btn--call" aria-label="Зателефонувати">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.24 1.01l-2.21 2.21z"/></svg>
@@ -226,24 +229,29 @@ export default function Landing({ user, profile }) {
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.28-.14-1.64-.81-1.9-.9-.25-.1-.44-.14-.62.14-.18.28-.72.9-.88 1.09-.16.19-.32.21-.6.07-.28-.14-1.18-.44-2.25-1.39-.83-.74-1.39-1.66-1.56-1.94-.16-.28-.02-.43.12-.57.13-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.62-1.5-.85-2.05-.22-.54-.45-.47-.62-.47-.16 0-.35-.02-.53-.02s-.48.07-.73.34c-.25.28-.96.94-.96 2.3 0 1.35.98 2.66 1.12 2.84.14.18 1.93 2.94 4.67 4.13.65.28 1.16.45 1.56.57.65.21 1.25.18 1.72.11.52-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.19-.53-.33z"/><path d="M12.04 2C6.48 2 2 6.48 2 12.04c0 1.85.5 3.58 1.37 5.06L2 22l5.08-1.33A10.02 10.02 0 0012.04 22C17.6 22 22 17.52 22 12.04 22 6.48 17.6 2 12.04 2zm0 18.16c-1.7 0-3.28-.46-4.64-1.26l-.33-.2-3.42.9.91-3.34-.22-.34a8.15 8.15 0 01-1.28-4.38c0-4.5 3.66-8.16 8.16-8.16 4.5 0 8.16 3.66 8.16 8.16 0 4.5-3.66 8.16-8.16 8.16z"/></svg>
               </a>
             </div>
-            <a href="https://www.google.com/maps/dir/?api=1&destination=Верховинна+44,+Київ" target="_blank" rel="noreferrer" className="contact-row">
+            )}
+            {instructorAddress && (
+            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(instructorAddress)}`} target="_blank" rel="noreferrer" className="contact-row">
               <div className="contact-ico loc">📍</div>
               <div style={{flex:1}}>
                 <div className="contact-label">Адреса</div>
-                <div className="contact-val">Київ, вул. Верховинна, 44</div>
+                <div className="contact-val">{instructorAddress}</div>
               </div>
             </a>
+            )}
           </div>
         </section>
+        )}
 
         {/* MAP */}
+        {instructorAddress && (
         <section className="lsection">
           <div className="lsection-title">Як доїхати</div>
           <h2>Місце зустрічі</h2>
           <div className="map-card">
             <iframe
               className="map-iframe"
-              src="https://www.google.com/maps?q=Верховинна+44,+Київ&output=embed"
+              src={`https://www.google.com/maps?q=${encodeURIComponent(instructorAddress)}&output=embed`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="Карта"
@@ -252,12 +260,13 @@ export default function Landing({ user, profile }) {
               <div className="map-pin">📍</div>
               <div>
                 <div className="contact-label">Адреса</div>
-                <div className="contact-val">Верховинна, 44</div>
+                <div className="contact-val">{instructorAddress}</div>
               </div>
-              <a href="https://www.google.com/maps/dir/?api=1&destination=Верховинна+44,+Київ" target="_blank" rel="noreferrer" className="map-route-btn">Маршрут</a>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(instructorAddress)}`} target="_blank" rel="noreferrer" className="map-route-btn">Маршрут</a>
             </div>
           </div>
         </section>
+        )}
 
         {/* TERMS */}
         <section className="lsection">

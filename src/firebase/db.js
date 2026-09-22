@@ -3,7 +3,45 @@
 } from 'firebase/database'
 import { db } from './config'
 
-export const iRef = (path) => ref(db, path || '/')
+// ─── МУЛЬТИТЕНАНТНІСТЬ ──────────────────────────────────────────────
+// Один застосунок обслуговує студентів БАГАТЬОХ інструкторів — кожен
+// інструктор це instructors/{iid} в базі (iid = його Firebase Auth uid).
+// Поточний iid визначається один раз при заході (посилання /i/{slug} або
+// збережений з попереднього візиту) і зберігається тут на весь сеанс.
+const IID_KEY = 'dp_tenant_iid'
+const SLUG_KEY = 'dp_tenant_slug'
+let _iid = null
+let _slug = null
+
+export function setCurrentTenant(iid, slug) {
+  _iid = iid || null
+  _slug = slug || null
+  try {
+    if (_iid) localStorage.setItem(IID_KEY, _iid); else localStorage.removeItem(IID_KEY)
+    if (_slug) localStorage.setItem(SLUG_KEY, _slug); else localStorage.removeItem(SLUG_KEY)
+  } catch {}
+}
+
+export function loadStoredTenant() {
+  try {
+    const iid = localStorage.getItem(IID_KEY)
+    const slug = localStorage.getItem(SLUG_KEY)
+    if (iid) { _iid = iid; _slug = slug || null; return { iid, slug } }
+  } catch {}
+  return null
+}
+
+export function getCurrentIid() { return _iid }
+export function getCurrentSlug() { return _slug }
+
+// Резолвить посилання-запрошення інструктора (/i/{slug}) в його iid.
+// Читання публічне (slugs/.read: true в database.rules.json) — не потребує авторизації.
+export async function resolveSlug(slug) {
+  const snap = await get(ref(db, `slugs/${slug}`))
+  return snap.exists() ? snap.val()?.iid || null : null
+}
+
+export const iRef = (path) => ref(db, _iid ? `instructors/${_iid}${path ? '/' + path : ''}` : '/__no_tenant__')
 
 // ─── ACCESS CONTROL ─────────────────────────────────────
 // Заблокований адміном учень не бачить явного повідомлення про блок —
