@@ -25,7 +25,7 @@ messaging.onBackgroundMessage(async (payload) => {
   if (clientList.some(c => c.visibilityState === 'visible')) return
 
   const title = payload.notification?.title || 'DrivePad'
-  const url = payload.data?.url || 'https://drivepad.pro/cabinet'
+  const url = payload.data?.url || 'https://drivepad-client.web.app/cabinet'
   const options = {
     body: payload.notification?.body || '',
     icon: '/icon-192.png',
@@ -41,12 +41,12 @@ messaging.onBackgroundMessage(async (payload) => {
 self.addEventListener('notificationclick', (e) => {
   e.notification.close()
   const data = e.notification.data || {}
-  const target = data.url || 'https://drivepad.pro/cabinet'
-  const fullUrl = target.startsWith('http') ? target : ('https://drivepad.pro' + target)
+  const target = data.url || 'https://drivepad-client.web.app/cabinet'
+  const fullUrl = target.startsWith('http') ? target : ('https://drivepad-client.web.app' + target)
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
       for (const c of list) {
-        if (c.url.startsWith('https://drivepad.pro') && 'focus' in c) {
+        if (c.url.startsWith('https://drivepad-client.web.app') && 'focus' in c) {
           c.focus()
           return c.navigate(fullUrl)
         }

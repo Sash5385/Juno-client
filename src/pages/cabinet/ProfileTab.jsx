@@ -191,7 +191,8 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           <button
             onClick={() => {
               const slug = getCurrentSlug();
-              const link = slug ? `https://drivepad.pro/i/${slug}/?ref=${user.uid}` : `https://drivepad.pro/?ref=${user.uid}`;
+              const origin = window.location.origin;
+              const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
               navigator.clipboard.writeText(link)
                 .then(() => showToast("Посилання скопійовано!"))
                 .catch(() => showToast("Скопіюйте: " + link));
@@ -205,7 +206,8 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
             <button
               onClick={() => {
                 const slug = getCurrentSlug();
-                const link = slug ? `https://drivepad.pro/i/${slug}/?ref=${user.uid}` : `https://drivepad.pro/?ref=${user.uid}`;
+                const origin = window.location.origin;
+                const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
                 navigator.share({ title: 'DrivePad', text: 'Запишись на уроки водіння!', url: link }).catch(() => {});
               }}
               className="edit-save"
