@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
-import { getAdminSettings } from '../firebase/db'
+import { getAdminSettings, getApprovedReviews } from '../firebase/db'
 import './Landing.css'
 
 
@@ -13,6 +13,11 @@ export default function Landing({ user, profile }) {
   const [instructorProfile, setInstructorProfile] = useState(null)
   useEffect(() => {
     getAdminSettings().then(s => { if (s.profile) setInstructorProfile(s.profile) }).catch(() => {})
+  }, [])
+
+  const [reviews, setReviews] = useState([])
+  useEffect(() => {
+    getApprovedReviews().then(setReviews).catch(() => {})
   }, [])
   const instructorName = instructorProfile?.name || 'Інструктор'
   const instructorPhone = instructorProfile?.phone || ''
@@ -75,6 +80,29 @@ export default function Landing({ user, profile }) {
             </div>
           </div>
         </section>
+
+        {/* REVIEWS */}
+        {reviews.length > 0 && (
+        <section className="lsection">
+          <div className="lsection-title">Відгуки</div>
+          <h2>Що кажуть учні</h2>
+          <div className="reviews-scroll">
+            {reviews.map(rv => (
+              <div className="review-card" key={`${rv.uid}_${rv.id}`}>
+                <div className="review-stars">{'★'.repeat(rv.rating || 0)}{'☆'.repeat(5 - (rv.rating || 0))}</div>
+                {rv.text && <div className="review-text">{rv.text}</div>}
+                <div className="review-author">
+                  <div className="review-avatar">{(rv.studentName || 'У').trim()[0].toUpperCase()}</div>
+                  <div>
+                    <div className="review-name">{rv.studentName || 'Учень'}</div>
+                    {rv.createdAt && <div className="review-date">{new Date(rv.createdAt).toLocaleDateString('uk-UA')}</div>}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+        )}
 
         {/* CONTACTS */}
         {(instructorPhone || instructorAddress) && (

@@ -376,6 +376,23 @@ export async function getAdminServices() {
   return arr.filter(s => s && s.active && !s.archived)
 }
 
+// ─── REVIEWS (публічні, для лендингу) ──────────────────────────────
+// Те саме дерево reviews/{uid}/{id}, що читає адмінка (id4drive-settings.jsx
+// toggleReviewHidden) — сюди ж вона пише status:"hidden" для схованих.
+export async function getApprovedReviews(max = 12) {
+  const snap = await get(iRef('reviews'))
+  if (!snap.exists()) return []
+  const data = snap.val()
+  const list = []
+  Object.entries(data).forEach(([uid, userReviews]) => {
+    Object.entries(userReviews || {}).forEach(([id, v]) => {
+      if (v && v.status !== 'hidden') list.push({ id, uid, ...v })
+    })
+  })
+  list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
+  return list.slice(0, max)
+}
+
 // ─── CHAT ────────────────────────────────────────────────────────
 export function subscribeStudentChat(uid, callback) {
   const r = iRef(`chats/${uid}`)
