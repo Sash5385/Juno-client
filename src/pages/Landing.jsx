@@ -23,7 +23,15 @@ export default function Landing({ user, profile }) {
   const instructorPhone = instructorProfile?.phone || ''
   const instructorAddress = instructorProfile?.address || ''
   const instructorExperience = instructorProfile?.experience || 0
+  const instructorPhoto = instructorProfile?.photoUrl || ''
+  const instructorTerms = instructorProfile?.terms || ''
+  const telegramUsername = instructorProfile?.telegramUsername || ''
+  const meetLat = instructorProfile?.meetLat
+  const meetLng = instructorProfile?.meetLng
+  const hasMeetPin = meetLat != null && meetLng != null
+  const mapQuery = hasMeetPin ? `${meetLat},${meetLng}` : instructorAddress
   const iPhoneDigits = instructorPhone.replace(/\D/g, '')
+  const telegramHref = telegramUsername ? `https://t.me/${telegramUsername}` : `https://t.me/+${iPhoneDigits}`
 
   const goAuth = () => nav(user && profile ? '/cabinet' : '/schedule')
   const goRegister = () => nav(user && profile ? '/cabinet' : '/auth')
@@ -69,7 +77,11 @@ export default function Landing({ user, profile }) {
           <div className="lsection-title">Інструктор</div>
           <h2>{instructorName}</h2>
           <div className="instructor-card">
-            <div className="instructor-avatar" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,background:'var(--accent-bg, #eee)'}}>🧑‍🏫</div>
+            <div className="instructor-avatar" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,background:'var(--accent-bg, #eee)',overflow:'hidden'}}>
+              {instructorPhoto
+                ? <img src={instructorPhoto} alt={instructorName} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
+                : '🧑‍🏫'}
+            </div>
             <div className="instructor-info">
               <div className="instructor-name">{instructorName}</div>
               <div className="instructor-role">Інструктор з водіння</div>
@@ -115,7 +127,7 @@ export default function Landing({ user, profile }) {
               <a href={`tel:${instructorPhone}`} className="contact-icon-btn contact-icon-btn--call" aria-label="Зателефонувати">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.24 1.01l-2.21 2.21z"/></svg>
               </a>
-              <a href={`https://t.me/+${iPhoneDigits}`} target="_blank" rel="noreferrer" className="contact-icon-btn contact-icon-btn--tg" aria-label="Telegram">
+              <a href={telegramHref} target="_blank" rel="noreferrer" className="contact-icon-btn contact-icon-btn--tg" aria-label="Telegram">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8l-1.7 8c-.12.57-.46.71-.93.44l-2.58-1.9-1.24 1.19c-.14.14-.25.25-.51.25l.18-2.62 4.72-4.26c.2-.18-.05-.28-.32-.1L7.6 14.47l-2.54-.79c-.55-.17-.56-.55.12-.82l9.93-3.83c.46-.17.86.11.53.77z"/></svg>
               </a>
               <a href={`viber://chat?number=%2B${iPhoneDigits}`} className="contact-icon-btn contact-icon-btn--viber" aria-label="Viber">
@@ -140,14 +152,14 @@ export default function Landing({ user, profile }) {
         )}
 
         {/* MAP */}
-        {instructorAddress && (
+        {(hasMeetPin || instructorAddress) && (
         <section className="lsection">
           <div className="lsection-title">Як доїхати</div>
           <h2>Місце зустрічі</h2>
           <div className="map-card">
             <iframe
               className="map-iframe"
-              src={`https://www.google.com/maps?q=${encodeURIComponent(instructorAddress)}&output=embed`}
+              src={`https://www.google.com/maps?q=${encodeURIComponent(mapQuery)}&output=embed`}
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
               title="Карта"
@@ -156,15 +168,16 @@ export default function Landing({ user, profile }) {
               <div className="map-pin">📍</div>
               <div>
                 <div className="contact-label">Адреса</div>
-                <div className="contact-val">{instructorAddress}</div>
+                <div className="contact-val">{instructorAddress || 'Точка зустрічі на карті'}</div>
               </div>
-              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(instructorAddress)}`} target="_blank" rel="noreferrer" className="map-route-btn">Маршрут</a>
+              <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(mapQuery)}`} target="_blank" rel="noreferrer" className="map-route-btn">Маршрут</a>
             </div>
           </div>
         </section>
         )}
 
         {/* TERMS */}
+        {instructorTerms && (
         <section className="lsection">
           <button className="terms-btn" onClick={() => setTermsOpen(o => !o)}>
             <div className="terms-ico">📄</div>
@@ -173,58 +186,11 @@ export default function Landing({ user, profile }) {
           </button>
           {termsOpen && (
             <div className="terms-content">
-              <div className="terms-item">
-                <div className="terms-num">1</div>
-                <div>
-                  <div className="terms-heading">Скасування та перенесення</div>
-                  <div className="terms-text">Скасування або перенесення заняття можливі не пізніше ніж за 24 години до початку. У разі неявки учня без попередження — заняття підлягає компенсації в повному обсязі. Оплата здійснюється по завершенню заняття готівкою або переказом на картку.</div>
-                </div>
-              </div>
-              <div className="terms-item">
-                <div className="terms-num">2</div>
-                <div>
-                  <div className="terms-heading">Запізнення</div>
-                  <div className="terms-text">У разі запізнення учня час заняття не продовжується.</div>
-                </div>
-              </div>
-              <div className="terms-item">
-                <div className="terms-num">3</div>
-                <div>
-                  <div className="terms-heading">Стан учня</div>
-                  <div className="terms-text">До заняття не допускаються учні в стані алкогольного або наркотичного сп'яніння.</div>
-                </div>
-              </div>
-              <div className="terms-item">
-                <div className="terms-num">4</div>
-                <div>
-                  <div className="terms-heading">Документи</div>
-                  <div className="terms-text">Учень зобов'язаний мати при собі документ, що посвідчує особу, а також водійське посвідчення (за наявності).</div>
-                </div>
-              </div>
-              <div className="terms-item">
-                <div className="terms-num">5</div>
-                <div>
-                  <div className="terms-heading">Відповідальність та безпека</div>
-                  <div className="terms-text">Учень зобов'язаний дотримуватися вказівок інструктора, не перевищувати дозволену швидкість та правила дорожнього руху. Інструктор має право припинити заняття у разі створення загрози безпеці.</div>
-                </div>
-              </div>
-              <div className="terms-item">
-                <div className="terms-num">6</div>
-                <div>
-                  <div className="terms-heading">Погодні та дорожні умови</div>
-                  <div className="terms-text">У разі несприятливих погодних умов або форс-мажорних обставин заняття може бути перенесене за домовленістю сторін.</div>
-                </div>
-              </div>
-              <div className="terms-item">
-                <div className="terms-num">7</div>
-                <div>
-                  <div className="terms-heading">Згода з умовами</div>
-                  <div className="terms-text">Запис на заняття означає повну згоду з даними умовами.</div>
-                </div>
-              </div>
+              <div className="terms-text" style={{whiteSpace:'pre-line',padding:'12px 16px'}}>{instructorTerms}</div>
             </div>
           )}
         </section>
+        )}
 
         {/* FOOTER */}
         <div className="footer">
