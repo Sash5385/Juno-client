@@ -16,46 +16,13 @@ html, body {
 
 #root {
   height: 100dvh;
-  background: transparent;
+  background: var(--bg-deep);
   color: var(--text);
   isolation: isolate;
   display: flex;
   flex-direction: column;
   position: relative;
   overflow: hidden;
-}
-
-#root::before {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background-image: url('/id4-hero.jpg');
-  background-size: cover;
-  background-position: calc(50% - 173px) top;
-  background-repeat: no-repeat;
-}
-
-#root::after {
-  content: '';
-  position: fixed;
-  inset: 0;
-  z-index: -1;
-  pointer-events: none;
-  background: linear-gradient(to bottom,
-    rgba(7,7,8,0.62) 0%,
-    rgba(7,7,8,0.84) 55%,
-    rgba(7,7,8,0.95) 100%
-  );
-}
-
-[data-theme="light"] #root::before {
-  opacity: 0;
-}
-
-[data-theme="light"] #root::after {
-  background: var(--bg);
 }
 
 @media (min-width: 600px) {
