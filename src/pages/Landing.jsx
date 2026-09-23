@@ -22,7 +22,6 @@ export default function Landing({ user, profile }) {
   const instructorName = instructorProfile?.name || 'Інструктор'
   const instructorPhone = instructorProfile?.phone || ''
   const instructorAddress = instructorProfile?.address || ''
-  const instructorExperience = instructorProfile?.experience || 0
   const instructorPhoto = instructorProfile?.photoUrl || ''
   const instructorTerms = instructorProfile?.terms || ''
   const telegramUsername = instructorProfile?.telegramUsername || ''
@@ -70,17 +69,7 @@ export default function Landing({ user, profile }) {
         {/* HERO */}
         <section className="hero">
           <h1>Уроки водіння</h1>
-          <p>Онлайн-запис на уроки водіння в Києві.<br/>Автошкола та приватні уроки.</p>
           <button className="hero-cta" onClick={goAuth}>📅 Записатись на урок</button>
-
-          {instructorExperience > 0 && (
-            <div className="hero-stats">
-              <div className="stat-card">
-                <div className="stat-num">{instructorExperience}+</div>
-                <div className="stat-lbl">років досвіду</div>
-              </div>
-            </div>
-          )}
         </section>
 
         {/* INSTRUCTOR */}
@@ -96,10 +85,6 @@ export default function Landing({ user, profile }) {
             <div className="instructor-info">
               <div className="instructor-name">{instructorName}</div>
               <div className="instructor-role">Інструктор з водіння</div>
-              <div className="instructor-meta">
-                {instructorAddress && <span>📍 {instructorAddress}</span>}
-                {instructorExperience > 0 && <span>🚗 Стаж {instructorExperience}+ років</span>}
-              </div>
             </div>
           </div>
         </section>
