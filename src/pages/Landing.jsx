@@ -1,8 +1,26 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import { getAdminSettings, getApprovedReviews } from '../firebase/db'
 import './Landing.css'
+
+// Блоки лендингу з'являються знизу вгору по мірі прокрутки (замість того,
+// щоб бути одразу видимими) — IntersectionObserver ставить клас один раз,
+// коли блок вперше заходить у видиму область, і більше не знімає його.
+function Reveal({ children }) {
+  const ref = useRef(null)
+  const [inView, setInView] = useState(false)
+  useEffect(() => {
+    const el = ref.current
+    if (!el) return
+    const io = new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) { setInView(true); io.disconnect() }
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+  return <div ref={ref} className={`reveal${inView ? ' reveal-in' : ''}`}>{children}</div>
+}
 
 const HERO_PHOTO_SECONDS = 3.4 // тривалість показу одного фото в слоті
 
@@ -116,6 +134,7 @@ export default function Landing({ user, profile }) {
         </section>
 
         {/* INSTRUCTOR */}
+        <Reveal>
         <section className="lsection">
           <div className="lsection-title">Інструктор</div>
           <h2>{instructorName}</h2>
@@ -131,9 +150,11 @@ export default function Landing({ user, profile }) {
             </div>
           </div>
         </section>
+        </Reveal>
 
         {/* REVIEWS */}
         {reviews.length > 0 && (
+        <Reveal>
         <section className="lsection">
           <div className="lsection-title">Відгуки</div>
           <h2>Що кажуть учні</h2>
@@ -153,10 +174,12 @@ export default function Landing({ user, profile }) {
             ))}
           </div>
         </section>
+        </Reveal>
         )}
 
         {/* CONTACTS */}
         {instructorPhone && (
+        <Reveal>
         <section className="lsection">
           <div className="lsection-title">Контакти</div>
           <h2>Звʼязатись зі мною</h2>
@@ -177,10 +200,12 @@ export default function Landing({ user, profile }) {
             </div>
           </div>
         </section>
+        </Reveal>
         )}
 
         {/* MAP */}
         {(hasMeetPin || instructorAddress) && (
+        <Reveal>
         <section className="lsection">
           <div className="lsection-title">Як доїхати</div>
           <h2>Місце зустрічі</h2>
@@ -202,10 +227,12 @@ export default function Landing({ user, profile }) {
             </div>
           </div>
         </section>
+        </Reveal>
         )}
 
         {/* TERMS */}
         {instructorTerms && (
+        <Reveal>
         <section className="lsection">
           <button className="terms-btn" onClick={() => setTermsOpen(o => !o)}>
             <div className="terms-ico">📄</div>
@@ -218,6 +245,7 @@ export default function Landing({ user, profile }) {
             </div>
           )}
         </section>
+        </Reveal>
         )}
 
         {/* FOOTER */}
