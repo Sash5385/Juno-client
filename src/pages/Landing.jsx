@@ -4,6 +4,38 @@ import { useTheme } from '../hooks/useTheme'
 import { getAdminSettings, getApprovedReviews } from '../firebase/db'
 import './Landing.css'
 
+const HERO_PHOTO_SECONDS = 3.4 // тривалість показу одного фото в слоті
+
+// Три "слоти" колажу, кожен циклічно перебирає СВОЮ підмножину фото
+// (round-robin по індексу, щоб фото рівномірно розійшлись по трьох картках).
+function PhotoCollageSlot({ photos, phase, className }) {
+  if (!photos.length) return null
+  if (photos.length === 1) {
+    return (
+      <div className={`hp-slot ${className}`}>
+        <div className="hp-layer" style={{ backgroundImage: `url(${photos[0]})`, opacity: 1, filter: 'none' }} />
+      </div>
+    )
+  }
+  const duration = photos.length * HERO_PHOTO_SECONDS
+  const animName = `hp-blur-dissolve-${photos.length}`
+  return (
+    <div className={`hp-slot ${className}`}>
+      {photos.map((url, i) => (
+        <div
+          key={url + i}
+          className="hp-layer"
+          style={{
+            backgroundImage: `url(${url})`,
+            animationName: animName,
+            animationDuration: `${duration}s`,
+            animationDelay: `${-(i * HERO_PHOTO_SECONDS) + phase}s`,
+          }}
+        />
+      ))}
+    </div>
+  )
+}
 
 export default function Landing({ user, profile }) {
   const { theme, toggle } = useTheme()
@@ -31,6 +63,10 @@ export default function Landing({ user, profile }) {
   const mapQuery = hasMeetPin ? `${meetLat},${meetLng}` : instructorAddress
   const iPhoneDigits = instructorPhone.replace(/\D/g, '')
   const telegramHref = telegramUsername ? `https://t.me/${telegramUsername}` : `https://t.me/+${iPhoneDigits}`
+
+  const galleryPhotos = instructorProfile?.galleryPhotos || []
+  const collageSlots = [[], [], []]
+  galleryPhotos.forEach((p, i) => collageSlots[i % 3].push(p.url))
 
   const goAuth = () => nav(user && profile ? '/cabinet' : '/schedule')
   const goRegister = () => nav(user && profile ? '/cabinet' : '/auth')
@@ -68,6 +104,13 @@ export default function Landing({ user, profile }) {
 
         {/* HERO */}
         <section className="hero">
+          {galleryPhotos.length > 0 && (
+            <div className="photo-collage">
+              <PhotoCollageSlot photos={collageSlots[0]} phase={0}  className="hp-slot-a" />
+              <PhotoCollageSlot photos={collageSlots[1]} phase={-4} className="hp-slot-b" />
+              <PhotoCollageSlot photos={collageSlots[2]} phase={-8} className="hp-slot-c" />
+            </div>
+          )}
           <h1>Уроки водіння</h1>
           <button className="hero-cta" onClick={goAuth}>📅 Записатись на урок</button>
         </section>
