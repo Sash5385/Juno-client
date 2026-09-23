@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo, useRef } from 'react'
-import { Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
 import { useBookings } from '../hooks/useBookings'
@@ -17,7 +17,10 @@ import QueueTab from './cabinet/QueueTab'
 import TestTab from './cabinet/TestTab'
 
 import { formatDateLabel } from '../utils/date'
+import { useMosaicSwitch, MosaicOverlay } from '../mosaic'
 import './Cabinet.css'
+
+const TAB_COMPONENT_KEYS = ['book', 'bookings', 'progress', 'queue', 'chat', 'notifications', 'profile', 'test']
 
 const TITLES = {
   book: 'Записатись',
@@ -40,6 +43,12 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
   // Визначаємо активну вкладку з URL
   const path = loc.pathname.replace('/cabinet', '').replace('/', '')
   const activeTab = path || 'book'
+  const [displayedTab, mosaicPhase] = useMosaicSwitch(activeTab, 0.5)
+
+  // Невідомий шлях під /cabinet/* (раніше — <Route path="*" element={<Navigate .../>}/>)
+  useEffect(() => {
+    if (!TAB_COMPONENT_KEYS.includes(activeTab)) nav('/cabinet', { replace: true })
+  }, [activeTab])
 
   // Параметри з push-сповіщення: ?date=2026-06-06&time=12:00
   const notifParams = useMemo(() => {
@@ -275,23 +284,22 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
 
       {/* CONTENT */}
       <div
-        className={`cab-content${activeTab === 'chat' ? ' cab-content--chat' : ''}`}
+        className={`cab-content${displayedTab === 'chat' ? ' cab-content--chat' : ''}`}
         onTouchStart={handleContentTouchStart}
         onTouchEnd={handleContentTouchEnd}
+        style={{ position: 'relative' }}
       >
-        <div className="fade-up" key={activeTab} style={activeTab === 'chat' ? { display:'flex', flexDirection:'column', flex:1, minHeight:0 } : undefined}>
-          <Routes>
-            <Route path="/" element={<BookTab user={user} profile={profile} bookingsData={bookingsData} notifParams={notifParams} />} />
-            <Route path="/bookings" element={<BookingsTab user={user} profile={profile} bookingsData={bookingsData} />} />
-            <Route path="/progress" element={<ProgressTab user={user} profile={profile} bookingsData={bookingsData} />} />
-            <Route path="/queue" element={<QueueTab user={user} profile={profile} />} />
-            <Route path="/chat" element={<ChatTab user={user} profile={profile} />} />
-            <Route path="/notifications" element={<NotifTab user={user} onSeen={markNotifsSeen} />} />
-            <Route path="/profile" element={<ProfileTab user={user} profile={profile} bookingsData={bookingsData} onProfileUpdate={onProfileUpdate} />} />
-            <Route path="/test" element={<TestTab />} />
-            <Route path="*" element={<Navigate to="/cabinet" />} />
-          </Routes>
+        <div className="fade-up" key={displayedTab} style={displayedTab === 'chat' ? { display:'flex', flexDirection:'column', flex:1, minHeight:0 } : undefined}>
+          {displayedTab === 'book' && <BookTab user={user} profile={profile} bookingsData={bookingsData} notifParams={notifParams} />}
+          {displayedTab === 'bookings' && <BookingsTab user={user} profile={profile} bookingsData={bookingsData} />}
+          {displayedTab === 'progress' && <ProgressTab user={user} profile={profile} bookingsData={bookingsData} />}
+          {displayedTab === 'queue' && <QueueTab user={user} profile={profile} />}
+          {displayedTab === 'chat' && <ChatTab user={user} profile={profile} />}
+          {displayedTab === 'notifications' && <NotifTab user={user} onSeen={markNotifsSeen} />}
+          {displayedTab === 'profile' && <ProfileTab user={user} profile={profile} bookingsData={bookingsData} onProfileUpdate={onProfileUpdate} />}
+          {displayedTab === 'test' && <TestTab />}
         </div>
+        <MosaicOverlay phase={mosaicPhase} tileColor="var(--bg-deep)" speed={0.5}/>
       </div>
 
       {/* BOTTOM NAV */}
