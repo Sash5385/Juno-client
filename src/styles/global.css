@@ -25,6 +25,20 @@ html, body {
   overflow: hidden;
 }
 
+/* Кольоровий градієнт поверх суцільного фону — той самий, що в адмінці
+   (App.jsx: radial-gradient(...ACCENT/PURPLE/TEAL...) поверх theme.BG). */
+#root::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 10% 5%, rgba(255,90,60,0.18), transparent 45%),
+    radial-gradient(circle at 95% 30%, rgba(192,132,252,0.16), transparent 45%),
+    radial-gradient(circle at 20% 95%, rgba(45,212,191,0.14), transparent 45%);
+}
+
 @media (min-width: 600px) {
   html, body, #root {
     height: 100vh;
