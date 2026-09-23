@@ -128,12 +128,11 @@ export default function Landing({ user, profile }) {
         )}
 
         {/* CONTACTS */}
-        {(instructorPhone || instructorAddress) && (
+        {instructorPhone && (
         <section className="lsection">
           <div className="lsection-title">Контакти</div>
           <h2>Звʼязатись зі мною</h2>
           <div className="contacts">
-            {instructorPhone && (
             <div className="contact-icon-row">
               <a href={`tel:${instructorPhone}`} className="contact-icon-btn contact-icon-btn--call" aria-label="Зателефонувати">
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M6.62 10.79a15.05 15.05 0 006.59 6.59l2.2-2.2a1 1 0 011.01-.24c1.12.37 2.33.57 3.58.57a1 1 0 011 1V20a1 1 0 01-1 1C10.61 21 3 13.39 3 4a1 1 0 011-1h3.5a1 1 0 011 1c0 1.25.2 2.45.57 3.57a1 1 0 01-.24 1.01l-2.21 2.21z"/></svg>
@@ -148,16 +147,6 @@ export default function Landing({ user, profile }) {
                 <svg viewBox="0 0 24 24" fill="currentColor"><path d="M17.47 14.38c-.28-.14-1.64-.81-1.9-.9-.25-.1-.44-.14-.62.14-.18.28-.72.9-.88 1.09-.16.19-.32.21-.6.07-.28-.14-1.18-.44-2.25-1.39-.83-.74-1.39-1.66-1.56-1.94-.16-.28-.02-.43.12-.57.13-.12.28-.32.42-.48.14-.16.18-.28.28-.46.09-.18.05-.34-.02-.48-.07-.14-.62-1.5-.85-2.05-.22-.54-.45-.47-.62-.47-.16 0-.35-.02-.53-.02s-.48.07-.73.34c-.25.28-.96.94-.96 2.3 0 1.35.98 2.66 1.12 2.84.14.18 1.93 2.94 4.67 4.13.65.28 1.16.45 1.56.57.65.21 1.25.18 1.72.11.52-.08 1.64-.67 1.87-1.32.23-.65.23-1.2.16-1.32-.07-.12-.25-.19-.53-.33z"/><path d="M12.04 2C6.48 2 2 6.48 2 12.04c0 1.85.5 3.58 1.37 5.06L2 22l5.08-1.33A10.02 10.02 0 0012.04 22C17.6 22 22 17.52 22 12.04 22 6.48 17.6 2 12.04 2zm0 18.16c-1.7 0-3.28-.46-4.64-1.26l-.33-.2-3.42.9.91-3.34-.22-.34a8.15 8.15 0 01-1.28-4.38c0-4.5 3.66-8.16 8.16-8.16 4.5 0 8.16 3.66 8.16 8.16 0 4.5-3.66 8.16-8.16 8.16z"/></svg>
               </a>
             </div>
-            )}
-            {instructorAddress && (
-            <a href={`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(instructorAddress)}`} target="_blank" rel="noreferrer" className="contact-row">
-              <div className="contact-ico loc">📍</div>
-              <div style={{flex:1}}>
-                <div className="contact-label">Адреса</div>
-                <div className="contact-val">{instructorAddress}</div>
-              </div>
-            </a>
-            )}
           </div>
         </section>
         )}
