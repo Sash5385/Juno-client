@@ -42,11 +42,22 @@ export default function Landing({ user, profile }) {
       {/* TOP BAR */}
       <header className="landing-topbar">
         <div className="container landing-topbar-row">
-          <div className="logo">
-            <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
-            DrivePad
+          <div style={{display:'flex',alignItems:'center',gap:8,minWidth:0}}>
+            <button className="icon-btn" onClick={() => nav(-1)} aria-label="Назад">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+            </button>
+            <div className="logo">
+              <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
+              DrivePad
+            </div>
           </div>
           <div className="topbar-actions">
+            <button className="icon-btn" onClick={() => window.location.reload()} aria-label="Оновити">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+                <polyline points="23 4 23 10 17 10"/>
+                <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+              </svg>
+            </button>
             <button className="btn-login" onClick={goRegister}>
               {user ? 'Кабінет' : 'Увійти'}
             </button>

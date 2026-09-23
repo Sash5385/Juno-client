@@ -115,6 +115,18 @@ export default function PublicSchedule({ onBook }) {
         </div>
         <div style={{ display:'flex', gap:6, alignItems:'center', flexShrink:0 }}>
           <button
+            onClick={() => window.location.reload()}
+            aria-label="Оновити"
+            style={{ width:34, height:34, borderRadius:10, background:'var(--surface)', border:'none',
+              cursor:'pointer', color:'var(--text)', display:'flex', alignItems:'center', justifyContent:'center',
+              boxShadow:'var(--shadow)' }}
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="23 4 23 10 17 10"/>
+              <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+            </svg>
+          </button>
+          <button
             onClick={toggle}
             style={{ width:34, height:34, borderRadius:10, background:'var(--surface)', border:'none',
               cursor:'pointer', color:'var(--text)', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center',
