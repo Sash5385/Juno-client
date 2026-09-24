@@ -112,16 +112,10 @@ export default function Landing({ user, profile }) {
       {/* TOP BAR */}
       <header className="landing-topbar">
         <div className="container landing-topbar-row">
-          <div style={{display:'flex',alignItems:'center',gap:8,minWidth:0}}>
+          <div className="topbar-actions">
             <button className="icon-btn" onClick={() => nav(-1)} aria-label="Назад">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
             </button>
-            <div className="logo">
-              <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
-              DrivePad
-            </div>
-          </div>
-          <div className="topbar-actions">
             <button className="icon-btn" onClick={() => window.location.reload()} aria-label="Оновити">
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">
                 <polyline points="23 4 23 10 17 10"/>
@@ -132,6 +126,11 @@ export default function Landing({ user, profile }) {
               {user ? 'Кабінет' : 'Увійти'}
             </button>
           </div>
+          <div className="logo">
+            <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
+            DrivePad
+          </div>
+          <div aria-hidden="true"></div>
         </div>
       </header>
 
@@ -153,7 +152,6 @@ export default function Landing({ user, profile }) {
         {/* INSTRUCTOR */}
         <Reveal>
         <section className="lsection">
-          <div className="lsection-title">Інструктор</div>
           <h2>{instructorName}</h2>
           <div className="instructor-card">
             <div className="instructor-avatar" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,background:'var(--accent-bg, #eee)',overflow:'hidden'}}>
@@ -173,7 +171,6 @@ export default function Landing({ user, profile }) {
         {reviews.length > 0 && (
         <Reveal>
         <section className="lsection">
-          <div className="lsection-title">Відгуки</div>
           <h2>Що кажуть учні</h2>
           <div className="reviews-scroll">
             {reviews.map(rv => (
@@ -198,7 +195,6 @@ export default function Landing({ user, profile }) {
         {instructorPhone && (
         <Reveal>
         <section className="lsection">
-          <div className="lsection-title">Контакти</div>
           <h2>Звʼязатись зі мною</h2>
           <div className="contacts">
             <div className="contact-icon-row">
@@ -224,7 +220,6 @@ export default function Landing({ user, profile }) {
         {(hasMeetPin || instructorAddress) && (
         <Reveal>
         <section className="lsection">
-          <div className="lsection-title">Як доїхати</div>
           <h2>Місце зустрічі</h2>
           <div className="map-card">
             <iframe
