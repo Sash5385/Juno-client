@@ -246,6 +246,7 @@ export default function App() {
 
   if (!tenantIid) {
     return (
+      <>
       <div style={{
         display:'flex', alignItems:'center', justifyContent:'center',
         minHeight:'100vh', background:'var(--bg)', padding:20, textAlign:'center',
@@ -257,11 +258,14 @@ export default function App() {
           <p>Зверніться до вашого інструктора за коректним посиланням для запису.</p>
         </div>
       </div>
+      <InstallBanner/>
+      </>
     )
   }
 
   if (isLicenseBlocked(license)) {
     return (
+      <>
       <div style={{
         display:'flex', alignItems:'center', justifyContent:'center',
         minHeight:'100vh', background:'var(--bg)', padding:20, textAlign:'center',
@@ -273,6 +277,8 @@ export default function App() {
           <p>Зверніться до інструктора.</p>
         </div>
       </div>
+      <InstallBanner/>
+      </>
     )
   }
 
