@@ -58,6 +58,10 @@
   justify-content: center;
 }
 
+.landing-topbar-login {
+  justify-self: end;
+}
+
 .logo {
   display: flex;
   align-items: center;

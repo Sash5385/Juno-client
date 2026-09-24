@@ -122,15 +122,14 @@ export default function Landing({ user, profile }) {
                 <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
               </svg>
             </button>
-            <button className="btn-login" onClick={goRegister}>
-              {user ? 'Кабінет' : 'Увійти'}
-            </button>
           </div>
           <div className="logo">
             <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
             DrivePad
           </div>
-          <div aria-hidden="true"></div>
+          <button className="btn-login landing-topbar-login" onClick={goRegister}>
+            {user ? 'Кабінет' : 'Увійти'}
+          </button>
         </div>
       </header>
 
