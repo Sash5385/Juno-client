@@ -1,8 +1,33 @@
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
-import { getAdminSettings, getApprovedReviews } from '../firebase/db'
+import { getAdminSettings, getApprovedReviews, getAdminServices, getUpcomingFreeSlots } from '../firebase/db'
+import { parseYMD, getDayName, getMonthShort, formatDateYMD } from '../utils/date'
 import './Landing.css'
+
+// Та сама палітра, що й у виборі кольору послуги в адмінці (colorId) —
+// бабл ціни на лендингу тонується в колір, обраний для послуги там.
+const SERVICE_COLORS = {
+  green: '#7ed957', yellow: '#f7c948', blue: '#5b9bff', purple: '#c084fc',
+  red: '#ff5a3c', teal: '#2dd4bf', pink: '#f472b6', orange: '#fb923c',
+  indigo: '#818cf8', lime: '#a3e635',
+}
+const colorOfService = (colorId) => SERVICE_COLORS[colorId] || SERVICE_COLORS.green
+
+// Підпис дня для тизера найближчих вільних місць — "Сьогодні"/"Завтра"/скорочена назва дня.
+function slotDayLabel(dateStr) {
+  const today = new Date()
+  const tomorrow = new Date(today); tomorrow.setDate(tomorrow.getDate() + 1)
+  if (dateStr === formatDateYMD(today)) return 'Сьогодні'
+  if (dateStr === formatDateYMD(tomorrow)) return 'Завтра'
+  return getDayName(parseYMD(dateStr).getDay())
+}
+
+// Коротка дата для тизера найближчих вільних місць — "13 вер".
+function slotDateShort(dateStr) {
+  const d = parseYMD(dateStr)
+  return `${d.getDate()} ${getMonthShort(d.getMonth())}`
+}
 
 // Блоки лендингу "збираються" з дрібної мозаїчної плитки при прокрутці:
 // поверх контенту лежить сітка маленьких плиток кольору фону, які по черзі
@@ -86,6 +111,24 @@ export default function Landing({ user, profile }) {
   useEffect(() => {
     getApprovedReviews().then(setReviews).catch(() => {})
   }, [])
+
+  const [services, setServices] = useState([])
+  useEffect(() => {
+    getAdminServices().then(setServices).catch(() => {})
+  }, [])
+
+  const [upcomingSlots, setUpcomingSlots] = useState([])
+  useEffect(() => {
+    getUpcomingFreeSlots(12).then(setUpcomingSlots).catch(() => {})
+  }, [])
+
+  // Ціна за годину для кожного напрямку — перша активна 1-годинна послуга цього типу.
+  const schoolService = services.find(s => s.type === 'school' && Number(s.duration) === 60)
+  const privateService = services.find(s => s.type === 'private' && Number(s.duration) === 60)
+  const schoolService2h = services.find(s => s.type === 'school' && Number(s.duration) === 120)
+  const privateService2h = services.find(s => s.type === 'private' && Number(s.duration) === 120)
+  const nearestSlot = upcomingSlots[0]
+
   const instructorName = instructorProfile?.name || 'Інструктор'
   const instructorPhone = instructorProfile?.phone || ''
   const instructorAddress = instructorProfile?.address || ''
@@ -104,6 +147,9 @@ export default function Landing({ user, profile }) {
 
   const goAuth = () => nav(user && profile ? '/cabinet' : '/schedule')
   const goRegister = () => nav(user && profile ? '/cabinet' : '/auth')
+  // Публічний розклад (PublicSchedule) сам веде вибором дати й часу — тут
+  // просто відкриваємо його, конкретний слот з тизера учень обере там же.
+  const goBookSlot = () => goAuth()
 
   return (
     <div className="landing-page">
@@ -163,6 +209,72 @@ export default function Landing({ user, profile }) {
           </div>
         </section>
         </Reveal>
+
+        {/* PRICING */}
+        {(schoolService || privateService) && (
+        <Reveal>
+        <section className="lsection">
+          <h2>Скільки коштує урок</h2>
+          <div className="pricing-bubbles">
+            {schoolService && (
+              <div className="pricing-bubble" style={{ '--c': colorOfService(schoolService.colorId) }}>
+                <div className="pricing-bubble-icon">🎓</div>
+                <div className="pricing-bubble-lbl">Автошкола</div>
+                <div className="pricing-bubble-num">{schoolService.price}<span>₴/год</span></div>
+                {schoolService2h && <div className="pricing-bubble-sub">2 год — <b>{schoolService2h.price}₴</b></div>}
+              </div>
+            )}
+            {privateService && (
+              <div className="pricing-bubble" style={{ '--c': colorOfService(privateService.colorId) }}>
+                <div className="pricing-bubble-icon">🚙</div>
+                <div className="pricing-bubble-lbl">Приватні</div>
+                <div className="pricing-bubble-num">{privateService.price}<span>₴/год</span></div>
+                {privateService2h && <div className="pricing-bubble-sub">2 год — <b>{privateService2h.price}₴</b></div>}
+              </div>
+            )}
+          </div>
+        </section>
+        </Reveal>
+        )}
+
+        {/* NEAREST SLOTS */}
+        {nearestSlot && (
+        <Reveal>
+        <section className="lsection">
+          <h2>Найближчі вільні місця</h2>
+
+          <div className="next-slot-card">
+            <div className="next-slot-lbl">Найближче вікно</div>
+            <div className="next-slot-big">{slotDayLabel(nearestSlot.date)}, {slotDateShort(nearestSlot.date)} · {nearestSlot.time}</div>
+            <div className="next-slot-sub">
+              {upcomingSlots.length > 1
+                ? `Ще ${upcomingSlots.length - 1} вільних варіантів цього тижня`
+                : 'Встигни записатись, поки є місце'}
+            </div>
+            <button className="next-slot-cta" onClick={goBookSlot}>📅 Забронювати</button>
+          </div>
+
+          {upcomingSlots.length > 1 && (
+            <>
+              <div className="slot-chips-lbl">Або обери інший час</div>
+              <div className="slot-chips">
+                {upcomingSlots.map((s, i) => (
+                  <button
+                    key={`${s.date}_${s.time}`}
+                    className={`slot-chip${i === 0 ? ' active' : ''}`}
+                    onClick={goBookSlot}
+                  >
+                    <div className="slot-chip-day">{slotDayLabel(s.date)}</div>
+                    <div className="slot-chip-date">{slotDateShort(s.date)}</div>
+                    <div className="slot-chip-time">{s.time}</div>
+                  </button>
+                ))}
+              </div>
+            </>
+          )}
+        </section>
+        </Reveal>
+        )}
 
         {/* REVIEWS */}
         {reviews.length > 0 && (
