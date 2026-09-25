@@ -91,13 +91,12 @@ export default function Landing({ user, profile }) {
   const instructorAddress = instructorProfile?.address || ''
   const instructorPhoto = instructorProfile?.photoUrl || ''
   const instructorTerms = instructorProfile?.terms || ''
-  const telegramUsername = instructorProfile?.telegramUsername || ''
   const meetLat = instructorProfile?.meetLat
   const meetLng = instructorProfile?.meetLng
   const hasMeetPin = meetLat != null && meetLng != null
   const mapQuery = hasMeetPin ? `${meetLat},${meetLng}` : instructorAddress
   const iPhoneDigits = instructorPhone.replace(/\D/g, '')
-  const telegramHref = telegramUsername ? `https://t.me/${telegramUsername}` : `https://t.me/+${iPhoneDigits}`
+  const telegramHref = `https://t.me/+${iPhoneDigits}`
 
   const galleryPhotos = instructorProfile?.galleryPhotos || []
   const collageSlots = [[], [], []]
