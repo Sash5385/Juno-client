@@ -150,7 +150,6 @@ export default function Landing({ user, profile }) {
         {/* INSTRUCTOR */}
         <Reveal>
         <section className="lsection">
-          <h2>{instructorName}</h2>
           <div className="instructor-card">
             <div className="instructor-avatar" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,background:'var(--accent-bg, #eee)',overflow:'hidden'}}>
               {instructorPhoto
