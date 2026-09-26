@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
-import { cancelBooking, rateBooking, saveStudentNote, saveGoals, createBooking, markSlotsUnavailable, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
+import { cancelBooking, rateBooking, saveStudentNote, saveGoals, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import './BookingsTab.css'
@@ -136,8 +136,8 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         newPrice = Math.round(newSurcharge * discountFactor)
       }
 
-      // 1. Атомарно займаємо новий слот ДО скасування старого
-      const claimed = await claimSlot(newDate, selectedTime)
+      // 1. Атомарно займаємо весь новий діапазон ДО скасування старого
+      const claimed = await claimSlot(newDate, selectedTime, durationHours, adminSettings.interval || 30)
       if (!claimed) {
         showModalToast('Цей слот щойно зайняли. Оберіть інший час.')
         setSaving(false)
@@ -160,8 +160,6 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         phone: booking.phone,
         rescheduledFrom: `${booking.date} ${booking.time}`,
       })
-      // 4. Закриваємо слоти (фантомні 30-хв + повна тривалість)
-      await markSlotsUnavailable(newDate, selectedTime, durationHours, adminSettings.interval || 30)
       onDone()
     } catch (e) {
       showModalToast('Помилка: ' + e.message)

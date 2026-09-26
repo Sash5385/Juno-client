@@ -5,7 +5,7 @@ import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { auth } from './firebase/config'
 import {
-  getUserProfile, updateUserProfile, createBooking, markSlotsUnavailable, claimSlot,
+  getUserProfile, updateUserProfile, createBooking, claimSlot,
   setCurrentTenant, loadStoredTenant, resolveSlug,
 } from './firebase/db'
 import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
@@ -210,8 +210,8 @@ export default function App() {
     const pb = pendingBookingRef.current
     if (pb && p) {
       try {
-        // Атомарно займаємо слот — міг бути зайнятий поки користувач авторизувався
-        const claimed = await claimSlot(pb.date, pb.time)
+        // Атомарно займаємо весь діапазон — міг бути зайнятий поки користувач авторизувався
+        const claimed = await claimSlot(pb.date, pb.time, pb.duration, 30)
         if (!claimed) {
           showToast('На жаль, цей слот вже зайняли поки ви авторизувались. Оберіть інший час.')
         } else {
@@ -224,7 +224,6 @@ export default function App() {
             studentName: p.name,
             phone: p.phone || auth.currentUser.phoneNumber,
           })
-          await markSlotsUnavailable(pb.date, pb.time, pb.duration, 30)
         }
       } catch (e) {
         console.error('Auto-book failed:', e)

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, markSlotsUnavailable, claimSlot, claimReservedSlot, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
+import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, parseYMD } from '../../utils/date'
 import { getInitials, pluralize } from '../../utils/format'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
@@ -256,11 +256,22 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       const totalPrice = applyDiscount((selectedService?.price || 0) + surcharge)
       const currentSlot = slots[`slot${selectedTime.replace(':', '')}`]
       const isOfferedToMe = !!currentSlot?.offeredTo?.[user?.uid]
-      // Атомарно займаємо слот (крім випадку, коли його зарезервовано саме для мене)
+      // Атомарно займаємо весь діапазон (перша година вже зарезервована
+      // саме для мене через чергу — атомарно займаємо лише решту, якщо
+      // бронювання довше 1 год)
       if (!isOfferedToMe) {
-        const claimed = await claimSlot(dateStr, selectedTime)
+        const claimed = await claimSlot(dateStr, selectedTime, durationHours, adminSettings.interval || 30)
         if (!claimed) {
           showToast('Цей слот щойно зайняли. Оберіть інший час.')
+          setSubmitting(false)
+          return
+        }
+      } else if (durationHours > 1) {
+        const nextMin = bookStartMin + 60
+        const nextTime = `${String(Math.floor(nextMin / 60)).padStart(2, '0')}:${String(nextMin % 60).padStart(2, '0')}`
+        const claimed = await claimSlot(dateStr, nextTime, durationHours - 1, adminSettings.interval || 30)
+        if (!claimed) {
+          showToast('Наступна година щойно зайнята. Оберіть коротшу тривалість або інший час.')
           setSubmitting(false)
           return
         }
@@ -280,7 +291,6 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         studentNote: studentNote.trim() || undefined,
       })
       setStudentNote("")
-      await markSlotsUnavailable(dateStr, selectedTime, durationHours, adminSettings.interval || 30)
       if (isOfferedToMe) {
         await claimReservedSlot(dateStr, selectedTime, user.uid)
       }

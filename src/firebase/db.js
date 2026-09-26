@@ -291,21 +291,49 @@ export function getCompletedHours(bookings) {
 }
 
 // ─── TIMESLOTS ───────────────────────────────────────────────────
-// Атомарно займає початковий слот через транзакцію.
-// Повертає true якщо вдалось зайняти, false якщо слот уже зайнятий іншим.
-export async function claimSlot(date, startTime) {
+// Атомарно займає ВЕСЬ діапазон бронювання (кожні intervalMin хвилин,
+// включно з проміжними "фантомними" слотами всередині години), а не
+// лише стартовий слот. Раніше атомарно захоплювався тільки старт, а
+// решта діапазону позначалась недоступною вже ПІСЛЯ createBooking()
+// звичайним update() (markSlotsUnavailable) — у цьому вікні інший
+// учень міг встигнути атомарно застовпити проміжний/наступний слот під
+// власний запис, і обидва записи проходили одночасно на ту саму годину.
+// Якщо хоч один слот у діапазоні вже зайнятий — звільняє всі раніше
+// захоплені в цій же спробі й повертає false.
+export async function claimSlot(date, startTime, durationHours = 1, intervalMin = 30) {
   if (_blocked) return false
-  const slotId = `slot${startTime.replace(':', '')}`
-  const slotRef = iRef(`timeslots/${date}/${slotId}`)
-  const result = await runTransaction(slotRef, current => {
-    if (current && current.available === false) {
-      return undefined // вже зайнятий — скасувати транзакцію
+  const [h, m] = startTime.split(':').map(Number)
+  const startMin = h * 60 + m
+  const endMin = startMin + durationHours * 60
+  const claimedIds = []
+  for (let min = startMin; min < endMin; min += intervalMin) {
+    const slotH = String(Math.floor(min / 60)).padStart(2, '0')
+    const slotM = String(min % 60).padStart(2, '0')
+    const slotId = `slot${slotH}${slotM}`
+    const slotRef = iRef(`timeslots/${date}/${slotId}`)
+    const result = await runTransaction(slotRef, current => {
+      if (current && current.available === false) {
+        return undefined // вже зайнятий — скасувати транзакцію
+      }
+      return { ...(current || {}), available: false, time: `${slotH}:${slotM}` }
+    })
+    if (!result.committed) {
+      await Promise.all(claimedIds.map(id =>
+        runTransaction(iRef(`timeslots/${date}/${id}`), current =>
+          current ? { ...current, available: true } : current
+        ).catch(() => {})
+      ))
+      return false
     }
-    return { ...(current || {}), available: false, time: startTime }
-  })
-  return result.committed
+    claimedIds.push(slotId)
+  }
+  return true
 }
 
+// Позначає недоступними слоти діапазону БЕЗ атомарного захоплення —
+// лише для випадку, коли перший слот діапазону вже гарантовано
+// заброньований одержувачем через чергу (offeredTo/reservedFor
+// блокує інших від початку), тож гонки за нього немає.
 export async function markSlotsUnavailable(date, startTime, durationHours, intervalMin = 30) {
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
