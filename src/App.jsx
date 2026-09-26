@@ -19,6 +19,7 @@ import Auth from './pages/Auth'
 import Cabinet from './pages/Cabinet'
 import Landing from './pages/Landing'
 import PublicSchedule from './pages/PublicSchedule'
+import About from './pages/About'
 
 // ─── PWA INSTALL PROMPT (пропонуємо зберегти застосунок лише при
 // першому вході — раз показали (banner з'явився), більше не пропонуємо,
@@ -100,6 +101,10 @@ export default function App() {
   const [loading, setLoading] = useState(true)
   // undefined = ще визначаємо, null = посилання-інструктора нема, string = iid
   const [tenantIid, setTenantIid] = useState(undefined)
+  // true лише коли в URL БУВ /i/{slug}, але він не резолвнувся (справді
+  // "недійсне посилання") — на відміну від голого заходу на домен без
+  // жодного slug узагалі, де показуємо About() замість помилки.
+  const [tenantResolveFailed, setTenantResolveFailed] = useState(false)
   const license = useLicense(tenantIid)
   const pendingBookingRef = useRef(null)
   const { needRefresh, updateServiceWorker, isUpdating } = useAppUpdate()
@@ -118,10 +123,11 @@ export default function App() {
           setTenantIid(iid)
         } else {
           setTenantIid(null)
+          setTenantResolveFailed(true)
         }
         const rest = location.pathname.slice(m[0].length) || '/'
         navigate(rest + location.search, { replace: true })
-      }).catch(() => setTenantIid(null))
+      }).catch(() => { setTenantIid(null); setTenantResolveFailed(true) })
       return
     }
     const stored = loadStoredTenant()
@@ -245,6 +251,14 @@ export default function App() {
   }
 
   if (!tenantIid) {
+    if (!tenantResolveFailed) {
+      return (
+        <>
+        <About/>
+        <InstallBanner/>
+        </>
+      )
+    }
     return (
       <>
       <div style={{
