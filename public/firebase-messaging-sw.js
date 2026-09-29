@@ -24,10 +24,13 @@ messaging.onBackgroundMessage(async (payload) => {
   const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
   if (clientList.some(c => c.visibilityState === 'visible')) return
 
-  const title = payload.notification?.title || 'DrivePad'
+  // Data-only push (без top-level/webpush "notification") — payload.notification
+  // тут завжди undefined, тому title/body й досі бралися з нього ніколи не
+  // існуючого поля, і фонове сповіщення завжди показувалось порожнім.
+  const title = payload.data?.title || 'DrivePad'
   const url = payload.data?.url || 'https://drivepad-client.web.app/cabinet'
   const options = {
-    body: payload.notification?.body || '',
+    body: payload.data?.body || '',
     icon: '/icon-192.png',
     badge: '/icon-192.png',
     tag: 'drivepad-notif',

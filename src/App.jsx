@@ -162,8 +162,10 @@ export default function App() {
   useEffect(() => {
     if (!user) return
     return onForegroundMessage((payload) => {
-      const title = payload.notification?.title || 'DrivePad'
-      const body = payload.notification?.body || ''
+      // Data-only push — payload.notification тут завжди undefined, тому
+      // title/body бралися з нього ніколи не існуючого поля.
+      const title = payload.data?.title || 'DrivePad'
+      const body = payload.data?.body || ''
       const url = payload.data?.url || '/'
       if (Notification.permission !== 'granted') return
       if ('serviceWorker' in navigator) {
