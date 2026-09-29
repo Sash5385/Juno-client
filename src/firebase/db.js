@@ -2,6 +2,7 @@
   ref, get, set, update, push, onValue, off, remove, increment, onDisconnect, runTransaction
 } from 'firebase/database'
 import { db } from './config'
+import { blockRangeUpdates, restoreRangeUpdates } from '../utils/slotRules'
 
 // ─── МУЛЬТИТЕНАНТНІСТЬ ──────────────────────────────────────────────
 // Один застосунок обслуговує студентів БАГАТЬОХ інструкторів — кожен
@@ -205,27 +206,15 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
     cancelledBy: isReschedule ? 'reschedule' : 'student',
   })
 
-  // Відновити вільні слоти, видалити 30-хв фантоми
+  // Повертаємо день до стану ДО запису: phantom видаляємо, справжні слоти
+  // відновлюємо, відсутні не створюємо (єдині правила — utils/slotRules.js)
   if (booking.date && booking.time) {
     const [h, m] = booking.time.split(':').map(Number)
     const startMin = h * 60 + m
     const durMin = (booking.durationHours || 1) * 60
-    const updates = {}
-    for (let i = 0; i < durMin; i += 30) {
-      const slotMin = startMin + i
-      const slotH = String(Math.floor(slotMin / 60)).padStart(2, '0')
-      const slotM = String(slotMin % 60).padStart(2, '0')
-      const path = `timeslots/${booking.date}/slot${slotH}${slotM}`
-      if (i % 60 === 0) {
-        // Годинний слот — відновлюємо
-        updates[`${path}/available`] = true
-        updates[`${path}/time`] = `${slotH}:${slotM}`
-      } else {
-        // 30-хв фантом (створений markSlotsUnavailable) — видаляємо
-        updates[path] = null
-      }
-    }
-    await update(iRef(""), updates)
+    const daySnap = await get(iRef(`timeslots/${booking.date}`))
+    const updates = restoreRangeUpdates(daySnap.val() || {}, `timeslots/${booking.date}/`, startMin, durMin)
+    if (Object.keys(updates).length) await update(iRef(""), updates)
   }
 }
 
@@ -315,12 +304,14 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
       if (current && current.available === false) {
         return undefined // вже зайнятий — скасувати транзакцію
       }
-      return { ...(current || {}), available: false, time: `${slotH}:${slotM}` }
+      // Документа не було (current === null) — він існує лише під цей запис: phantom,
+      // щоб скасування видалило його, а не лишило окремим вільним слотом.
+      return { ...(current || {}), ...(current ? {} : { phantom: true }), available: false, time: `${slotH}:${slotM}` }
     })
     if (!result.committed) {
       await Promise.all(claimedIds.map(id =>
         runTransaction(iRef(`timeslots/${date}/${id}`), current =>
-          current ? { ...current, available: true } : current
+          current ? (current.phantom ? null : { ...current, available: true }) : current
         ).catch(() => {})
       ))
       return false
@@ -337,15 +328,8 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
 export async function markSlotsUnavailable(date, startTime, durationHours, intervalMin = 30) {
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
-  const endMin = startMin + durationHours * 60
-  const updates = {}
-  for (let min = startMin; min < endMin; min += intervalMin) {
-    const slotH = String(Math.floor(min / 60)).padStart(2, '0')
-    const slotM = String(min % 60).padStart(2, '0')
-    const slotId = `slot${slotH}${slotM}`
-    updates[`timeslots/${date}/${slotId}/available`] = false
-    updates[`timeslots/${date}/${slotId}/time`] = `${slotH}:${slotM}`
-  }
+  const daySnap = await get(iRef(`timeslots/${date}`))
+  const updates = blockRangeUpdates(daySnap.val() || {}, `timeslots/${date}/`, startMin, durationHours * 60, { step: intervalMin })
   await update(iRef(""), updates)
 }
 
