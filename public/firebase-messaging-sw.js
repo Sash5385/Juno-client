@@ -33,7 +33,10 @@ messaging.onBackgroundMessage(async (payload) => {
     body: payload.data?.body || '',
     icon: '/icon-192.png',
     badge: '/icon-192.png',
-    tag: 'drivepad-notif',
+    // Унікальний tag — з тим самим сталим tag кожне наступне повідомлення
+    // (напр. друге в чаті поспіль) тихо замінює попереднє сповіщення без
+    // нового звуку/вібрації на деяких Android/Chrome.
+    tag: payload.data?.tag || ('drivepad-notif-' + Date.now()),
     requireInteraction: true,
     vibrate: [200, 100, 200],
     data: { url, ...(payload.data || {}) },

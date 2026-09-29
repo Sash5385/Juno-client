@@ -175,7 +175,8 @@ export default function App() {
             body,
             icon: '/icon-192.png',
             badge: '/icon-192.png',
-            tag: 'drivepad-notif',
+            // Унікальний tag — інакше друге повідомлення поспіль тихо замінює перше.
+            tag: payload.data?.tag || ('drivepad-notif-' + Date.now()),
             requireInteraction: true,
             data: { url },
           })
