@@ -19,11 +19,13 @@ firebase.initializeApp({
 
 const messaging = firebase.messaging()
 
-messaging.onBackgroundMessage(async (payload) => {
-  // Skip if any app window is visible — the foreground handler will show the notification
-  const clientList = await self.clients.matchAll({ type: 'window', includeUncontrolled: true })
-  if (clientList.some(c => c.visibilityState === 'visible')) return
-
+messaging.onBackgroundMessage((payload) => {
+  // Раніше тут була перевірка "чи є видима вкладка" з раннім return — але
+  // Firebase SDK і так сам розводить foreground (onMessage) і фонові
+  // (onBackgroundMessage) повідомлення; ця додаткова перевірка based on
+  // client.visibilityState на Android/PWA часто застаріла (вкладка у фоні,
+  // а visibilityState ще "visible"), і сповіщення тихо не показувалось
+  // узагалі — ні тут, ні у foreground-обробнику (бо JS вкладки не активний).
   // Data-only push (без top-level/webpush "notification") — payload.notification
   // тут завжди undefined, тому title/body й досі бралися з нього ніколи не
   // існуючого поля, і фонове сповіщення завжди показувалось порожнім.
