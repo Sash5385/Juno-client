@@ -9,6 +9,10 @@
     ],
     "rewrites": [
       {
+        "source": "/i/*/manifest.webmanifest",
+        "destination": "/manifest-tenant.webmanifest"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }

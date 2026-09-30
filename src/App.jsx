@@ -155,6 +155,24 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
+  // Персональний манифест: /i/{slug}/manifest.webmanifest (firebase.json віддає один
+  // файл, а start_url "./" резолвиться відносно цієї адреси). iPhone (iOS 16.4+) бере
+  // адресу запуску ярлика з манифесту, а не зі сторінки — зі статичним start_url "/"
+  // ярлик завжди відкривався на голому домені без інструктора.
+  useEffect(() => {
+    if (!tenantIid) return
+    const slug = getCurrentSlug()
+    if (!slug) return
+    const link = document.querySelector('link[rel="manifest"]')
+    const href = `/i/${encodeURIComponent(slug)}/manifest.webmanifest`
+    if (link) link.setAttribute('href', href)
+    else {
+      const l = document.createElement('link')
+      l.rel = 'manifest'; l.href = href
+      document.head.appendChild(l)
+    }
+  }, [tenantIid])
+
   // Тримаємо ?i={slug} в адресі на КОЖНІЙ сторінці: інакше після першої ж
   // навігації адреса стає без інструктора, і ярлик, доданий на екран Домой
   // (iPhone), відкривається як "спільний сайт" без прив'язки до учня/інструктора.
