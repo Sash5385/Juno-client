@@ -5,6 +5,7 @@
 // відвідувач просто вперше на домені — потрібен опис сервісу як такого
 // (напр. для перевірки мерчанта платіжними системами LiqPay/Monobank).
 import { useState } from 'react'
+import { APP_VERSION } from '../version.js'
 
 // Витягує slug з введеного коду або повного посилання (…/i/{slug}, …?i={slug}, {slug})
 function parseSlug(input) {
@@ -96,6 +97,9 @@ export default function About() {
       </div>
 
       <div style={{ marginTop: 40, fontSize: 11, color: 'var(--dim)' }}>© {new Date().getFullYear()} DrivePad</div>
+      <div style={{ marginTop: 6, fontSize: 10, color: 'var(--dim)', opacity: 0.6 }}>
+        {APP_VERSION} · {(window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true) ? 'ярлик' : 'браузер'} · {window.location.pathname}{window.location.search}
+      </div>
     </div>
   )
 }

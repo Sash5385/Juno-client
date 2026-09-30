@@ -14,6 +14,26 @@ const SLUG_KEY = 'dp_tenant_slug'
 let _iid = null
 let _slug = null
 
+const TENANT_COOKIE = 'dp_tenant'
+
+// Дублюємо інструктора в cookie: iPhone при додаванні на екран Домой копіює cookie
+// Safari у сховище ярлика (localStorage НЕ копіюється) — так ярлик відкривається вже
+// прив'язаним до інструктора, навіть якщо адреса запуску втратила /i/{slug}.
+function writeTenantCookie(iid, slug) {
+  try {
+    if (iid) document.cookie = `${TENANT_COOKIE}=${encodeURIComponent(iid + '|' + (slug || ''))}; max-age=31536000; path=/; SameSite=Lax`
+    else document.cookie = `${TENANT_COOKIE}=; max-age=0; path=/`
+  } catch {}
+}
+function readTenantCookie() {
+  try {
+    const m = document.cookie.match(new RegExp('(?:^|; )' + TENANT_COOKIE + '=([^;]*)'))
+    if (!m) return null
+    const [iid, slug] = decodeURIComponent(m[1]).split('|')
+    return iid ? { iid, slug: slug || null } : null
+  } catch { return null }
+}
+
 export function setCurrentTenant(iid, slug) {
   _iid = iid || null
   _slug = slug || null
@@ -21,14 +41,21 @@ export function setCurrentTenant(iid, slug) {
     if (_iid) localStorage.setItem(IID_KEY, _iid); else localStorage.removeItem(IID_KEY)
     if (_slug) localStorage.setItem(SLUG_KEY, _slug); else localStorage.removeItem(SLUG_KEY)
   } catch {}
+  writeTenantCookie(_iid, _slug)
 }
 
 export function loadStoredTenant() {
   try {
     const iid = localStorage.getItem(IID_KEY)
     const slug = localStorage.getItem(SLUG_KEY)
-    if (iid) { _iid = iid; _slug = slug || null; return { iid, slug } }
+    if (iid) { _iid = iid; _slug = slug || null; writeTenantCookie(_iid, _slug); return { iid, slug } }
   } catch {}
+  const c = readTenantCookie()
+  if (c) {
+    _iid = c.iid; _slug = c.slug
+    try { localStorage.setItem(IID_KEY, c.iid); if (c.slug) localStorage.setItem(SLUG_KEY, c.slug) } catch {}
+    return c
+  }
   return null
 }
 
