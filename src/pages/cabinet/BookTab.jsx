@@ -91,7 +91,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   // Базова тривалість — з послуги. Якщо послуга годинна, учень може обрати два сусідні
   // годинні слоти поспіль — тоді запис триває 2 години (як в ID4).
   const baseDurationHours = selectedService ? selectedService.duration / 60 : 1
-  const durationHours = selectedTime2 && baseDurationHours === 1 ? 2 : baseDurationHours
+  // Тривалість слота задає адмін (durMin — розтягнутий слот, напр. "2 год"); без durMin — з послуги.
+  const slotDurOf = (slot) => (slot && slot.durMin ? slot.durMin / 60 : baseDurationHours)
+  const selectedSlotDur = slotDurOf(selectedTime ? slots[`slot${selectedTime.replace(':', '')}`] : null)
+  const durationHours = selectedTime2 ? 2 : selectedSlotDur
 
   function getLunchForDate(date) {
     if (!date) return { lunchEnabled: adminSettings.lunchEnabled, lunchStart: adminSettings.lunchStart || 12, lunchEnd: adminSettings.lunchEnd || 13 }
@@ -146,8 +149,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       // Слоти на рівній годинній межі — обов'язкові для багатогодинного уроку,
       // блокують тільки якщо вони вже зайняті.
       if (offsetMin % 60 === 0) return s.available === false
-      // Будь-який слот на нестандартному зміщенні (напр. +30хв) — конфлікт.
-      return true
+      // Нестандартне зміщення (+30хв) — конфлікт лише якщо слот зайнятий (як в ID4).
+      return s.available === false
     })
   }
 
@@ -222,7 +225,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const days = useMemo(() => getMonthGrid(viewMonth.getFullYear(), viewMonth.getMonth()), [viewMonth])
 
   const handleSlotClick = (slot) => {
-    if (slot.lunchBlocked || slot.overlapBlocked) return
+    if (slot.lunchBlocked || slot.overlapBlocked || (slot.cutoffBlocked && slot.available !== false)) return
     if (slot.offeredTo?.[user?.uid]) {
       // Слот зарезервований для мене → одразу до бронювання
       setSelectedTime(slot.time)
@@ -249,10 +252,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     }
     // Тап на сусідній вільний годинний слот, коли вже обрано один — об'єднуємо в один
     // запис на 2 години замість заміни вибору (лише для годинної послуги).
-    if (baseDurationHours === 1 && selectedTime && !selectedTime2 && !slot.vipOnly
+    if (slot.slotDurHours === 1 && selectedTime && !selectedTime2 && !slot.vipOnly
         && Math.abs(timeToMin(slot.time) - timeToMin(selectedTime)) === 60) {
       const first = slots[`slot${selectedTime.replace(':', '')}`]
-      if (first && first.available !== false && !first.vipOnly && !first.offeredTo?.[user?.uid]) {
+      if (first && first.available !== false && !first.vipOnly && !first.offeredTo?.[user?.uid] && slotDurOf(first) === 1) {
         setSelectedTime2(slot.time)
         return
       }
@@ -282,7 +285,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       const [bh, bm] = startTime.split(':').map(Number)
       const bookStartMin = bh * 60 + bm
       let surcharge = 0
-      for (let i = 0; i < durationHours; i++) {
+      for (let i = 0; i < Math.ceil(durationHours); i++) {
         const slotMin = bookStartMin + i * 60
         const key = `slot${String(Math.floor(slotMin/60)).padStart(2,'0')}${String(slotMin%60).padStart(2,'0')}`
         surcharge += slots[key]?.surcharge || 0
@@ -293,7 +296,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           return
         }
       }
-      const totalPrice = applyDiscount((selectedService?.price || 0) * (durationHours / baseDurationHours) + surcharge)
+      // Фіксована ціна слота (адмін) повністю замінює тарифну (не для злитих двох слотів)
+      const fixedPrice = !selectedTime2 ? (slots[`slot${startTime.replace(':', '')}`]?.fixedPrice ?? null) : null
+      const totalPrice = fixedPrice != null
+        ? fixedPrice
+        : applyDiscount((selectedService?.price || 0) * (durationHours / baseDurationHours) + surcharge)
       const currentSlot = slots[`slot${startTime.replace(':', '')}`]
       const isOfferedToMe = !!currentSlot?.offeredTo?.[user?.uid]
       // Атомарно займаємо весь діапазон (перша година вже зарезервована
@@ -323,8 +330,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         serviceId: selectedService.id,
         serviceName: selectedService.name,
         price: totalPrice || undefined,
-        surcharge: surcharge || undefined,
-        discountPct: discountPct || undefined,
+        surcharge: fixedPrice != null ? undefined : (surcharge || undefined),
+        discountPct: fixedPrice != null ? undefined : (discountPct || undefined),
         durationHours,
         studentName: profile.name,
         phone: profile.phone || user.phoneNumber,
@@ -355,16 +362,17 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       return
     }
     const dateStr = formatDateYMD(selectedDate)
-    if (overlapsMyBooking(dateStr, dialogSlot.time, durationHours)) {
+    const queueDur = dialogSlot.slotDurHours || baseDurationHours
+    if (overlapsMyBooking(dateStr, dialogSlot.time, queueDur)) {
       setDialogSlot(null)
       showToast('Ви вже записані на цей час')
       return
     }
     setSubmitting(true)
     try {
-      await joinQueue(user.uid, dateStr, dialogSlot.time, selectedService.type, durationHours, profile?.name || '', profile?.phone || user?.phoneNumber || '')
+      await joinQueue(user.uid, dateStr, dialogSlot.time, selectedService.type, queueDur, profile?.name || '', profile?.phone || user?.phoneNumber || '')
       setDialogSlot(null)
-      setSuccessData({ type: 'queue', date: formatDateYMD(selectedDate), time: dialogSlot.time, service: selectedService, durationHours, surcharge: dialogSlot.surcharge || 0 })
+      setSuccessData({ type: 'queue', date: formatDateYMD(selectedDate), time: dialogSlot.time, service: selectedService, durationHours: queueDur, surcharge: dialogSlot.surcharge || 0 })
     } catch (e) {
       showToast('Помилка: ' + e.message)
     } finally {
@@ -413,22 +421,20 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       }
     }
 
-    // Sticky slots: show only free slots adjacent to existing bookings on this day
-    const stickyEnabled = adminSettings.stickyTimeEnabled !== false
+    // "Липкий час" — як в ID4: ВИМКНЕНО за замовчуванням (раніше тут було "!== false", тобто
+    // увімкнено, навіть якщо адмін його ніколи не вмикав — і в клієнта лишались лише слоти
+    // впритул до запису самого учня). Коли адмін вмикає — показуємо вільні слоти лише впритул
+    // до вже зайнятих (по ВСІХ записах дня з slots, а не лише власних учня).
+    const stickyEnabled = !!adminSettings.stickyTimeEnabled
     const stickyMode = adminSettings.stickyTime || 'both'
-    const bookingsOnDate = bookingsData.upcoming.filter(b =>
-      b.date === dateStr && b.status !== 'cancelled'
-    )
-    const allowedStartMins = new Set()
-    if (stickyEnabled && bookingsOnDate.length > 0) {
-      bookingsOnDate.forEach(b => {
-        const [bh, bm] = (b.time || '0:0').split(':').map(Number)
-        const bStart = bh * 60 + bm
-        const bEnd = bStart + (b.durationHours || 1) * 60
-        if (stickyMode !== 'after')  allowedStartMins.add(bStart - baseDurationHours * 60)
-        if (stickyMode !== 'before') allowedStartMins.add(bEnd)
-      })
-    }
+    const takenIntervals = Object.values(slots)
+      .filter(s => s.available === false && s.time)
+      .map(s => { const start = timeToMin(s.time); return { start, end: start + (s.durMin || 60) } })
+    const dayStartTimes = Object.values(slots).map(s => timeToMin(s.time))
+    const dayStartMin = dayStartTimes.length ? Math.min(...dayStartTimes) : null
+    const { lunchEnabled: dayLunchEnabled, lunchStart: dayLunchStart, lunchEnd: dayLunchEnd } = getLunchForDate(selectedDate)
+    const lunchEndMin = dayLunchEnabled ? dayLunchEnd * 60 : null
+    const lunchStartMin = dayLunchEnabled ? dayLunchStart * 60 : null
 
     return Object.values(slots)
       .filter(slot => !!(slot.time))
@@ -449,8 +455,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         }
         const [th, tm] = (slot.time || '0:0').split(':').map(Number)
         const slotStartMin = th * 60 + tm
+        // Тривалість цього слота (адмін міг розтягнути його) — вона ж і тривалість запису
+        const slotDurHours = slotDurOf(slot)
+        const isCustomDur = !!slot.durMin && slot.durMin !== 60
         let totalSurcharge = 0
-        for (let i = 0; i < baseDurationHours; i++) {
+        for (let i = 0; i < Math.ceil(slotDurHours); i++) {
           const coveredMin = slotStartMin + i * 60
           const coveredKey = `slot${String(Math.floor(coveredMin/60)).padStart(2,'0')}${String(coveredMin%60).padStart(2,'0')}`
           totalSurcharge += slots[coveredKey]?.surcharge || 0
@@ -469,26 +478,44 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           const bEnd = bStart + (b.durationHours || 1) * 60
           return slotMin >= bStart && slotMin < bEnd
         })
+        const slotDurMin = slotDurHours * 60
+        const isSticky = !stickyEnabled || takenIntervals.length === 0 || slot.available === false || slotStartMin === dayStartMin
+          || (stickyMode !== 'before' && slotStartMin === lunchEndMin)
+          || (stickyMode !== 'after'  && slotStartMin + slotDurMin === lunchStartMin)
+          ? true
+          : takenIntervals.some(iv =>
+              (stickyMode !== 'after'  && slotStartMin + slotDurMin === iv.start) ||
+              (stickyMode !== 'before' && slotStartMin === iv.end)
+            )
         return {
           ...slot,
-          lunchBlocked:   isBlockedByLunch(slot.time, baseDurationHours),
-          overlapBlocked: slot.available !== false && wouldOverlapTaken(slot.time, baseDurationHours),
-          isMyBooked:     overlapsMyBooking(dateStr, slot.time, baseDurationHours),
+          slotDurHours,
+          isSticky,
+          // lunchOverride — адмін вручну відкрив цей слот під час обіду: не ховаємо
+          lunchBlocked:   !slot.lunchOverride && isBlockedByLunch(slot.time, slotDurHours),
+          // Розтягнутий слот — цілісний блок: проміжні документи годин поглинуті навмисно
+          overlapBlocked: slot.available !== false && (isCustomDur ? false : wouldOverlapTaken(slot.time, slotDurHours)),
+          // Обмеження "не пізніше ніж за N годин до уроку" (налаштування адміна bookCutoffHours)
+          cutoffBlocked:  (() => {
+            const hrs = adminSettings.bookCutoffHours || 0
+            if (!hrs || !selectedDate) return false
+            const slotDt = new Date(selectedDate)
+            slotDt.setHours(th, tm, 0, 0)
+            return Date.now() + hrs * 60 * 60 * 1000 > slotDt.getTime()
+          })(),
+          isMyBooked:     overlapsMyBooking(dateStr, slot.time, slotDurHours),
           isExactlyMine,
           isPartOfMyBooking,
           vipBlocked,
           totalSurcharge,
-          totalPrice: (selectedService?.price || 0) + totalSurcharge,
+          // Фіксована ціна слота повністю замінює тарифну
+          totalPrice: slot.fixedPrice != null
+            ? slot.fixedPrice
+            : Math.round((selectedService?.price || 0) * (slotDurHours / baseDurationHours)) + totalSurcharge,
         }
       })
-      .filter(slot => !slot.lunchBlocked && !slot.overlapBlocked)
-      .filter(slot => {
-        if (!stickyEnabled || bookingsOnDate.length === 0) return true
-        if (slot.available === false) return true // зайняті — показуємо для черги
-        if (slot.isMyBooked) return true // власний запис студента завжди видимий
-        const [h, m] = (slot.time || '0:0').split(':').map(Number)
-        return allowedStartMins.has(h * 60 + m)
-      })
+      .filter(slot => !slot.lunchBlocked && !slot.overlapBlocked && !(slot.cutoffBlocked && slot.available !== false))
+      .filter(slot => slot.isSticky || slot.isMyBooked)
       .filter(slot => {
         // Для заблокованих слотів: показуємо тільки кожен годинний блок від старту бронювання.
         // Наприклад, бронювання 17:30 (2г) → показуємо 17:30 і 18:30, ховаємо 18:00 і 19:00.
@@ -719,7 +746,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         ) : (
                           // Тривалість і ціна прямо на плитці — як в ID4
                           <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:1}}>
-                            <div style={{fontSize:10, color:'#7ed957', fontWeight:700}}>{formatDurShort(baseDurationHours * 60)}</div>
+                            <div style={{fontSize:10, color:'#7ed957', fontWeight:700}}>{formatDurShort((slot.slotDurHours || baseDurationHours) * 60)}</div>
                             {slot.totalPrice > 0 && (
                               <div style={{fontSize:10, color:'var(--dim)', fontWeight:700}}>{slot.totalPrice}₴</div>
                             )}
@@ -779,17 +806,26 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         const [sh, sm] = ctaStart.split(':').map(Number)
         const startMin = sh * 60 + sm
         let surcharge = 0
-        for (let i = 0; i < durationHours; i++) {
+        for (let i = 0; i < Math.ceil(durationHours); i++) {
           const slotMin = startMin + i * 60
           const key = `slot${String(Math.floor(slotMin/60)).padStart(2,'0')}${String(slotMin%60).padStart(2,'0')}`
           surcharge += slots[key]?.surcharge || 0
         }
+        const ctaFixed = !selectedTime2 ? (slots[`slot${ctaStart.replace(':', '')}`]?.fixedPrice ?? null) : null
         const baseP = (selectedService.price || 0) * (durationHours / baseDurationHours)
-        const totalPrice = applyDiscount(baseP + surcharge)
+        const totalPrice = ctaFixed != null ? ctaFixed : applyDiscount(baseP + surcharge)
         const dateLabel = formatDateYMD(selectedDate).slice(-5).split('-').reverse().join('.')
         return (
           <div ref={ctaSectionRef}>
-            {surcharge > 0 ? (
+            {ctaFixed != null ? (
+              <div style={{
+                marginTop:12, padding:'10px 14px', borderRadius:12,
+                background:'rgba(74,222,128,0.08)', border:'1px solid rgba(74,222,128,0.35)',
+                fontSize:13, color:'#4ade80', fontWeight:700, textAlign:'center',
+              }}>
+                Фіксована ціна: <strong>{ctaFixed}₴</strong>
+              </div>
+            ) : surcharge > 0 ? (
               <div style={{
                 marginTop:12, padding:'12px 14px', borderRadius:12,
                 background:'rgba(247,201,72,0.08)', border:'1px solid rgba(247,201,72,0.35)',
