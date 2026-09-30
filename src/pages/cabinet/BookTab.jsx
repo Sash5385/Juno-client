@@ -19,6 +19,15 @@ function stripDurationSuffix(name) {
   return (name || '').replace(/\s+\d+(?:[.,]\d+)?\s*год\S*\.?\s*$/iu, '').trim() || name
 }
 
+function timeToMin(t) {
+  const [h, m] = (t || '0:0').split(':').map(Number)
+  return h * 60 + m
+}
+function formatDurShort(min) {
+  const h = Math.floor(min / 60), m = min % 60
+  return h === 0 ? `${m} хв` : m === 0 ? `${h} год` : `${h} год ${m} хв`
+}
+
 export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const { showToast, ToastEl } = useToast()
   const isSchool = profile?.studentType === 'school'
@@ -45,11 +54,14 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const [slots, setSlots] = useState({})
   const [queueMap, setQueueMap] = useState({}) // time → count
   const [selectedTime, setSelectedTime] = useState(notifParams?.time || null)
+  // Другий обраний годинний слот: два сусідні вільні години об'єднуються в один запис на 2 години
+  const [selectedTime2, setSelectedTime2] = useState(null)
   const [loading, setLoading] = useState(() => !!notifParams?.date)
   const initialDateSet = useRef(true)
   useEffect(() => {
     if (initialDateSet.current) { initialDateSet.current = false; return }
     setSelectedTime(null)
+    setSelectedTime2(null)
   }, [selectedDate])
   const [adminSettings, setAdminSettings] = useState({ lunchEnabled: true, lunchStart: 12, lunchEnd: 13 })
   const [monthAvail, setMonthAvail] = useState({})
@@ -61,6 +73,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const [submitting, setSubmitting] = useState(false)
   const [successData, setSuccessData] = useState(null) // {type:'booking'|'queue', date, time, service, duration}
   const [studentNote, setStudentNote] = useState("")
+
+  useEffect(() => { setSelectedTime2(null) }, [selectedService?.id])
 
   useEffect(() => {
     getAdminSettings().then(s => setAdminSettings(s)).catch(() => {})
@@ -74,7 +88,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     })
   }, [])
 
-  const durationHours = selectedService ? selectedService.duration / 60 : 1
+  // Базова тривалість — з послуги. Якщо послуга годинна, учень може обрати два сусідні
+  // годинні слоти поспіль — тоді запис триває 2 години (як в ID4).
+  const baseDurationHours = selectedService ? selectedService.duration / 60 : 1
+  const durationHours = selectedTime2 && baseDurationHours === 1 ? 2 : baseDurationHours
 
   function getLunchForDate(date) {
     if (!date) return { lunchEnabled: adminSettings.lunchEnabled, lunchStart: adminSettings.lunchStart || 12, lunchEnd: adminSettings.lunchEnd || 13 }
@@ -209,6 +226,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     if (slot.offeredTo?.[user?.uid]) {
       // Слот зарезервований для мене → одразу до бронювання
       setSelectedTime(slot.time)
+      setSelectedTime2(null)
       return
     }
     if (slot.available === false) {
@@ -217,29 +235,51 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       const q = queueMap[slot.time]
       if (q?.mine) return
       setDialogSlot({ ...slot, queueCount: q?.count || 0 })
-    } else {
-      setSelectedTime(slot.time)
+      return
     }
+    // Повторний тап на вже обраний слот — знімає його з вибору.
+    if (slot.time === selectedTime) {
+      if (selectedTime2) { setSelectedTime(selectedTime2); setSelectedTime2(null) }
+      else setSelectedTime(null)
+      return
+    }
+    if (slot.time === selectedTime2) {
+      setSelectedTime2(null)
+      return
+    }
+    // Тап на сусідній вільний годинний слот, коли вже обрано один — об'єднуємо в один
+    // запис на 2 години замість заміни вибору (лише для годинної послуги).
+    if (baseDurationHours === 1 && selectedTime && !selectedTime2 && !slot.vipOnly
+        && Math.abs(timeToMin(slot.time) - timeToMin(selectedTime)) === 60) {
+      const first = slots[`slot${selectedTime.replace(':', '')}`]
+      if (first && first.available !== false && !first.vipOnly && !first.offeredTo?.[user?.uid]) {
+        setSelectedTime2(slot.time)
+        return
+      }
+    }
+    setSelectedTime(slot.time)
+    setSelectedTime2(null)
   }
 
   const handleBook = async () => {
     if (!selectedDate || !selectedTime || !selectedService) return
+    const startTime = selectedTime2 && timeToMin(selectedTime2) < timeToMin(selectedTime) ? selectedTime2 : selectedTime
     const slotDt = new Date(selectedDate)
-    const [slotH, slotM] = selectedTime.split(':').map(Number)
+    const [slotH, slotM] = startTime.split(':').map(Number)
     slotDt.setHours(slotH, slotM, 0, 0)
     if (slotDt <= new Date()) {
       showToast('Не можна записатись на минулий час')
       return
     }
     const dateStr = formatDateYMD(selectedDate)
-    if (overlapsMyBooking(dateStr, selectedTime, durationHours)) {
+    if (overlapsMyBooking(dateStr, startTime, durationHours)) {
       showToast('Ви вже записані на цей час')
       return
     }
     setSubmitting(true)
     try {
       const dateStr = formatDateYMD(selectedDate)
-      const [bh, bm] = selectedTime.split(':').map(Number)
+      const [bh, bm] = startTime.split(':').map(Number)
       const bookStartMin = bh * 60 + bm
       let surcharge = 0
       for (let i = 0; i < durationHours; i++) {
@@ -253,14 +293,14 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           return
         }
       }
-      const totalPrice = applyDiscount((selectedService?.price || 0) + surcharge)
-      const currentSlot = slots[`slot${selectedTime.replace(':', '')}`]
+      const totalPrice = applyDiscount((selectedService?.price || 0) * (durationHours / baseDurationHours) + surcharge)
+      const currentSlot = slots[`slot${startTime.replace(':', '')}`]
       const isOfferedToMe = !!currentSlot?.offeredTo?.[user?.uid]
       // Атомарно займаємо весь діапазон (перша година вже зарезервована
       // саме для мене через чергу — атомарно займаємо лише решту, якщо
       // бронювання довше 1 год)
       if (!isOfferedToMe) {
-        const claimed = await claimSlot(dateStr, selectedTime, durationHours, adminSettings.interval || 30)
+        const claimed = await claimSlot(dateStr, startTime, durationHours, adminSettings.interval || 30)
         if (!claimed) {
           showToast('Цей слот щойно зайняли. Оберіть інший час.')
           setSubmitting(false)
@@ -278,7 +318,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       }
       await createBooking(user.uid, {
         date: dateStr,
-        time: selectedTime,
+        time: startTime,
         serviceType: selectedService.type,
         serviceId: selectedService.id,
         serviceName: selectedService.name,
@@ -292,10 +332,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       })
       setStudentNote("")
       if (isOfferedToMe) {
-        await claimReservedSlot(dateStr, selectedTime, user.uid)
+        await claimReservedSlot(dateStr, startTime, user.uid)
       }
       setSelectedTime(null)
-      setSuccessData({ type: 'booking', date: formatDateYMD(selectedDate), time: selectedTime, service: selectedService, surcharge, durationHours, pending: !!adminSettings.pendingEnabled })
+      setSelectedTime2(null)
+      setSuccessData({ type: 'booking', date: formatDateYMD(selectedDate), time: startTime, service: selectedService, surcharge, durationHours, pending: !!adminSettings.pendingEnabled })
     } catch (e) {
       showToast('Помилка: ' + e.message)
     } finally {
@@ -384,7 +425,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         const [bh, bm] = (b.time || '0:0').split(':').map(Number)
         const bStart = bh * 60 + bm
         const bEnd = bStart + (b.durationHours || 1) * 60
-        if (stickyMode !== 'after')  allowedStartMins.add(bStart - durationHours * 60)
+        if (stickyMode !== 'after')  allowedStartMins.add(bStart - baseDurationHours * 60)
         if (stickyMode !== 'before') allowedStartMins.add(bEnd)
       })
     }
@@ -409,7 +450,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         const [th, tm] = (slot.time || '0:0').split(':').map(Number)
         const slotStartMin = th * 60 + tm
         let totalSurcharge = 0
-        for (let i = 0; i < durationHours; i++) {
+        for (let i = 0; i < baseDurationHours; i++) {
           const coveredMin = slotStartMin + i * 60
           const coveredKey = `slot${String(Math.floor(coveredMin/60)).padStart(2,'0')}${String(coveredMin%60).padStart(2,'0')}`
           totalSurcharge += slots[coveredKey]?.surcharge || 0
@@ -430,9 +471,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         })
         return {
           ...slot,
-          lunchBlocked:   isBlockedByLunch(slot.time, durationHours),
-          overlapBlocked: slot.available !== false && wouldOverlapTaken(slot.time, durationHours),
-          isMyBooked:     overlapsMyBooking(dateStr, slot.time, durationHours),
+          lunchBlocked:   isBlockedByLunch(slot.time, baseDurationHours),
+          overlapBlocked: slot.available !== false && wouldOverlapTaken(slot.time, baseDurationHours),
+          isMyBooked:     overlapsMyBooking(dateStr, slot.time, baseDurationHours),
           isExactlyMine,
           isPartOfMyBooking,
           vipBlocked,
@@ -470,7 +511,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         return slotDt > new Date()
       })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slots, durationHours, adminSettings, profile?.isVip, selectedDate, selectedService, bookingsData.upcoming])
+  }, [slots, baseDurationHours, adminSettings, profile?.isVip, selectedDate, selectedService, bookingsData.upcoming])
 
   const nextLesson = useMemo(() => {
     const now = Date.now()
@@ -634,7 +675,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   const q = queueMap[slot.time]
                   const isAvailable = slot.available !== false
                   const isMyQueue = q?.mine
-                  const isSelected = selectedTime === slot.time
+                  const isSelected = selectedTime === slot.time || selectedTime2 === slot.time
                   const isLunch = slot.lunchBlocked
                   const isOverlap = slot.overlapBlocked
                   const isMyReserved = !!(slot.offeredTo?.[user?.uid])
@@ -675,7 +716,15 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                           </div>
                         ) : q?.count > 0 ? (
                           <QueueIcons n={q.count} />
-                        ) : null}
+                        ) : (
+                          // Тривалість і ціна прямо на плитці — як в ID4
+                          <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:1}}>
+                            <div style={{fontSize:10, color:'#7ed957', fontWeight:700}}>{formatDurShort(baseDurationHours * 60)}</div>
+                            {slot.totalPrice > 0 && (
+                              <div style={{fontSize:10, color:'var(--dim)', fontWeight:700}}>{slot.totalPrice}₴</div>
+                            )}
+                          </div>
+                        )}
                       </button>
                       {isMyQueue && (
                         <button
@@ -710,6 +759,15 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               }}>
                 ⏳ Якщо ваш бажаний час зайнятий — ви можете стати на нього в чергу. Як тільки він звільниться, ви зможете записатися.
               </div>
+              {baseDurationHours === 1 && (
+                <div style={{
+                  marginTop:8, padding:'8px 12px', borderRadius:10,
+                  background:'rgba(74,222,128,0.06)', border:'1px solid rgba(74,222,128,0.2)',
+                  fontSize:11, color:'var(--dim)', textAlign:'center', lineHeight:1.4,
+                }}>
+                  🕐 Щоб записатись на 2 години поспіль — оберіть два сусідні вільні слоти.
+                </div>
+              )}
             </>
           )}
         </>
@@ -717,7 +775,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
 
       {/* CTA */}
       {selectedTime && selectedService && (() => {
-        const [sh, sm] = selectedTime.split(':').map(Number)
+        const ctaStart = selectedTime2 && timeToMin(selectedTime2) < timeToMin(selectedTime) ? selectedTime2 : selectedTime
+        const [sh, sm] = ctaStart.split(':').map(Number)
         const startMin = sh * 60 + sm
         let surcharge = 0
         for (let i = 0; i < durationHours; i++) {
@@ -725,7 +784,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           const key = `slot${String(Math.floor(slotMin/60)).padStart(2,'0')}${String(slotMin%60).padStart(2,'0')}`
           surcharge += slots[key]?.surcharge || 0
         }
-        const baseP = selectedService.price || 0
+        const baseP = (selectedService.price || 0) * (durationHours / baseDurationHours)
         const totalPrice = applyDiscount(baseP + surcharge)
         const dateLabel = formatDateYMD(selectedDate).slice(-5).split('-').reverse().join('.')
         return (
@@ -768,7 +827,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               }}
             />
             <button className="btn-primary" style={{marginTop:8}} onClick={handleBook} disabled={submitting}>
-              {submitting ? 'Записуємо...' : `✓ Записатись ${dateLabel} о ${selectedTime}${totalPrice ? ` · ${totalPrice}₴` : ''}`}
+              {submitting ? 'Записуємо...' : `✓ Записатись ${dateLabel} о ${ctaStart}${durationHours > baseDurationHours ? ` на ${durationHours} год` : ''}${totalPrice ? ` · ${totalPrice}₴` : ''}`}
             </button>
           </div>
         )
