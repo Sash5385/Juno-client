@@ -6,7 +6,7 @@ import { App as CapacitorApp } from '@capacitor/app'
 import { auth } from './firebase/config'
 import {
   getUserProfile, updateUserProfile, createBooking, claimSlot,
-  setCurrentTenant, loadStoredTenant, resolveSlug,
+  setCurrentTenant, loadStoredTenant, resolveSlug, getCurrentSlug,
 } from './firebase/db'
 import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
 import { useAppUpdate } from './hooks/useAppUpdate'
@@ -114,19 +114,39 @@ export default function App() {
   // посилання-запрошення /i/{slug} (одноразово прив'язує пристрій до
   // інструктора) або збережений з попереднього візиту iid.
   useEffect(() => {
+    // Slug береться з /i/{slug} АБО з ?i={slug}: параметр ми самі лишаємо в адресі
+    // (див. ефект нижче), щоб ярлик "На екран Домой" (iOS зберігає ПОТОЧНУ адресу
+    // сторінки, а сховище PWA на iPhone ізольоване від Safari) відкривався вже
+    // прив'язаним до свого інструктора, а не на голому домені.
     const m = location.pathname.match(/^\/i\/([^/]+)/)
-    if (m) {
-      const slug = decodeURIComponent(m[1])
+    const qSlug = new URLSearchParams(location.search).get('i')
+    const rawSlug = m ? m[1] : qSlug
+    if (rawSlug) {
+      const slug = decodeURIComponent(rawSlug)
+      const withSlug = (search, s) => {
+        const p = new URLSearchParams(search)
+        if (s) p.set('i', s); else p.delete('i')
+        const str = p.toString()
+        return str ? '?' + str : ''
+      }
       resolveSlug(slug).then(iid => {
+        const rest = m ? (location.pathname.slice(m[0].length) || '/') : location.pathname
         if (iid) {
           setCurrentTenant(iid, slug)
           setTenantIid(iid)
-        } else {
-          setTenantIid(null)
-          setTenantResolveFailed(true)
+          navigate(rest + withSlug(location.search, slug) + location.hash, { replace: true })
+          return
         }
-        const rest = location.pathname.slice(m[0].length) || '/'
-        navigate(rest + location.search, { replace: true })
+        // slug із ?i= застарів, але є збережений інструктор — працюємо з ним
+        const stored = !m ? loadStoredTenant() : null
+        if (stored) {
+          setTenantIid(stored.iid)
+          navigate(rest + withSlug(location.search, stored.slug) + location.hash, { replace: true })
+          return
+        }
+        setTenantIid(null)
+        setTenantResolveFailed(true)
+        navigate(rest + withSlug(location.search, null) + location.hash, { replace: true })
       }).catch(() => { setTenantIid(null); setTenantResolveFailed(true) })
       return
     }
@@ -134,6 +154,19 @@ export default function App() {
     setTenantIid(stored ? stored.iid : null)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Тримаємо ?i={slug} в адресі на КОЖНІЙ сторінці: інакше після першої ж
+  // навігації адреса стає без інструктора, і ярлик, доданий на екран Домой
+  // (iPhone), відкривається як "спільний сайт" без прив'язки до учня/інструктора.
+  useEffect(() => {
+    if (!tenantIid) return
+    const slug = getCurrentSlug()
+    if (!slug) return
+    const p = new URLSearchParams(location.search)
+    if (p.get('i') === slug) return
+    p.set('i', slug)
+    navigate({ pathname: location.pathname, search: '?' + p.toString(), hash: location.hash }, { replace: true, state: location.state })
+  }, [tenantIid, location.pathname, location.search])
 
   useEffect(() => {
     if (tenantIid === undefined) return // ще визначаємо інструктора

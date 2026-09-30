@@ -4,7 +4,19 @@
 // "недійсне посилання" (App.jsx: коли slug був, але не резолвнувся), тут
 // відвідувач просто вперше на домені — потрібен опис сервісу як такого
 // (напр. для перевірки мерчанта платіжними системами LiqPay/Monobank).
+import { useState } from 'react'
+
+// Витягує slug з введеного коду або повного посилання (…/i/{slug}, …?i={slug}, {slug})
+function parseSlug(input) {
+  const t = (input || '').trim()
+  if (!t) return ''
+  const m = t.match(/\/i\/([^/?#\s]+)/) || t.match(/[?&]i=([^&#\s]+)/)
+  return decodeURIComponent(m ? m[1] : t.replace(/^\/+|\/+$/g, ''))
+}
+
 export default function About() {
+  const [code, setCode] = useState('')
+  const slug = parseSlug(code)
   return (
     <div style={{
       minHeight: '100vh',
@@ -59,6 +71,28 @@ export default function About() {
           Якщо у вас є персональне посилання від свого інструктора — перейдіть за ним,
           щоб побачити вільні уроки саме в нього.
         </p>
+
+        {/* Ярлик на екрані Домой (iPhone) має власне сховище і може відкритись без
+            посилання інструктора — тут його можна ввести вручну один раз. */}
+        <div style={{ background: 'var(--surface)', border: '1px solid var(--border)', borderRadius: 16, padding: '14px 16px' }}>
+          <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
+            Вже маєте посилання від інструктора?
+          </div>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <input
+              value={code}
+              onChange={e => setCode(e.target.value)}
+              placeholder="Вставте посилання або код"
+              autoCapitalize="none" autoCorrect="off" spellCheck={false}
+              style={{ flex: 1, minWidth: 0, padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}
+            />
+            <button
+              disabled={!slug}
+              onClick={() => { window.location.href = '/i/' + encodeURIComponent(slug) }}
+              style={{ padding: '10px 14px', borderRadius: 10, border: 'none', background: 'linear-gradient(145deg,var(--acc-hi),var(--accent))', color: '#fff', fontWeight: 800, fontSize: 14, opacity: slug ? 1 : 0.5 }}
+            >Відкрити</button>
+          </div>
+        </div>
       </div>
 
       <div style={{ marginTop: 40, fontSize: 11, color: 'var(--dim)' }}>© {new Date().getFullYear()} DrivePad</div>
