@@ -10,7 +10,8 @@ import {
 } from './firebase/db'
 import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
 import { useAppUpdate } from './hooks/useAppUpdate'
-import { useLicense, isLicenseBlocked } from './hooks/useLicense'
+import { useLicense, isLicenseReadOnly, LicenseContext } from './hooks/useLicense'
+import BookingPaused from './pages/cabinet/BookingPaused'
 import { useToast } from './hooks/useToast'
 import { consumeBackHandler } from './hooks/useBackButton'
 import { APP_VERSION } from './version.js'
@@ -417,26 +418,10 @@ export default function App() {
     )
   }
 
-  if (isLicenseBlocked(license)) {
-    return (
-      <>
-      <div style={{
-        display:'flex', alignItems:'center', justifyContent:'center',
-        minHeight:'100vh', background:'var(--bg)', padding:20, textAlign:'center',
-        paddingTop:'calc(20px + env(safe-area-inset-top, 0px))', paddingBottom:'calc(20px + env(safe-area-inset-bottom, 0px))'
-      }}>
-        <div>
-          <div style={{ fontSize:40, marginBottom:12 }}>🔒</div>
-          <p>Сервіс тимчасово недоступний.</p>
-          <p>Зверніться до інструктора.</p>
-        </div>
-      </div>
-      <InstallBanner/>
-      </>
-    )
-  }
+  const licenseReadOnly = isLicenseReadOnly(license)
 
   return (
+    <LicenseContext.Provider value={{ readOnly: licenseReadOnly }}>
     <>
     <Routes>
       {/* Лендінг — тільки для не авторизованих */}
@@ -450,7 +435,7 @@ export default function App() {
       <Route path="/schedule" element={
         user && profile
           ? <Navigate to="/cabinet" replace />
-          : <PublicSchedule onBook={handleBook} />
+          : (licenseReadOnly ? <BookingPaused /> : <PublicSchedule onBook={handleBook} />)
       } />
 
       {/* Авторизація */}
@@ -483,5 +468,6 @@ export default function App() {
     {ToastEl}
     <InstallPrompt active={!!(user && profile)}/>
     </>
+    </LicenseContext.Provider>
   )
 }

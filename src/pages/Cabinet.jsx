@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef } from 'react'
+import { useState, useEffect, useMemo, useRef, useContext } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
@@ -8,6 +8,8 @@ import { signOut } from '../firebase/auth'
 import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue } from '../firebase/db'
 
 import BookTab from './cabinet/BookTab'
+import BookingPaused from './cabinet/BookingPaused'
+import { LicenseContext } from '../hooks/useLicense'
 import BookingsTab from './cabinet/BookingsTab'
 import ProgressTab from './cabinet/ProgressTab'
 import ProfileTab from './cabinet/ProfileTab'
@@ -34,6 +36,7 @@ const TITLES = {
 }
 
 export default function Cabinet({ user, profile, onProfileUpdate }) {
+  const { readOnly: licenseReadOnly } = useContext(LicenseContext)
   const { theme, toggle } = useTheme()
   const { showToast, ToastEl } = useToast()
   const loc = useLocation()
@@ -290,7 +293,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
         style={{ position: 'relative' }}
       >
         <div className="fade-up" key={displayedTab} style={displayedTab === 'chat' ? { display:'flex', flexDirection:'column', flex:1, minHeight:0 } : undefined}>
-          {displayedTab === 'book' && <BookTab user={user} profile={profile} bookingsData={bookingsData} notifParams={notifParams} />}
+          {displayedTab === 'book' && (licenseReadOnly ? <BookingPaused /> : <BookTab user={user} profile={profile} bookingsData={bookingsData} notifParams={notifParams} />)}
           {displayedTab === 'bookings' && <BookingsTab user={user} profile={profile} bookingsData={bookingsData} />}
           {displayedTab === 'progress' && <ProgressTab user={user} profile={profile} bookingsData={bookingsData} />}
           {displayedTab === 'queue' && <QueueTab user={user} profile={profile} />}

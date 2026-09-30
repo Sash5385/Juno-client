@@ -1,10 +1,11 @@
-import { useState, useEffect, useMemo } from 'react'
+import { useState, useEffect, useMemo, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
 import { cancelBooking, rateBooking, saveStudentNote, saveGoals, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
+import { LicenseContext } from '../../hooks/useLicense'
 import './BookingsTab.css'
 import './BookTab.css'
 
@@ -261,6 +262,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
 
 // ─── MAIN ────────────────────────────────────────────────────────
 export default function BookingsTab({ user, profile, bookingsData }) {
+  const { readOnly: licenseReadOnly } = useContext(LicenseContext)
   const { upcoming, completed, loading } = bookingsData
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
@@ -458,7 +460,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            <button className="action-btn" title="Перенести" onClick={() => setRescheduleBooking(b)}>📅</button>
+            {!licenseReadOnly && <button className="action-btn" title="Перенести" onClick={() => setRescheduleBooking(b)}>📅</button>}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: '#e53935', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
