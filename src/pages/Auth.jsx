@@ -10,6 +10,10 @@ import './Auth.css'
 
 const iosDevice = isIOSDevice()
 const inAppBrowser = isInAppBrowser()
+// iPhone, застосунок запущено з екрана Домой: вхід через Google тут неможливий — iOS відкриває
+// сторінку Google в окремому вікні Safari з власним сховищем, і результат входу ніколи не
+// повертається в застосунок (користувача "викидає" назад на головну). Показуємо Email/SMS.
+const iosStandalone = iosDevice && (window.navigator.standalone === true || window.matchMedia?.('(display-mode: standalone)').matches)
 
 const TERMS_TEXT = `Умови відвідування уроків водіння
 
@@ -275,7 +279,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       if (e.code === 'auth/popup-blocked') {
         setGoogleError('Браузер заблокував вікно. Дозволь popup або використай SMS/Email')
       } else {
-        setGoogleError('Не вдалось увійти через Google. Спробуй SMS або Email')
+        setGoogleError('Не вдалось увійти через Google' + (e?.code ? ' (' + e.code + ')' : '') + '. Спробуй SMS або Email')
       }
     } finally {
       setGoogleLoading(false)
@@ -288,7 +292,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       .then(u => { if (u) { setGoogleLoading(true); return completeGoogleSignIn(u) } })
       .catch(e => {
         console.error(e)
-        setGoogleError('Не вдалось увійти через Google. Спробуй SMS або Email')
+        setGoogleError('Не вдалось увійти через Google' + (e?.code ? ' (' + e.code + ')' : '') + '. Спробуй SMS або Email')
       })
       .finally(() => setGoogleLoading(false))
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -440,7 +444,14 @@ export default function Auth({ user, profile, onProfileSaved }) {
           </div>
 
           {/* Google */}
-          {!inAppBrowser && (
+          {iosStandalone && (
+            <div style={{marginBottom:12,padding:'12px 14px',borderRadius:14,border:'1px solid var(--border)',background:'var(--surface)',fontSize:12.5,lineHeight:1.55,color:'var(--dim)'}}>
+              <b style={{color:'var(--text)'}}>Вхід через Google недоступний у встановленому застосунку на iPhone</b> (обмеження iOS).
+              Увійдіть через <b>Email</b> або <b>SMS</b>. Якщо акаунт створено через Google — на вкладці Email натисніть
+              «Забули пароль?», і ви зможете задати пароль для цієї ж пошти.
+            </div>
+          )}
+          {!inAppBrowser && !iosStandalone && (
             <div style={{marginBottom:8}}>
               <button
                 onClick={handleGoogleSignIn}
