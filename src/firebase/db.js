@@ -90,7 +90,7 @@ export async function getUserProfile(uid) {
   if (!snap.exists()) { _blocked = false; return null }
   const data = snap.val()
   _blocked = !!data.blocked
-  return { ...(data.profile || {}), isVip: data.isVip || false, discount: data.discount || 0, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 }
+  return { ...(data.profile || {}), isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 }
 }
 
 export async function saveUserProfile(uid, profile) {

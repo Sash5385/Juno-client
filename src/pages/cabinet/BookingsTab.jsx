@@ -127,14 +127,14 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
           return
         }
       }
-      // Ціна = стара ціна + різниця надбавки (з урахуванням знижки, застосованої до запису)
-      const discountFactor = 1 - (booking.discountPct || 0) / 100
+      // Ціна = стара ціна + різниця надбавки. Знижка учня — фіксована сума за годину (а не %),
+      // тож вона вже врахована в старій ціні і на різницю надбавки не діє.
       const oldSurcharge = booking.surcharge || 0
       let newPrice = booking.price
       if (booking.price != null) {
-        newPrice = booking.price + Math.round((newSurcharge - oldSurcharge) * discountFactor)
+        newPrice = Math.max(0, booking.price + (newSurcharge - oldSurcharge))
       } else if (newSurcharge > 0) {
-        newPrice = Math.round(newSurcharge * discountFactor)
+        newPrice = newSurcharge
       }
 
       // 1. Атомарно займаємо весь новий діапазон ДО скасування старого
@@ -155,7 +155,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         serviceName: booking.serviceName,
         price: newPrice,
         surcharge: newSurcharge || undefined,
-        discountPct: booking.discountPct || undefined,
+        discountAmt: booking.discountAmt || undefined,
         durationHours,
         studentName: booking.studentName,
         phone: booking.phone,

@@ -36,8 +36,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   // private student: only private; school student: school until 40h, then only private
   const canPrivate = isPrivateStudent || schoolLimitReached
   const isVipStudent = profile?.isVip === true
-  const discountPct = profile?.discount || 0
-  const applyDiscount = (price) => discountPct > 0 ? Math.round(price * (1 - discountPct / 100)) : price
+  // Знижка учня — фіксована сума ₴ за годину (так її задає інструктор в картці учня і так
+  // рахує адмінка та ID4-клієнт), а НЕ відсотки. customPrice — індивідуальна ціна ₴/год,
+  // що повністю замінює тарифну (знижка тоді не діє).
+  const discountAmt = profile?.discount || 0
+  const customPriceAmt = profile?.customPrice > 0 ? Number(profile.customPrice) : null
+  const applyDiscount = (price, hours = 1) => discountAmt > 0 ? Math.max(0, Math.round(price - discountAmt * hours)) : price
   const [selectedService, setSelectedService] = useState(null)
   const [today] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
   const [viewMonth, setViewMonth] = useState(() => {
@@ -95,6 +99,13 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const slotDurOf = (slot) => (slot && slot.durMin ? slot.durMin / 60 : baseDurationHours)
   const selectedSlotDur = slotDurOf(selectedTime ? slots[`slot${selectedTime.replace(':', '')}`] : null)
   const durationHours = selectedTime2 ? 2 : selectedSlotDur
+  // Базова ціна уроку заданої тривалості (індивідуальна ціна або тариф послуги), без надбавки/знижки
+  const lessonBase = (hours) => customPriceAmt != null
+    ? Math.round(customPriceAmt * hours)
+    : Math.round((selectedService?.price || 0) * (hours / baseDurationHours))
+  const lessonPrice = (hours, surcharge = 0) => customPriceAmt != null
+    ? lessonBase(hours) + surcharge
+    : applyDiscount(lessonBase(hours) + surcharge, hours)
 
   function getLunchForDate(date) {
     if (!date) return { lunchEnabled: adminSettings.lunchEnabled, lunchStart: adminSettings.lunchStart || 12, lunchEnd: adminSettings.lunchEnd || 13 }
@@ -300,7 +311,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       const fixedPrice = !selectedTime2 ? (slots[`slot${startTime.replace(':', '')}`]?.fixedPrice ?? null) : null
       const totalPrice = fixedPrice != null
         ? fixedPrice
-        : applyDiscount((selectedService?.price || 0) * (durationHours / baseDurationHours) + surcharge)
+        : lessonPrice(durationHours, surcharge)
       const currentSlot = slots[`slot${startTime.replace(':', '')}`]
       const isOfferedToMe = !!currentSlot?.offeredTo?.[user?.uid]
       // Атомарно займаємо весь діапазон (перша година вже зарезервована
@@ -331,7 +342,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         serviceName: selectedService.name,
         price: totalPrice || undefined,
         surcharge: fixedPrice != null ? undefined : (surcharge || undefined),
-        discountPct: fixedPrice != null ? undefined : (discountPct || undefined),
+        discountAmt: (fixedPrice != null || customPriceAmt != null) ? undefined : (discountAmt || undefined),
         durationHours,
         studentName: profile.name,
         phone: profile.phone || user.phoneNumber,
@@ -343,7 +354,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       }
       setSelectedTime(null)
       setSelectedTime2(null)
-      setSuccessData({ type: 'booking', date: formatDateYMD(selectedDate), time: startTime, service: selectedService, surcharge, durationHours, pending: !!adminSettings.pendingEnabled })
+      setSuccessData({ type: 'booking', date: formatDateYMD(selectedDate), time: startTime, service: selectedService, surcharge, durationHours, price: totalPrice, pending: !!adminSettings.pendingEnabled })
     } catch (e) {
       showToast('Помилка: ' + e.message)
     } finally {
@@ -812,8 +823,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           surcharge += slots[key]?.surcharge || 0
         }
         const ctaFixed = !selectedTime2 ? (slots[`slot${ctaStart.replace(':', '')}`]?.fixedPrice ?? null) : null
-        const baseP = (selectedService.price || 0) * (durationHours / baseDurationHours)
-        const totalPrice = ctaFixed != null ? ctaFixed : applyDiscount(baseP + surcharge)
+        const baseP = lessonBase(durationHours)
+        const totalPrice = ctaFixed != null ? ctaFixed : lessonPrice(durationHours, surcharge)
         const dateLabel = formatDateYMD(selectedDate).slice(-5).split('-').reverse().join('.')
         return (
           <div ref={ctaSectionRef}>
@@ -835,7 +846,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   ⚠️ Ціна за цей час: <strong>{totalPrice}₴</strong>
                 </div>
                 <div style={{fontSize:11, color:'rgba(247,201,72,0.7)'}}>
-                  Стандартна {baseP}₴ + надбавка +{surcharge}₴{discountPct > 0 ? ` − знижка ${discountPct}%` : ''}
+                  {customPriceAmt != null ? 'Індивідуальна' : 'Стандартна'} {baseP}₴ + надбавка +{surcharge}₴{customPriceAmt == null && discountAmt > 0 ? ` − знижка ${discountAmt * durationHours}₴` : ''}
                 </div>
               </div>
             ) : totalPrice > 0 ? (
@@ -845,7 +856,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 fontSize:12, color:'var(--dim)', textAlign:'center',
               }}>
                 Вартість уроку: <strong style={{color:'var(--text)'}}>{totalPrice}₴</strong>
-                {discountPct > 0 && <span style={{marginLeft:6, color:'#4ade80', fontSize:11}}>−{discountPct}%</span>}
+                {customPriceAmt == null && discountAmt > 0 && <span style={{marginLeft:6, color:'#4ade80', fontSize:11}}>−{discountAmt * durationHours}₴</span>}
               </div>
             ) : null}
             <textarea
@@ -924,9 +935,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 <div className="dialog-info-row">
                   <span className="lbl">Ціна</span>
                   <span className="val" style={{color:'var(--gold)'}}>
-                    {applyDiscount(successData.service.price + (successData.surcharge || 0))} ₴
+                    {successData.price != null ? successData.price : lessonPrice(successData.durationHours, successData.surcharge || 0)} ₴
                     {successData.surcharge > 0 && <span style={{fontSize:10, color:'var(--gold)', opacity:0.7}}> (+{successData.surcharge}₴)</span>}
-                    {discountPct > 0 && <span style={{fontSize:10, color:'#4ade80', marginLeft:4}}>−{discountPct}%</span>}
+                    {customPriceAmt == null && discountAmt > 0 && <span style={{fontSize:10, color:'#4ade80', marginLeft:4}}>−{discountAmt * successData.durationHours}₴</span>}
                   </span>
                 </div>
               )}
@@ -979,21 +990,21 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 <>
                   <div className="dialog-info-row">
                     <span className="lbl">Базова ціна</span>
-                    <span className="val">{selectedService?.price || 0}₴</span>
+                    <span className="val">{lessonBase(dialogSlot.slotDurHours || baseDurationHours)}₴</span>
                   </div>
                   <div className="dialog-info-row">
                     <span className="lbl" style={{color:'var(--gold)'}}>⚡ Надбавка</span>
                     <span className="val" style={{color:'var(--gold)'}}>+{dialogSlot.surcharge}₴</span>
                   </div>
-                  {discountPct > 0 && (
+                  {customPriceAmt == null && discountAmt > 0 && (
                     <div className="dialog-info-row">
                       <span className="lbl" style={{color:'#4ade80'}}>Знижка</span>
-                      <span className="val" style={{color:'#4ade80'}}>−{discountPct}%</span>
+                      <span className="val" style={{color:'#4ade80'}}>−{discountAmt * (dialogSlot.slotDurHours || baseDurationHours)}₴</span>
                     </div>
                   )}
                   <div className="dialog-info-row" style={{borderTop:'1px solid rgba(255,255,255,0.07)', marginTop:4, paddingTop:4}}>
                     <span className="lbl" style={{fontWeight:700}}>Разом</span>
-                    <span className="val" style={{fontWeight:800}}>{applyDiscount((selectedService?.price || 0) + dialogSlot.surcharge)}₴</span>
+                    <span className="val" style={{fontWeight:800}}>{lessonPrice(dialogSlot.slotDurHours || baseDurationHours, dialogSlot.surcharge)}₴</span>
                   </div>
                 </>
               )}
