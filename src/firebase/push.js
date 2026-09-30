@@ -3,9 +3,9 @@ import { set } from 'firebase/database'
 import { app } from './config'
 import { iRef } from './db'
 
-// ⚠️ ЗГЕНЕРУЙ VAPID KEY В Firebase Console:
-// Project Settings → Cloud Messaging → Web Push certificates → Generate key pair
-const VAPID_KEY = 'BFT1t7hXhEcSsHdotLlG5xoIFNrdS11vU_jsHiD1UUMsskVINBW2het8ogOKioGTPK8X_-u1ivEQM0n0Dh6Zvqk'
+// VAPID-ключ навмисно НЕ задаємо: раніше тут стояв ключ проєкту ID4, а DrivePad працює на
+// іншому проєкті (drivepad-86fe1) — Firebase відхиляв getToken, токени учнів не
+// зберігались. Без vapidKey SDK бере ключ за замовчуванням, який працює для будь-якого проєкту.
 
 let messaging = null
 
@@ -55,7 +55,7 @@ export async function requestNotificationPermission(uid) {
 
   try {
     const swReg = await getFirebaseSwReg()
-    const token = await getToken(msg, { vapidKey: VAPID_KEY, ...(swReg ? { serviceWorkerRegistration: swReg } : {}) })
+    const token = await getToken(msg, { ...(swReg ? { serviceWorkerRegistration: swReg } : {}) })
     if (token && uid) {
       const deviceId = getDeviceId()
       await set(iRef(`users/${uid}/fcmTokens/${deviceId}`), token)
