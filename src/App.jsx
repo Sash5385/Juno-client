@@ -28,27 +28,114 @@ import About from './pages/About'
 // iPhone показуємо власну підказку "Поділитися → На екран Домівка".
 // У нативному Capacitor-застосунку (вже встановлений) банер не потрібен.
 const IOS_UA_RE = /iphone|ipad|ipod/i
+const isIOSDevice = () =>
+  IOS_UA_RE.test(window.navigator.userAgent) ||
+  (window.navigator.platform === 'MacIntel' && window.navigator.maxTouchPoints > 1) // iPadOS під виглядом Mac
+const isStandaloneMode = () =>
+  window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true
+
+// beforeinstallprompt приходить ОДИН раз одразу після старту — задовго до того, як
+// користувач увійде і змонтується підказка після входу. Тому ловимо його глобально.
+let _deferredInstall = null
+const _installSubs = new Set()
+if (typeof window !== 'undefined') {
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault(); _deferredInstall = e; _installSubs.forEach(f => f())
+  })
+  window.addEventListener('appinstalled', () => {
+    _deferredInstall = null
+    try { localStorage.setItem('pwa_installed', '1') } catch {}
+    _installSubs.forEach(f => f())
+  })
+}
 function useInstallPrompt() {
-  const [deferredPrompt, setDeferredPrompt] = useState(null)
-  const [installed, setInstalled] = useState(() =>
-    window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true
-  )
+  const [, force] = useState(0)
   useEffect(() => {
-    const onBeforeInstall = (e) => { e.preventDefault(); setDeferredPrompt(e) }
-    const onInstalled = () => { setInstalled(true); setDeferredPrompt(null) }
-    window.addEventListener('beforeinstallprompt', onBeforeInstall)
-    window.addEventListener('appinstalled', onInstalled)
-    return () => {
-      window.removeEventListener('beforeinstallprompt', onBeforeInstall)
-      window.removeEventListener('appinstalled', onInstalled)
-    }
+    const f = () => force(n => n + 1)
+    _installSubs.add(f)
+    return () => { _installSubs.delete(f) }
   }, [])
-  return { deferredPrompt, installed }
+  let installed = isStandaloneMode()
+  try { if (localStorage.getItem('pwa_installed') === '1') installed = true } catch {}
+  return { deferredPrompt: _deferredInstall, installed }
+}
+
+// Підказка "Встановити на головний екран" ПІСЛЯ ВХОДУ. Показується автоматично
+// (через пару секунд після входу), якщо застосунок ще не встановлений. "Пізніше"
+// відкладає підказку на 7 днів; встановлений застосунок більше не турбуємо.
+// iPhone: нативного діалогу немає — показуємо кроки "Поділитися → На екран Домой".
+const INSTALL_SNOOZE_KEY = 'pwa_install_snooze_until'
+function InstallPrompt({ active }) {
+  const { deferredPrompt, installed } = useInstallPrompt()
+  const ios = isIOSDevice()
+  const [open, setOpen] = useState(false)
+  const [hidden, setHidden] = useState(false)
+  let snoozed = false
+  try { snoozed = Number(localStorage.getItem(INSTALL_SNOOZE_KEY) || 0) > Date.now() } catch {}
+  const eligible = active && !hidden && !snoozed && !installed && !Capacitor.isNativePlatform() && (!!deferredPrompt || ios)
+
+  useEffect(() => {
+    if (!eligible) { setOpen(false); return }
+    const t = setTimeout(() => setOpen(true), 2500)
+    return () => clearTimeout(t)
+  }, [eligible])
+
+  if (!eligible || !open) return null
+
+  const snooze = (days) => {
+    try { localStorage.setItem(INSTALL_SNOOZE_KEY, String(Date.now() + days * 86400000)) } catch {}
+    setHidden(true)
+  }
+  const install = async () => {
+    if (!deferredPrompt) return
+    deferredPrompt.prompt()
+    const choice = await deferredPrompt.userChoice.catch(() => null)
+    if (choice?.outcome === 'accepted') {
+      try { localStorage.setItem('pwa_installed', '1') } catch {}
+      setHidden(true)
+    } else snooze(7)
+  }
+
+  return (
+    <div style={{
+      position:'fixed', left:12, right:12, bottom:'calc(env(safe-area-inset-bottom,0px) + 76px)', zIndex:210,
+      background:'var(--surface)', border:'1px solid var(--border)', borderRadius:18, padding:'14px 16px',
+      boxShadow:'0 12px 36px rgba(0,0,0,0.5)',
+    }}>
+      <div style={{display:'flex', alignItems:'center', gap:10}}>
+        <img src="/icon-192.png" alt="" style={{width:40, height:40, borderRadius:10, flexShrink:0}} />
+        <div style={{flex:1, minWidth:0}}>
+          <div style={{fontSize:14, fontWeight:800, color:'var(--text)'}}>Додайте DrivePad на головний екран</div>
+          <div style={{fontSize:12, color:'var(--dim)', marginTop:2}}>Запис на уроки в один дотик і сповіщення про урок</div>
+        </div>
+      </div>
+      {ios && !deferredPrompt && (
+        <ol style={{margin:'12px 0 0', paddingLeft:20, fontSize:12.5, lineHeight:1.6, color:'var(--text)'}}>
+          <li>Натисніть <b>«Поділитися»</b> <span style={{fontSize:15}}>⬆︎</span> внизу Safari</li>
+          <li>Оберіть <b>«На екран Домой»</b></li>
+          <li>Натисніть <b>«Додати»</b> та відкрийте DrivePad з екрана. Увійдіть там ще раз — вхід з Safari на iPhone не переноситься</li>
+        </ol>
+      )}
+      <div style={{display:'flex', gap:8, marginTop:12}}>
+        {deferredPrompt && (
+          <button onClick={install} style={{
+            flex:1, padding:'10px 14px', borderRadius:12, border:'none', cursor:'pointer',
+            fontSize:13, fontWeight:800, color:'#fff',
+            background:'linear-gradient(145deg,var(--acc-hi),var(--accent))',
+          }}>Встановити</button>
+        )}
+        <button onClick={() => snooze(ios && !deferredPrompt ? 30 : 7)} style={{
+          flex: deferredPrompt ? 0 : 1, padding:'10px 14px', borderRadius:12, border:'1px solid var(--border)', cursor:'pointer',
+          fontSize:13, fontWeight:700, color:'var(--dim)', background:'transparent', whiteSpace:'nowrap',
+        }}>{ios && !deferredPrompt ? 'Зрозуміло' : 'Пізніше'}</button>
+      </div>
+    </div>
+  )
 }
 
 function InstallBanner() {
   const { deferredPrompt, installed } = useInstallPrompt()
-  const ios = IOS_UA_RE.test(window.navigator.userAgent)
+  const ios = isIOSDevice()
   const [dismissed, setDismissed] = useState(() => localStorage.getItem('pwa_install_offered') === '1')
   const eligible = !Capacitor.isNativePlatform() && !installed && !dismissed && (deferredPrompt || ios)
 
@@ -394,7 +481,7 @@ export default function App() {
       </div>
     )}
     {ToastEl}
-    <InstallBanner/>
+    <InstallPrompt active={!!(user && profile)}/>
     </>
   )
 }
