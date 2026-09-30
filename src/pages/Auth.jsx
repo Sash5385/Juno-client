@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { sendSmsCode, verifySmsCode, resetRecaptcha, getSmsErrorMessage, renderRecaptcha, isIOSDevice, isInAppBrowser } from '../firebase/auth'
-import { signInWithEmail, signUpWithEmail, sendPasswordReset, signInWithGoogle, getGoogleRedirectResult } from '../firebase/auth-email'
+import { signInWithEmail, signUpWithEmail, sendPasswordReset, signInWithGoogle, getGoogleRedirectResult, signOut } from '../firebase/auth-email'
 import { saveUserProfile, getUserProfile, sendWelcomeIfEnabled } from '../firebase/db'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
@@ -362,6 +362,13 @@ export default function Auth({ user, profile, onProfileSaved }) {
 
   const [termsOpen, setTermsOpen] = useState(false)
 
+  // Обрали не той акаунт (пошту/телефон) — виходимо й повертаємось на вибір способу входу
+  const handleChangeAccount = async () => {
+    try { await signOut() } catch (e) { console.error(e) }
+    setEmail(''); setPassword(''); setPhoneError(''); setGoogleError('')
+    setStep('phone')
+  }
+
   const stepNum = step === 'phone' ? 0 : step === 'sms' ? 1 : 2
 
   return (
@@ -378,7 +385,9 @@ export default function Auth({ user, profile, onProfileSaved }) {
               ? <button className="back-btn" onClick={() => nav(-1)}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
-              : <div style={{width:36}}/>
+              : <button className="back-btn" onClick={handleChangeAccount} aria-label="Змінити акаунт">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
           }
           {step !== 'survey' && (
             <button className="back-btn" onClick={() => nav(1)}>
@@ -644,6 +653,14 @@ export default function Auth({ user, profile, onProfileSaved }) {
         <div className="fade-up" style={{display:'flex',flexDirection:'column'}}>
           <h1 className="auth-h1" style={{marginTop:8}}>Розкажи <span className="acc">про себе</span></h1>
           <p className="auth-sub">Допоможе підібрати програму навчання</p>
+          {(user?.email || user?.phoneNumber) && (
+            <p className="auth-sub" style={{marginTop:-6}}>
+              Ви увійшли як <b>{user.email || user.phoneNumber}</b>.{' '}
+              <button onClick={handleChangeAccount} style={{background:'none',border:'none',padding:0,color:'var(--accent)',fontWeight:700,cursor:'pointer',fontSize:'inherit'}}>
+                Це не ви? Змінити акаунт
+              </button>
+            </p>
+          )}
 
           <div className="field">
             <div className="field-label">Імʼя *</div>

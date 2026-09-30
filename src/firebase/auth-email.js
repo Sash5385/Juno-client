@@ -11,6 +11,9 @@
 import { auth } from './config'
 
 const googleProvider = new GoogleAuthProvider()
+// Завжди показуємо вибір акаунта Google — інакше Google мовчки бере останній
+// акаунт, і обрати іншу пошту після помилки неможливо.
+googleProvider.setCustomParameters({ prompt: 'select_account' })
 
 // Popup-вхід не працює у частині мобільних браузерів (Samsung Internet,
 // вбудовані webview тощо) — блокують popup або сторонні cookie без явної
