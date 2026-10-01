@@ -4,6 +4,9 @@ import { useTheme } from "../../hooks/useTheme";
 import { useToast } from "../../hooks/useToast";
 import { getInitials, formatPhone } from "../../utils/format";
 import { APP_VERSION } from "../../version.js";
+import { auth } from "../../firebase/config";
+import { getCurrentIid } from "../../firebase/db";
+import { signOut } from "../../firebase/auth";
 import "./ProfileTab.css";
 
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
@@ -17,6 +20,29 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const iPhone = instructorProfile?.phone || '';
   const iAddress = instructorProfile?.address || '';
   const iPhoneDigits = iPhone.replace(/\D/g, '');
+
+  // Видалення власного акаунта (дані записів, чатів, сповіщень + обліковий запис). Незворотно.
+  const [delOpen, setDelOpen] = useState(false);
+  const [delText, setDelText] = useState("");
+  const [deleting, setDeleting] = useState(false);
+  const handleDeleteAccount = async () => {
+    setDeleting(true);
+    try {
+      const token = await auth.currentUser.getIdToken(true);
+      const resp = await fetch("/api/delete-account", {
+        method: "POST",
+        headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "student", iid: getCurrentIid(), uid: user.uid }),
+      });
+      if (!resp.ok) throw new Error("server");
+      try { localStorage.clear(); } catch { /* ignore */ }
+      await signOut().catch(() => {});
+      window.location.href = "/";
+    } catch {
+      setDeleting(false);
+      showToast("Не вдалося видалити акаунт. Спробуйте пізніше");
+    }
+  };
 
   const [editing, setEditing] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -225,6 +251,32 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         {(profile.lessonBalance || 0) > 0 && (
           <div style={{textAlign:"center",fontSize:13,color:"#34d399",fontWeight:700,padding:"6px 0"}}>
             🎓 Залишок уроків: {profile.lessonBalance}
+          </div>
+        )}
+      </div>
+
+      <div style={{margin:"18px 4px 0",textAlign:"center"}}>
+        {!delOpen ? (
+          <button onClick={() => setDelOpen(true)} style={{background:"none",border:"none",color:"#f87171",fontSize:13,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontFamily:"inherit"}}>
+            Видалити акаунт
+          </button>
+        ) : (
+          <div style={{padding:"14px",borderRadius:14,border:"1px solid rgba(239,68,68,0.4)",background:"rgba(239,68,68,0.08)",textAlign:"left"}}>
+            <div style={{fontSize:13,fontWeight:800,color:"#f87171",marginBottom:6}}>Видалити акаунт назавжди?</div>
+            <div style={{fontSize:12,color:"var(--dim)",lineHeight:1.5,marginBottom:10}}>
+              Будуть видалені ваш профіль, записи, чат і сповіщення, а майбутні заняття скасовані. Це неможливо скасувати.
+              Щоб підтвердити, введіть слово <b style={{color:"var(--text)"}}>ВИДАЛИТИ</b>.
+            </div>
+            <input value={delText} onChange={e => setDelText(e.target.value)} placeholder="ВИДАЛИТИ"
+              style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:"1px solid rgba(255,255,255,0.18)",background:"rgba(0,0,0,0.3)",color:"var(--text)",fontSize:14,outline:"none",marginBottom:10,fontFamily:"inherit"}}/>
+            <div style={{display:"flex",gap:8}}>
+              <button onClick={handleDeleteAccount} disabled={deleting || delText.trim().toUpperCase() !== "ВИДАЛИТИ"}
+                style={{flex:1,padding:"10px",borderRadius:10,border:"none",cursor:(deleting||delText.trim().toUpperCase()!=="ВИДАЛИТИ")?"default":"pointer",background:(deleting||delText.trim().toUpperCase()!=="ВИДАЛИТИ")?"rgba(239,68,68,0.25)":"#ef4444",color:"#fff",fontWeight:800,fontSize:13,fontFamily:"inherit"}}>
+                {deleting ? "Видалення…" : "Видалити"}
+              </button>
+              <button onClick={() => { setDelOpen(false); setDelText(""); }} disabled={deleting}
+                style={{padding:"10px 16px",borderRadius:10,border:"1px solid rgba(255,255,255,0.18)",background:"transparent",color:"var(--text)",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>Скасувати</button>
+            </div>
           </div>
         )}
       </div>
