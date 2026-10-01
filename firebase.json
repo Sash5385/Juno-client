@@ -13,6 +13,11 @@
         "destination": "/manifest-tenant.webmanifest"
       },
       {
+        "source": "/api/delete-account",
+        "function": "deleteAccount",
+        "region": "europe-west1"
+      },
+      {
         "source": "**",
         "destination": "/index.html"
       }
