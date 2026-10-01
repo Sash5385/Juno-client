@@ -509,3 +509,40 @@
 }
 
 .bottom-spacer { margin-top: 20px; padding-top: 4px; }
+
+/* ===== Тема «Скло» (як на екрані входу інструктора): кольорові шари за матовими панелями ===== */
+.auth-page { position: relative; isolation: isolate; }
+.auth-page::before {
+  content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;
+  background:
+    radial-gradient(48vmax 48vmax at 4% 2%, rgba(255,90,60,0.85), transparent 68%),
+    radial-gradient(44vmax 44vmax at 98% 86%, rgba(122,77,255,0.85), transparent 68%),
+    radial-gradient(30vmax 30vmax at 38% 104%, rgba(20,184,166,0.8), transparent 68%),
+    #0a0b0d;
+}
+[data-theme="light"] .auth-page::before {
+  background:
+    radial-gradient(48vmax 48vmax at 4% 2%, rgba(255,177,153,0.95), transparent 68%),
+    radial-gradient(44vmax 44vmax at 98% 86%, rgba(185,166,255,0.95), transparent 68%),
+    radial-gradient(30vmax 30vmax at 38% 104%, rgba(155,227,215,0.95), transparent 68%),
+    #e9e4f5;
+}
+.phone-card, .text-input, .tile-pick, .select-item, .toggle-row, .terms-survey-btn, .warning-card, .code-cell {
+  background: rgba(255,255,255,0.07);
+  border: 1px solid rgba(255,255,255,0.16);
+  backdrop-filter: blur(18px);
+  -webkit-backdrop-filter: blur(18px);
+  box-shadow: none;
+}
+.text-input { border-width: 1px; }
+.text-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,90,60,0.18); }
+.code-cell.filled { background: linear-gradient(165deg, var(--acc-hi), var(--accent)); border-color: transparent; }
+.code-cell.active, .tile-pick.selected { border-color: var(--accent); }
+[data-theme="light"] .phone-card, [data-theme="light"] .text-input, [data-theme="light"] .tile-pick, [data-theme="light"] .select-item,
+[data-theme="light"] .toggle-row, [data-theme="light"] .terms-survey-btn, [data-theme="light"] .warning-card, [data-theme="light"] .code-cell {
+  background: rgba(255,255,255,0.55);
+  border-color: rgba(255,255,255,0.85);
+}
+.back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); box-shadow: none; }
+.auth-logo-icon { box-shadow: 0 8px 26px rgba(0,0,0,0.45), 0 0 0 4px rgba(255,255,255,0.1); }
+.auth-page { width: 100%; box-sizing: border-box; min-width: 0; }
