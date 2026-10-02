@@ -12,6 +12,15 @@
     <meta name="apple-mobile-web-app-title" content="DrivePad" />
     <link rel="apple-touch-icon" href="/icon-192.png" />
     <title>DrivePad — Запис на уроки водіння</title>
+    <script>
+      // Палітра й режим застосовуємо до першого малювання (див. hooks/useTheme.js)
+      try {
+        var p = localStorage.getItem('palette'); if (p !== 'ocean') p = 'neon';
+        document.documentElement.setAttribute('data-palette', p);
+        var t = localStorage.getItem('theme'); if (t !== 'light') t = 'dark';
+        document.addEventListener('DOMContentLoaded', function () { document.body.setAttribute('data-theme', t); });
+      } catch (e) {}
+    </script>
   </head>
   <body>
     <div id="root"></div>

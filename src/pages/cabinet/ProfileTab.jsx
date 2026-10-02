@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 import { updateUserProfile, getAdminSettings, getCurrentSlug } from "../../firebase/db";
-import { useTheme } from "../../hooks/useTheme";
+import { useTheme, PALETTES } from "../../hooks/useTheme";
 import { useToast } from "../../hooks/useToast";
 import { getInitials, formatPhone } from "../../utils/format";
 import { APP_VERSION } from "../../version.js";
@@ -10,7 +10,7 @@ import { signOut } from "../../firebase/auth";
 import "./ProfileTab.css";
 
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
-  const { theme, setTheme } = useTheme();
+  const { palette, setPalette } = useTheme();
   const { showToast, ToastEl } = useToast();
 
   const [instructorProfile, setInstructorProfile] = useState(null);
@@ -207,6 +207,23 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           )}
         </div>
       )}
+
+      <div className="profile-section">
+        <div className="section-title">🎨 Оформлення</div>
+        <div className="edit-tiles">
+          {PALETTES.map(p => (
+            <button key={p.id} type="button" className={`edit-tile${palette === p.id ? " selected" : ""}`} onClick={() => setPalette(p.id)}>
+              <span style={{display:"flex",justifyContent:"center",gap:4,marginBottom:6}}>
+                {p.colors.map(c => <i key={c} style={{width:14,height:14,borderRadius:"50%",background:c,display:"block",boxShadow:"0 0 0 1.5px rgba(255,255,255,0.35)"}}/>)}
+              </span>
+              {p.name}
+            </button>
+          ))}
+        </div>
+        <div style={{fontSize:12,color:"var(--faint)",marginTop:8,lineHeight:1.5}}>
+          Темний або світлий режим перемикає кнопка в шапці.
+        </div>
+      </div>
 
       <div className="profile-section">
         <div className="section-title">🎁 Запросити друга</div>

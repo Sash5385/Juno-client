@@ -1,0 +1,175 @@
+/* Палітри клієнта: «Неон-ніч» (neon) і «Океан» (ocean), у темному й світлому режимі.
+   Активна палітра — атрибут data-palette на <html> (див. hooks/useTheme.js), режим — data-theme на <body>.
+   Селектори мають вищу специфічність, ніж базові правила з [data-theme="light"] у компонентних CSS. */
+
+/* ── Неон-ніч · dark ── */
+html[data-palette="neon"] body[data-theme="dark"]{
+  --bg:#0a0614;--bg-deep:#0e0a1f;--surface:#1b1334;--surf-hi:#2b2442;--surf-lo:#160f2a;
+  --border:rgba(255,255,255,0.08);--text:#f3eeff;--dim:#918d9c;--faint:#635e6d;
+  --accent:#ff3d9a;--acc-hi:#ff6eb3;--green:#2ee6a6;--blue:#5b9bff;--gold:#f7c948;
+  --shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05);
+  color-scheme:dark;
+}
+html[data-palette="neon"] body[data-theme="dark"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(255,61,154,0.2), transparent 45%), radial-gradient(circle at 95% 30%, rgba(34,211,238,0.17), transparent 45%), radial-gradient(circle at 20% 95%, rgba(139,92,246,0.15), transparent 45%)}
+html[data-palette="neon"] body[data-theme="dark"] .cab-topbar{background:linear-gradient(180deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 88%,transparent));border-bottom:1px solid var(--border)}
+html[data-palette="neon"] body[data-theme="dark"] .cal-card,html[data-palette="neon"] body[data-theme="dark"] .svc-tile{background:color-mix(in srgb, #1b1334 72%, transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.14);border-radius:20px;box-shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05)}
+html[data-palette="neon"] body[data-theme="dark"] .user-banner,html[data-palette="neon"] body[data-theme="dark"] .booking-card,html[data-palette="neon"] body[data-theme="dark"] .profile-section,html[data-palette="neon"] body[data-theme="dark"] .profile-banner,html[data-palette="neon"] body[data-theme="dark"] .empty-state{border-radius:20px;border:1px solid rgba(255,255,255,0.14);}
+html[data-palette="neon"] body[data-theme="dark"] .cal-day{border-radius:50%}
+html[data-palette="neon"] body[data-theme="dark"] .cal-day.day-free{background:#2ee6a6;box-shadow:0 4px 12px rgba(46,230,166,0.45);color:#fff}
+html[data-palette="neon"] body[data-theme="dark"] .cal-day.day-partial{background:#ffb020;box-shadow:0 4px 12px rgba(255,176,32,0.45);color:#fff}
+html[data-palette="neon"] body[data-theme="dark"] .cal-day.day-full{background:#ff4d6d;box-shadow:none;color:#fff}
+html[data-palette="neon"] body[data-theme="dark"] .cal-day.selected{background:linear-gradient(155deg,#5eead4,#8b5cf6);color:#0b0618 !important;border-radius:50%;box-shadow:0 4px 14px rgba(139,92,246,0.5)}
+html[data-palette="neon"] body[data-theme="dark"] .cal-day.today:not(.selected)::before{border-radius:50%}
+html[data-palette="neon"] body[data-theme="dark"] .slot{border-radius:16px;background:rgba(46,230,166,0.28);border:1px solid rgba(46,230,166,0.5);color:var(--text)}
+html[data-palette="neon"] body[data-theme="dark"] .slot.taken{background:rgba(255,77,109,0.13);border-color:rgba(255,77,109,0.34)}
+html[data-palette="neon"] body[data-theme="dark"] .slot.selected{background:linear-gradient(155deg,#5eead4,#8b5cf6);color:#0b0618;border-color:rgba(139,92,246,0.7)}
+
+html[data-palette="neon"] body[data-theme="dark"] .botnav-inner{background:color-mix(in srgb, #0e0a1f 78%, transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.14);border-radius:28px;box-shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05)}
+html[data-palette="neon"] body[data-theme="dark"] .botnav-ico{color:var(--text)}
+html[data-palette="neon"] body[data-theme="dark"] .botnav-lbl{color:var(--faint)}
+html[data-palette="neon"] body[data-theme="dark"] .botnav-btn.active .botnav-ico,html[data-palette="neon"] body[data-theme="dark"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
+html[data-palette="neon"] body[data-theme="dark"] .botnav-fab{background:linear-gradient(155deg,#ff6eb3,#ff3d9a);border-color:var(--bg);box-shadow:0 8px 20px rgba(255,61,154,0.5)}
+html[data-palette="neon"] body[data-theme="dark"] .botnav-fab-glow{background:radial-gradient(circle,rgba(255,61,154,0.35),transparent 70%)}
+html[data-palette="neon"] body[data-theme="dark"] .botnav-badge,html[data-palette="neon"] body[data-theme="dark"] .cab-icon-btn .badge{background:var(--accent);color:#fff}
+/* ── кнопки шапки: «кульки з градієнтом» ── */
+html[data-palette="neon"] body[data-theme="dark"] .cab-icon-btn{width:28px;height:28px;border-radius:50%;border:0;color:#fff;background:linear-gradient(145deg,color-mix(in srgb,var(--bc,#7c3aed) 78%,#fff),color-mix(in srgb,var(--bc,#7c3aed) 82%,#000));
+  box-shadow:0 0 12px color-mix(in srgb,var(--bc,#7c3aed) 55%,transparent), inset 1px 1px 0 rgba(255,255,255,0.4);backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-palette="neon"] body[data-theme="dark"] .cab-icon-btn::before{display:none}
+html[data-palette="neon"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(1){--bc:#7c3aed}
+html[data-palette="neon"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(2){--bc:#6366f1}
+html[data-palette="neon"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(3){--bc:#06b6d4}
+html[data-palette="neon"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(4){--bc:#ec4899}
+html[data-palette="neon"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(1){--bc:#3b82f6}
+html[data-palette="neon"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(3){--bc:#f59e0b}
+html[data-palette="neon"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(4){--bc:#ef4444}
+html[data-palette="neon"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(2){--bc:#7c6cff;background:linear-gradient(145deg,#7c6cff,#3b2fb0)}
+
+/* ── Неон-ніч · light ── */
+html[data-palette="neon"] body[data-theme="light"]{
+  --bg:#f6f0ff;--bg-deep:#ece3ff;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#f0f0f0;
+  --border:rgba(0,0,0,0.07);--text:#1d1038;--dim:#695e7e;--faint:#948ba5;
+  --accent:#d61f7e;--acc-hi:#e0579e;--green:#10b981;--blue:#5b9bff;--gold:#f7c948;
+  --shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9);
+  color-scheme:light;
+}
+html[data-palette="neon"] body[data-theme="light"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(255,61,154,0.22), transparent 45%), radial-gradient(circle at 95% 30%, rgba(34,211,238,0.2), transparent 45%), radial-gradient(circle at 20% 95%, rgba(139,92,246,0.18), transparent 45%)}
+html[data-palette="neon"] body[data-theme="light"] .cab-topbar{background:linear-gradient(180deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 88%,transparent));border-bottom:1px solid var(--border)}
+html[data-palette="neon"] body[data-theme="light"] .cal-card,html[data-palette="neon"] body[data-theme="light"] .svc-tile{background:color-mix(in srgb, #ffffff 90%, transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,0,0,0.08);border-radius:20px;box-shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9)}
+html[data-palette="neon"] body[data-theme="light"] .user-banner,html[data-palette="neon"] body[data-theme="light"] .booking-card,html[data-palette="neon"] body[data-theme="light"] .profile-section,html[data-palette="neon"] body[data-theme="light"] .profile-banner,html[data-palette="neon"] body[data-theme="light"] .empty-state{border-radius:20px;border:1px solid rgba(0,0,0,0.08);}
+html[data-palette="neon"] body[data-theme="light"] .cal-day{border-radius:50%}
+html[data-palette="neon"] body[data-theme="light"] .cal-day.day-free{background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.45);color:#fff}
+html[data-palette="neon"] body[data-theme="light"] .cal-day.day-partial{background:#f59e0b;box-shadow:0 4px 12px rgba(245,158,11,0.45);color:#fff}
+html[data-palette="neon"] body[data-theme="light"] .cal-day.day-full{background:#ef4444;box-shadow:none;color:#fff}
+html[data-palette="neon"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(155deg,#a78bfa,#7c3aed);color:#ffffff !important;border-radius:50%;box-shadow:0 4px 14px rgba(124,58,237,0.5)}
+html[data-palette="neon"] body[data-theme="light"] .cal-day.today:not(.selected)::before{border-radius:50%}
+html[data-palette="neon"] body[data-theme="light"] .slot{border-radius:16px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.4);color:var(--text)}
+html[data-palette="neon"] body[data-theme="light"] .slot.taken{background:rgba(239,68,68,0.13);border-color:rgba(239,68,68,0.34)}
+html[data-palette="neon"] body[data-theme="light"] .slot.selected{background:linear-gradient(155deg,#a78bfa,#7c3aed);color:#ffffff;border-color:rgba(124,58,237,0.7)}
+
+html[data-palette="neon"] body[data-theme="light"] .botnav-inner{background:color-mix(in srgb, #ffffff 88%, transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,0,0,0.08);border-radius:28px;box-shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9)}
+html[data-palette="neon"] body[data-theme="light"] .botnav-ico{color:var(--text)}
+html[data-palette="neon"] body[data-theme="light"] .botnav-lbl{color:var(--faint)}
+html[data-palette="neon"] body[data-theme="light"] .botnav-btn.active .botnav-ico,html[data-palette="neon"] body[data-theme="light"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
+html[data-palette="neon"] body[data-theme="light"] .botnav-fab{background:linear-gradient(155deg,#e0579e,#d61f7e);border-color:var(--bg);box-shadow:0 8px 20px rgba(214,31,126,0.5)}
+html[data-palette="neon"] body[data-theme="light"] .botnav-fab-glow{background:radial-gradient(circle,rgba(214,31,126,0.35),transparent 70%)}
+html[data-palette="neon"] body[data-theme="light"] .botnav-badge,html[data-palette="neon"] body[data-theme="light"] .cab-icon-btn .badge{background:var(--accent);color:#fff}
+/* ── кнопки шапки: «кульки з градієнтом» ── */
+html[data-palette="neon"] body[data-theme="light"] .cab-icon-btn{width:28px;height:28px;border-radius:50%;border:0;color:#fff;background:linear-gradient(145deg,color-mix(in srgb,var(--bc,#7c3aed) 78%,#fff),color-mix(in srgb,var(--bc,#7c3aed) 82%,#000));
+  box-shadow:0 0 12px color-mix(in srgb,var(--bc,#7c3aed) 55%,transparent), inset 1px 1px 0 rgba(255,255,255,0.4);backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-palette="neon"] body[data-theme="light"] .cab-icon-btn::before{display:none}
+html[data-palette="neon"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(1){--bc:#7c3aed}
+html[data-palette="neon"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(2){--bc:#6366f1}
+html[data-palette="neon"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(3){--bc:#06b6d4}
+html[data-palette="neon"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(4){--bc:#ec4899}
+html[data-palette="neon"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(1){--bc:#3b82f6}
+html[data-palette="neon"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(3){--bc:#f59e0b}
+html[data-palette="neon"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(4){--bc:#ef4444}
+html[data-palette="neon"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(2){--bc:#ffd45e;background:linear-gradient(145deg,#ffd45e,#ff8a3c)}
+
+/* ── Океан · dark ── */
+html[data-palette="ocean"] body[data-theme="dark"]{
+  --bg:#04121c;--bg-deep:#061a28;--surface:#0f2b3d;--surf-hi:#203a4b;--surf-lo:#0c2231;
+  --border:rgba(255,255,255,0.08);--text:#e6f6ff;--dim:#8796a0;--faint:#5a6972;
+  --accent:#14b8a6;--acc-hi:#4fcabc;--green:#2dd4bf;--blue:#5b9bff;--gold:#f7c948;
+  --shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05);
+  color-scheme:dark;
+}
+html[data-palette="ocean"] body[data-theme="dark"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(20,184,166,0.2), transparent 45%), radial-gradient(circle at 95% 30%, rgba(14,165,233,0.17), transparent 45%), radial-gradient(circle at 20% 95%, rgba(99,102,241,0.15), transparent 45%)}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-topbar{background:linear-gradient(180deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 88%,transparent));border-bottom:1px solid var(--border)}
+html[data-palette="ocean"] body[data-theme="dark"] .cal-card,html[data-palette="ocean"] body[data-theme="dark"] .svc-tile{background:color-mix(in srgb, #0f2b3d 72%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.14);border-radius:16px;box-shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05)}
+html[data-palette="ocean"] body[data-theme="dark"] .user-banner,html[data-palette="ocean"] body[data-theme="dark"] .booking-card,html[data-palette="ocean"] body[data-theme="dark"] .profile-section,html[data-palette="ocean"] body[data-theme="dark"] .profile-banner,html[data-palette="ocean"] body[data-theme="dark"] .empty-state{border-radius:16px;border:1px solid rgba(255,255,255,0.14);}
+html[data-palette="ocean"] body[data-theme="dark"] .cal-day{border-radius:50%}
+html[data-palette="ocean"] body[data-theme="dark"] .cal-day.day-free{background:#2dd4bf;box-shadow:0 4px 12px rgba(45,212,191,0.45);color:#fff}
+html[data-palette="ocean"] body[data-theme="dark"] .cal-day.day-partial{background:#f59e0b;box-shadow:0 4px 12px rgba(245,158,11,0.45);color:#fff}
+html[data-palette="ocean"] body[data-theme="dark"] .cal-day.day-full{background:#ef4444;box-shadow:none;color:#fff}
+html[data-palette="ocean"] body[data-theme="dark"] .cal-day.selected{background:linear-gradient(155deg,#7dd3fc,#0284c7);color:#03202f !important;border-radius:50%;box-shadow:0 4px 14px rgba(2,132,199,0.5)}
+html[data-palette="ocean"] body[data-theme="dark"] .cal-day.today:not(.selected)::before{border-radius:50%}
+html[data-palette="ocean"] body[data-theme="dark"] .slot{border-radius:12px;background:rgba(45,212,191,0.28);border:1px solid rgba(45,212,191,0.5);color:var(--text)}
+html[data-palette="ocean"] body[data-theme="dark"] .slot.taken{background:rgba(239,68,68,0.13);border-color:rgba(239,68,68,0.34)}
+html[data-palette="ocean"] body[data-theme="dark"] .slot.selected{background:linear-gradient(155deg,#7dd3fc,#0284c7);color:#03202f;border-color:rgba(2,132,199,0.7)}
+
+html[data-palette="ocean"] body[data-theme="dark"] .botnav-inner{background:color-mix(in srgb, #061a28 78%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(255,255,255,0.14);border-radius:26px;box-shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05)}
+html[data-palette="ocean"] body[data-theme="dark"] .botnav-ico{color:var(--text)}
+html[data-palette="ocean"] body[data-theme="dark"] .botnav-lbl{color:var(--faint)}
+html[data-palette="ocean"] body[data-theme="dark"] .botnav-btn.active .botnav-ico,html[data-palette="ocean"] body[data-theme="dark"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
+html[data-palette="ocean"] body[data-theme="dark"] .botnav-fab{background:linear-gradient(155deg,#4fcabc,#14b8a6);border-color:var(--bg);box-shadow:0 8px 20px rgba(20,184,166,0.5)}
+html[data-palette="ocean"] body[data-theme="dark"] .botnav-fab-glow{background:radial-gradient(circle,rgba(20,184,166,0.35),transparent 70%)}
+html[data-palette="ocean"] body[data-theme="dark"] .botnav-badge,html[data-palette="ocean"] body[data-theme="dark"] .cab-icon-btn .badge{background:var(--accent);color:#fff}
+/* ── кнопки шапки: «кульки з градієнтом» ── */
+html[data-palette="ocean"] body[data-theme="dark"] .cab-icon-btn{width:28px;height:28px;border-radius:50%;border:0;color:#fff;background:linear-gradient(145deg,color-mix(in srgb,var(--bc,#0ea5a4) 78%,#fff),color-mix(in srgb,var(--bc,#0ea5a4) 82%,#000));
+  box-shadow:0 0 12px color-mix(in srgb,var(--bc,#0ea5a4) 55%,transparent), inset 1px 1px 0 rgba(255,255,255,0.4);backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-icon-btn::before{display:none}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(1){--bc:#0ea5a4}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(2){--bc:#0284c7}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(3){--bc:#14b8a6}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(4){--bc:#6366f1}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(1){--bc:#0891b2}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(3){--bc:#f59e0b}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(4){--bc:#ef4444}
+html[data-palette="ocean"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth-child(2){--bc:#38bdf8;background:linear-gradient(145deg,#38bdf8,#0b4f8a)}
+
+/* ── Океан · light ── */
+html[data-palette="ocean"] body[data-theme="light"]{
+  --bg:#eaf6fb;--bg-deep:#d9edf6;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#f0f0f0;
+  --border:rgba(0,0,0,0.07);--text:#0b2a3a;--dim:#59717e;--faint:#869aa4;
+  --accent:#0e9488;--acc-hi:#4aafa6;--green:#14b8a6;--blue:#5b9bff;--gold:#f7c948;
+  --shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9);
+  color-scheme:light;
+}
+html[data-palette="ocean"] body[data-theme="light"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(20,184,166,0.22), transparent 45%), radial-gradient(circle at 95% 30%, rgba(14,165,233,0.2), transparent 45%), radial-gradient(circle at 20% 95%, rgba(99,102,241,0.18), transparent 45%)}
+html[data-palette="ocean"] body[data-theme="light"] .cab-topbar{background:linear-gradient(180deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 88%,transparent));border-bottom:1px solid var(--border)}
+html[data-palette="ocean"] body[data-theme="light"] .cal-card,html[data-palette="ocean"] body[data-theme="light"] .svc-tile{background:color-mix(in srgb, #ffffff 90%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(0,0,0,0.08);border-radius:16px;box-shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9)}
+html[data-palette="ocean"] body[data-theme="light"] .user-banner,html[data-palette="ocean"] body[data-theme="light"] .booking-card,html[data-palette="ocean"] body[data-theme="light"] .profile-section,html[data-palette="ocean"] body[data-theme="light"] .profile-banner,html[data-palette="ocean"] body[data-theme="light"] .empty-state{border-radius:16px;border:1px solid rgba(0,0,0,0.08);}
+html[data-palette="ocean"] body[data-theme="light"] .cal-day{border-radius:50%}
+html[data-palette="ocean"] body[data-theme="light"] .cal-day.day-free{background:#14b8a6;box-shadow:0 4px 12px rgba(20,184,166,0.45);color:#fff}
+html[data-palette="ocean"] body[data-theme="light"] .cal-day.day-partial{background:#f59e0b;box-shadow:0 4px 12px rgba(245,158,11,0.45);color:#fff}
+html[data-palette="ocean"] body[data-theme="light"] .cal-day.day-full{background:#ef4444;box-shadow:none;color:#fff}
+html[data-palette="ocean"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(155deg,#38bdf8,#0369a1);color:#ffffff !important;border-radius:50%;box-shadow:0 4px 14px rgba(3,105,161,0.5)}
+html[data-palette="ocean"] body[data-theme="light"] .cal-day.today:not(.selected)::before{border-radius:50%}
+html[data-palette="ocean"] body[data-theme="light"] .slot{border-radius:12px;background:rgba(20,184,166,0.14);border:1px solid rgba(20,184,166,0.4);color:var(--text)}
+html[data-palette="ocean"] body[data-theme="light"] .slot.taken{background:rgba(239,68,68,0.13);border-color:rgba(239,68,68,0.34)}
+html[data-palette="ocean"] body[data-theme="light"] .slot.selected{background:linear-gradient(155deg,#38bdf8,#0369a1);color:#ffffff;border-color:rgba(3,105,161,0.7)}
+
+html[data-palette="ocean"] body[data-theme="light"] .botnav-inner{background:color-mix(in srgb, #ffffff 88%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(0,0,0,0.08);border-radius:26px;box-shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9)}
+html[data-palette="ocean"] body[data-theme="light"] .botnav-ico{color:var(--text)}
+html[data-palette="ocean"] body[data-theme="light"] .botnav-lbl{color:var(--faint)}
+html[data-palette="ocean"] body[data-theme="light"] .botnav-btn.active .botnav-ico,html[data-palette="ocean"] body[data-theme="light"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
+html[data-palette="ocean"] body[data-theme="light"] .botnav-fab{background:linear-gradient(155deg,#4aafa6,#0e9488);border-color:var(--bg);box-shadow:0 8px 20px rgba(14,148,136,0.5)}
+html[data-palette="ocean"] body[data-theme="light"] .botnav-fab-glow{background:radial-gradient(circle,rgba(14,148,136,0.35),transparent 70%)}
+html[data-palette="ocean"] body[data-theme="light"] .botnav-badge,html[data-palette="ocean"] body[data-theme="light"] .cab-icon-btn .badge{background:var(--accent);color:#fff}
+/* ── кнопки шапки: «кульки з градієнтом» ── */
+html[data-palette="ocean"] body[data-theme="light"] .cab-icon-btn{width:28px;height:28px;border-radius:50%;border:0;color:#fff;background:linear-gradient(145deg,color-mix(in srgb,var(--bc,#0ea5a4) 78%,#fff),color-mix(in srgb,var(--bc,#0ea5a4) 82%,#000));
+  box-shadow:0 0 12px color-mix(in srgb,var(--bc,#0ea5a4) 55%,transparent), inset 1px 1px 0 rgba(255,255,255,0.4);backdrop-filter:none;-webkit-backdrop-filter:none}
+html[data-palette="ocean"] body[data-theme="light"] .cab-icon-btn::before{display:none}
+html[data-palette="ocean"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(1){--bc:#0ea5a4}
+html[data-palette="ocean"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(2){--bc:#0284c7}
+html[data-palette="ocean"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(3){--bc:#14b8a6}
+html[data-palette="ocean"] body[data-theme="light"] .cab-topbar > div:first-child .cab-icon-btn:nth-child(4){--bc:#6366f1}
+html[data-palette="ocean"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(1){--bc:#0891b2}
+html[data-palette="ocean"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(3){--bc:#f59e0b}
+html[data-palette="ocean"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(4){--bc:#ef4444}
+html[data-palette="ocean"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(2){--bc:#fcd34d;background:linear-gradient(145deg,#fcd34d,#f59e0b)}
+
+/* Кнопки-кульки: іконка завжди біла; активна вкладка (Cabinet.jsx задає inline color:var(--accent)) — кільце */
+html[data-palette] body[data-theme] .cab-icon-btn{color:#fff !important;overflow:visible}
+html[data-palette] body[data-theme] .cab-icon-btn[style*="accent"]{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent),0 0 14px color-mix(in srgb,var(--accent) 60%,transparent)}
