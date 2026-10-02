@@ -15,6 +15,7 @@ import BookingPaused from './pages/cabinet/BookingPaused'
 import { useToast } from './hooks/useToast'
 import { consumeBackHandler } from './hooks/useBackButton'
 import { APP_VERSION } from './version.js'
+import { DEMO, DEMO_IID, DEMO_SLUG } from './demo/demoMode'
 
 import Auth from './pages/Auth'
 import Cabinet from './pages/Cabinet'
@@ -202,6 +203,7 @@ export default function App() {
   // посилання-запрошення /i/{slug} (одноразово прив'язує пристрій до
   // інструктора) або збережений з попереднього візиту iid.
   useEffect(() => {
+    if (DEMO) { setCurrentTenant(DEMO_IID, DEMO_SLUG); setTenantIid(DEMO_IID); return } // ?demo=1: вигаданий інструктор
     // Slug береться з /i/{slug} АБО з ?i={slug}: параметр ми самі лишаємо в адресі
     // (див. ефект нижче), щоб ярлик "На екран Домой" (iOS зберігає ПОТОЧНУ адресу
     // сторінки, а сховище PWA на iPhone ізольоване від Safari) відкривався вже

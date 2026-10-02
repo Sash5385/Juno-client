@@ -82,6 +82,10 @@ function versionGuard() {
 }
 
 export default defineConfig({
+  resolve: {
+    // Демо-режим (?demo=1) — див. src/firebaseDbDemo.js
+    alias: [{ find: /^firebase\/database$/, replacement: resolve(__dirname, 'src/firebaseDbDemo.js') }],
+  },
   plugins: [
     react(),
     versionGuard(),

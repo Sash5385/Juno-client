@@ -2,6 +2,7 @@
   ref, get, set, update, push, onValue, off, remove, increment, onDisconnect, runTransaction
 } from 'firebase/database'
 import { db } from './config'
+import { DEMO } from '../demo/demoMode'
 import { blockRangeUpdates, restoreRangeUpdates } from '../utils/slotRules'
 
 // ─── МУЛЬТИТЕНАНТНІСТЬ ──────────────────────────────────────────────
@@ -37,6 +38,7 @@ function readTenantCookie() {
 export function setCurrentTenant(iid, slug) {
   _iid = iid || null
   _slug = slug || null
+  if (DEMO) return // демо: не прив'язуємо пристрій до вигаданого інструктора
   try {
     if (_iid) localStorage.setItem(IID_KEY, _iid); else localStorage.removeItem(IID_KEY)
     if (_slug) localStorage.setItem(SLUG_KEY, _slug); else localStorage.removeItem(SLUG_KEY)

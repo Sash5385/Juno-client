@@ -1,6 +1,7 @@
 import { initializeApp } from 'firebase/app'
 import { getAuth } from 'firebase/auth'
-import { getDatabase } from 'firebase/database'
+import { getDatabase, goOffline } from 'firebase/database'
+import { DEMO, DEMO_USER } from '../demo/demoMode'
 
 // Беремо з .env (Vite автоматично підставляє import.meta.env.VITE_*)
 // Якщо .env немає — fallback на дефолти (треба підставити вручну)
@@ -33,5 +34,12 @@ const firebaseConfig = {
 }
 
 export const app = initializeApp(firebaseConfig)
-export const auth = getAuth(app)
+// Демо (?demo=1): фейковий вхід учня без звернень до Firebase Auth/бази.
+const demoAuth = {
+  currentUser: { ...DEMO_USER, getIdToken: async () => 'demo' },
+  onAuthStateChanged(cb) { setTimeout(() => cb(demoAuth.currentUser), 0); return () => {} },
+  signOut: async () => {},
+}
+export const auth = DEMO ? demoAuth : getAuth(app)
 export const db = getDatabase(app)
+if (DEMO) goOffline(db) // демо: жодних з'єднань зі справжньою базою

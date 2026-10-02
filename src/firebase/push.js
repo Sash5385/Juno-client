@@ -2,6 +2,7 @@ import { getMessaging, getToken, onMessage } from 'firebase/messaging'
 import { set } from 'firebase/database'
 import { app } from './config'
 import { iRef } from './db'
+import { DEMO } from '../demo/demoMode'
 
 // VAPID-ключ навмисно НЕ задаємо: раніше тут стояв ключ проєкту ID4, а DrivePad працює на
 // іншому проєкті (drivepad-86fe1) — Firebase відхиляв getToken, токени учнів не
@@ -36,6 +37,7 @@ export async function getFirebaseSwReg() {
 }
 
 export function initMessaging() {
+  if (DEMO) return null // демо: без push і запиту дозволу на сповіщення
   if (!('Notification' in window)) {
     console.warn('Браузер не підтримує сповіщення')
     return null
