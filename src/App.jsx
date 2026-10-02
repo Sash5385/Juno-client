@@ -315,7 +315,7 @@ export default function App() {
           reg.showNotification(title, {
             body,
             icon: '/icon-192.png',
-            badge: '/icon-192.png',
+            badge: '/badge-dp.png',
             // Унікальний tag — інакше друге повідомлення поспіль тихо замінює перше.
             tag: payload.data?.tag || ('drivepad-notif-' + Date.now()),
             requireInteraction: true,
