@@ -570,8 +570,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     const ms = nextLesson._ts - Date.now()
     const hours = ms / 3600000
     if (hours < 1) return `через ${Math.ceil(ms / 60000)} хв`
-    if (hours < 24) return `сьогодні о ${nextLesson.time}`
-    if (hours < 48) return `завтра о ${nextLesson.time}`
+    // «сьогодні/завтра» — за календарним днем, а не за кількістю годин до уроку
+    const dayStart = t => { const x = new Date(t); x.setHours(0, 0, 0, 0); return x.getTime() }
+    const dayDiff = Math.round((dayStart(nextLesson._ts) - dayStart(Date.now())) / 86400000)
+    if (dayDiff === 0) return `сьогодні о ${nextLesson.time}`
+    if (dayDiff === 1) return `завтра о ${nextLesson.time}`
     const d = new Date(nextLesson._ts)
     const DAY = ['нд','пн','вт','ср','чт','пт','сб']
     const MON = ['','Січ','Лют','Бер','Кві','Тра','Чер','Лип','Сер','Вер','Жов','Лис','Гру']
@@ -619,11 +622,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         }}>
           <span style={{fontSize:22}}>📅</span>
           <div style={{flex:1, minWidth:0}}>
-            <div style={{color:'#93c5fd', fontWeight:700, fontSize:13}}>Найближчий урок</div>
+            <div className="nl-title" style={{fontWeight:700, fontSize:13}}>Найближчий урок</div>
             <div style={{color:'var(--text)', fontSize:12, marginTop:2}}>{nextLessonLabel}</div>
           </div>
           {nextLesson.status === 'pending' && (
-            <div style={{fontSize:10, fontWeight:700, color:'#fbbf24', background:'rgba(251,191,36,0.12)', padding:'2px 8px', borderRadius:6, flexShrink:0}}>очікує</div>
+            <div className="nl-pending" style={{fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:6, flexShrink:0}}>очікує</div>
           )}
         </div>
       )}
@@ -651,7 +654,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       )}
 
       {/* 1. ДАТА */}
-      <div className="section-title" style={{color:'#ffffff', fontSize:13, textAlign:'center'}}>1. Дата</div>
+      <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>1. Дата</div>
       <div className="cal-card" onTouchStart={handleCalTouchStart} onTouchEnd={handleCalTouchEnd}>
         <div className="cal-head">
           <button className="cal-nav-btn" onClick={prevMonth}>‹</button>
@@ -697,7 +700,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       {/* 3. ЧАС */}
       {selectedDate && (
         <>
-          <div ref={timeSectionRef} className="section-title" style={{color:'#ffffff', fontSize:13, textAlign:'center'}}>
+          <div ref={timeSectionRef} className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>
             3. Час ({selectedDate.toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' })})
           </div>
           {loading ? (
@@ -735,7 +738,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                       >
                         <div className="slot-time">{slot.time}</div>
                         {isExactlyMine ? (
-                          <div style={{fontSize:8, color:'#4ade80', fontWeight:700}}>ваш</div>
+                          <div className="slot-mine" style={{fontSize:8, fontWeight:700}}>ваш</div>
                         ) : isPartOfMyBooking ? null
                         : isMyReserved ? (
                           <div style={{fontSize:8, color:'white', fontWeight:700}}>ваш!</div>
@@ -746,7 +749,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         ) : isTakenByOthers || isOverlap ? (
                           <div style={{fontSize:8, opacity:0.7}}>зайнято</div>
                         ) : slot.totalSurcharge ? (
-                          <div style={{fontSize:8, color:'#f7c948', fontWeight:700}}>{slot.totalPrice}₴</div>
+                          <div className="slot-sur" style={{fontSize:8, fontWeight:700}}>{slot.totalPrice}₴</div>
                         ) : isMyQueue ? (
                           <div className="slot-queue">
                             <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
@@ -757,9 +760,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         ) : (
                           // Тривалість і ціна прямо на плитці — як в ID4
                           <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:1}}>
-                            <div style={{fontSize:10, color:'#7ed957', fontWeight:700}}>{formatDurShort((slot.slotDurHours || baseDurationHours) * 60)}</div>
+                            <div className="slot-dur" style={{fontSize:10, fontWeight:700}}>{formatDurShort((slot.slotDurHours || baseDurationHours) * 60)}</div>
                             {slot.totalPrice > 0 && (
-                              <div style={{fontSize:10, color:'var(--dim)', fontWeight:700}}>{slot.totalPrice}₴</div>
+                              <div className="slot-price" style={{fontSize:10, fontWeight:700}}>{slot.totalPrice}₴</div>
                             )}
                           </div>
                         )}

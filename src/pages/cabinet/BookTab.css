@@ -596,3 +596,21 @@
   background: radial-gradient(ellipse at top right, rgba(255,255,255,0.5) 0%, transparent 65%);
   pointer-events: none;
 }
+
+/* ── Контраст тексту: кольори залежать від теми, на вибраному слоті — колір тексту слота ── */
+.slot-dur { color: #7ed957; }
+.slot-price { color: var(--dim); }
+.slot-sur { color: #f7c948; }
+.slot-mine { color: #4ade80; }
+[data-theme="light"] .slot-dur { color: #15803d; }
+[data-theme="light"] .slot-sur { color: #b45309; }
+[data-theme="light"] .slot-mine { color: #15803d; }
+.slot.selected .slot-dur, .slot.selected .slot-price, .slot.selected .slot-sur, .slot.selected .slot-mine { color: inherit; }
+.slot.selected .slot-dur, .slot.selected .slot-price { opacity: 0.92; }
+
+.nl-title { color: #93c5fd; }
+.nl-pending { color: #fbbf24; background: rgba(251,191,36,0.12); }
+[data-theme="light"] .nl-title { color: #1d4ed8; }
+[data-theme="light"] .nl-pending { color: #92400e; background: rgba(245,158,11,0.2); }
+.nl-pill { color: #6b9bff; background: rgba(107,155,255,0.12); }
+[data-theme="light"] .nl-pill { color: #1d4ed8; background: rgba(37,99,235,0.12); }

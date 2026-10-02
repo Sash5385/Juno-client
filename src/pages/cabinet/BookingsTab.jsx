@@ -20,6 +20,15 @@ function hoursUntilLesson(booking) {
   return (d.getTime() - Date.now()) / 3600000
 }
 
+// Кінець уроку (мс): початок + тривалість. Без дати/часу — нескінченність (не відкидаємо запис)
+function lessonEndMs(b) {
+  if (!b?.date || !b?.time) return Infinity
+  const [h, m] = b.time.split(':').map(Number)
+  const d = parseYMD(b.date)
+  d.setHours(h, m || 0, 0, 0)
+  return d.getTime() + (b.durationHours || 1) * 3600000
+}
+
 function lessonCountdown(b) {
   if (!b?.date || !b?.time) return null
   const [h, m] = b.time.split(':').map(Number)
@@ -505,15 +514,17 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             </div>
           )}
           {upcoming.length > 0 && (() => {
-            const next = upcoming[0]
+            // Сьогоднішні уроки, що вже закінчились, не вважаємо «наступним»
+            const next = upcoming.find(b => lessonEndMs(b) > Date.now())
+            if (!next) return null
             const hrs = hoursUntilLesson(next)
             const d = parseYMD(next.date)
-            const countdown = !isFinite(hrs) ? '' : hrs < 1 ? 'Менше за годину' : hrs < 24 ? `Через ${Math.round(hrs)} год` : `Через ${Math.ceil(hrs / 24)} дн`
+            const countdown = !isFinite(hrs) ? '' : hrs <= 0 ? 'Триває зараз' : hrs < 1 ? 'Менше за годину' : hrs < 24 ? `Через ${Math.round(hrs)} год` : `Через ${Math.ceil(hrs / 24)} дн`
             return (
               <div style={{borderRadius:18,background:'linear-gradient(135deg,rgba(99,155,255,0.1) 0%,rgba(120,80,255,0.06) 100%)',border:'1px solid rgba(99,155,255,0.18)',padding:'16px',marginBottom:16}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
                   <div style={{fontSize:11,color:'var(--dim)',fontWeight:700,textTransform:'uppercase',letterSpacing:1}}>Наступний урок</div>
-                  {countdown && <div style={{fontSize:11,fontWeight:800,color:'#6b9bff',background:'rgba(107,155,255,0.12)',padding:'3px 9px',borderRadius:8}}>{countdown}</div>}
+                  {countdown && <div className="nl-pill" style={{fontSize:11,fontWeight:800,padding:'3px 9px',borderRadius:8}}>{countdown}</div>}
                 </div>
                 <div style={{fontSize:28,fontWeight:900,color:'var(--text)',lineHeight:1}}>{next.time}</div>
                 <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())} · {next.serviceName}</div>

@@ -60,11 +60,11 @@ html[data-palette="neon"] body[data-theme="light"] .cal-day{border-radius:50%}
 html[data-palette="neon"] body[data-theme="light"] .cal-day.day-free{background:#10b981;box-shadow:0 4px 12px rgba(16,185,129,0.45);color:#fff}
 html[data-palette="neon"] body[data-theme="light"] .cal-day.day-partial{background:#f59e0b;box-shadow:0 4px 12px rgba(245,158,11,0.45);color:#fff}
 html[data-palette="neon"] body[data-theme="light"] .cal-day.day-full{background:#ef4444;box-shadow:none;color:#fff}
-html[data-palette="neon"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(155deg,#a78bfa,#7c3aed);color:#ffffff !important;border-radius:50%;box-shadow:0 4px 14px rgba(124,58,237,0.5)}
+html[data-palette="neon"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(155deg,#8b5cf6,#6d28d9);color:#ffffff !important;border-radius:50%;box-shadow:0 4px 14px rgba(124,58,237,0.5)}
 html[data-palette="neon"] body[data-theme="light"] .cal-day.today:not(.selected)::before{border-radius:50%}
 html[data-palette="neon"] body[data-theme="light"] .slot{border-radius:16px;background:rgba(16,185,129,0.14);border:1px solid rgba(16,185,129,0.4);color:var(--text)}
 html[data-palette="neon"] body[data-theme="light"] .slot.taken{background:rgba(239,68,68,0.13);border-color:rgba(239,68,68,0.34)}
-html[data-palette="neon"] body[data-theme="light"] .slot.selected{background:linear-gradient(155deg,#a78bfa,#7c3aed);color:#ffffff;border-color:rgba(124,58,237,0.7)}
+html[data-palette="neon"] body[data-theme="light"] .slot.selected{background:linear-gradient(155deg,#8b5cf6,#6d28d9);color:#ffffff;border-color:rgba(124,58,237,0.7)}
 
 html[data-palette="neon"] body[data-theme="light"] .botnav-inner{background:color-mix(in srgb, #ffffff 88%, transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(0,0,0,0.08);border-radius:28px;box-shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9)}
 html[data-palette="neon"] body[data-theme="light"] .botnav-ico{color:var(--text)}
@@ -144,11 +144,11 @@ html[data-palette="ocean"] body[data-theme="light"] .cal-day{border-radius:50%}
 html[data-palette="ocean"] body[data-theme="light"] .cal-day.day-free{background:#14b8a6;box-shadow:0 4px 12px rgba(20,184,166,0.45);color:#fff}
 html[data-palette="ocean"] body[data-theme="light"] .cal-day.day-partial{background:#f59e0b;box-shadow:0 4px 12px rgba(245,158,11,0.45);color:#fff}
 html[data-palette="ocean"] body[data-theme="light"] .cal-day.day-full{background:#ef4444;box-shadow:none;color:#fff}
-html[data-palette="ocean"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(155deg,#38bdf8,#0369a1);color:#ffffff !important;border-radius:50%;box-shadow:0 4px 14px rgba(3,105,161,0.5)}
+html[data-palette="ocean"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(155deg,#0ea5e9,#0369a1);color:#ffffff !important;border-radius:50%;box-shadow:0 4px 14px rgba(3,105,161,0.5)}
 html[data-palette="ocean"] body[data-theme="light"] .cal-day.today:not(.selected)::before{border-radius:50%}
 html[data-palette="ocean"] body[data-theme="light"] .slot{border-radius:12px;background:rgba(20,184,166,0.14);border:1px solid rgba(20,184,166,0.4);color:var(--text)}
 html[data-palette="ocean"] body[data-theme="light"] .slot.taken{background:rgba(239,68,68,0.13);border-color:rgba(239,68,68,0.34)}
-html[data-palette="ocean"] body[data-theme="light"] .slot.selected{background:linear-gradient(155deg,#38bdf8,#0369a1);color:#ffffff;border-color:rgba(3,105,161,0.7)}
+html[data-palette="ocean"] body[data-theme="light"] .slot.selected{background:linear-gradient(155deg,#0ea5e9,#0369a1);color:#ffffff;border-color:rgba(3,105,161,0.7)}
 
 html[data-palette="ocean"] body[data-theme="light"] .botnav-inner{background:color-mix(in srgb, #ffffff 88%, transparent);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border:1px solid rgba(0,0,0,0.08);border-radius:26px;box-shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9)}
 html[data-palette="ocean"] body[data-theme="light"] .botnav-ico{color:var(--text)}
