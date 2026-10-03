@@ -1,5 +1,5 @@
 {
-  "appId": "pro.drivepad.app",
-  "appName": "DrivePad",
+  "appId": "app.juno.client",
+  "appName": "Juno",
   "webDir": "dist"
 }

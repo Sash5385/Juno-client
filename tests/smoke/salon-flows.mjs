@@ -1,4 +1,4 @@
-// Сценарії клієнта салону в демо-режимі (?app=salon&demo=1, пам'ять замість Firebase): запис, скасування за політикою,
+// Сценарії клієнта салону в демо-режимі (?demo=1, пам'ять замість Firebase): запис, скасування за політикою,
 // перенесення, оцінка, чат, сповіщення, профіль — на екрані 320px.
 // Запуск: node tests/smoke/salon-flows.mjs [BASE_URL]   (потрібен запущений vite preview)
 import { chromium } from "playwright";
@@ -17,7 +17,7 @@ const btn = (t) => page.locator("button", { hasText: t }).first();
 const navTab = (t) => page.locator("nav button", { hasText: t }).first().click();
 
 console.log("── публічна сторінка");
-await page.goto(`${base}/?demo=1&app=salon`);
+await page.goto(`${base}/?demo=1`);
 await page.waitForTimeout(2000);
 check("redirects to /s/{slug}, shows salon, masters, prices", page.url().includes("/s/beauty-studio") && await has("Beauty Studio") && await has("Анна Мельник") && await has("від 550"));
 

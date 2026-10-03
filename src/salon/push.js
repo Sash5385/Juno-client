@@ -7,7 +7,7 @@ import { DEMO } from '../demo/demoMode'
 import { sref } from './data'
 
 function deviceId() {
-  const KEY = 'id4_device_id'
+  const KEY = 'juno_device_id'
   try {
     let id = localStorage.getItem(KEY)
     if (!id) { id = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2, 10); localStorage.setItem(KEY, id) }

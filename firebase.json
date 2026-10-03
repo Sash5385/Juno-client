@@ -1,31 +1,11 @@
 {
   "hosting": {
-    "site": "drivepad-client",
+    "site": "juno-client",
     "public": "dist",
-    "ignore": [
-      "firebase.json",
-      "**/.*",
-      "**/node_modules/**"
-    ],
+    "ignore": ["firebase.json", "**/.*", "**/node_modules/**"],
     "rewrites": [
-      {
-        "source": "/i/*/manifest.webmanifest",
-        "destination": "/manifest-tenant.webmanifest"
-      },
-      {
-        "source": "/api/delete-account",
-        "function": "deleteAccount",
-        "region": "europe-west1"
-      },
-      {
-        "source": "/api/report-error",
-        "function": "reportError",
-        "region": "europe-west1"
-      },
-      {
-        "source": "**",
-        "destination": "/index.html"
-      }
+      { "source": "/api/report-error", "function": "reportError", "region": "europe-west1" },
+      { "source": "**", "destination": "/index.html" }
     ]
   }
 }

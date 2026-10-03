@@ -1,5 +1,5 @@
 // Дії клієнта: запис (атомарне захоплення слотів → бронь), скасування, перенесення, оцінка, черга, чат.
-// Усі шляхи й поля відповідають rules (tests/rules/salonClientApp.test.mjs у репозиторії DrivePad).
+// Усі шляхи й поля відповідають rules (tests/rules/salonClientApp.test.mjs у репозиторії Juno).
 import { push, set, update, remove, increment } from 'firebase/database'
 import { sref } from './data'
 import { slotIdOf, minToTime, timeToMin } from '../utils/salonLogic'

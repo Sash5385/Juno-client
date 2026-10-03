@@ -25,7 +25,7 @@ export function getInitials(name) {
 }
 
 export function pluralize(n, forms) {
-  // pluralize(2, ['учень', 'учні', 'учнів']) → 'учні'
+  // pluralize(2, ['клієнт', 'клієнти', 'клієнтів']) → 'учні'
   const mod10 = n % 10
   const mod100 = n % 100
   if (mod10 === 1 && mod100 !== 11) return forms[0]

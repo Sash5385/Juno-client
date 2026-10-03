@@ -25,7 +25,7 @@ function versionGuard() {
   let version = ''
   let overlayJs = ''
   return {
-    name: 'drivepad-client-version-guard',
+    name: 'juno-client-version-guard',
     buildStart() {
       version = readVersion()
       // Анімація оновлення — окремий читабельний файл, вставляється в HTML інлайном.
@@ -93,9 +93,9 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'DrivePad — Запис на уроки',
-        short_name: 'DrivePad',
-        description: 'Онлайн-запис на уроки водіння',
+        name: 'Juno — запис до майстра',
+        short_name: 'Juno',
+        description: 'Онлайн-запис до салонів і майстрів',
         theme_color: '#ff5a3c',
         background_color: '#1c1d21',
         display: 'standalone',
