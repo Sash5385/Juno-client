@@ -1,7 +1,7 @@
 ﻿import {
   ref, get, set, update, push, onValue, off, remove, increment, onDisconnect, runTransaction
 } from 'firebase/database'
-import { db } from './config'
+import { db, auth } from './config'
 import { DEMO } from '../demo/demoMode'
 import { blockRangeUpdates, restoreRangeUpdates } from '../utils/slotRules'
 
@@ -242,8 +242,10 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
     const startMin = h * 60 + m
     const durMin = (booking.durationHours || 1) * 60
     const daySnap = await get(iRef(`timeslots/${booking.date}`))
-    const updates = restoreRangeUpdates(daySnap.val() || {}, `timeslots/${booking.date}/`, startMin, durMin)
-    if (Object.keys(updates).length) await update(iRef(""), updates)
+    const updates = restoreRangeUpdates(daySnap.val() || {}, `timeslots/${booking.date}/`, startMin, durMin, { extra: { bookedBy: null } })
+    // Слоти звільняє і сервер (onBookingChanged); якщо правила не пускають (слот зайнятий без bookedBy
+    // зі старої версії) — скасування запису вже збережено, тож це не помилка для учня.
+    if (Object.keys(updates).length) await update(iRef(""), updates).catch(() => {})
   }
 }
 
@@ -320,6 +322,7 @@ export function getCompletedHours(bookings) {
 // захоплені в цій же спробі й повертає false.
 export async function claimSlot(date, startTime, durationHours = 1, intervalMin = 30) {
   if (_blocked) return false
+  const uid = auth.currentUser?.uid || null
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
   const endMin = startMin + durationHours * 60
@@ -335,12 +338,13 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
       }
       // Документа не було (current === null) — він існує лише під цей запис: phantom,
       // щоб скасування видалило його, а не лишило окремим вільним слотом.
-      return { ...(current || {}), ...(current ? {} : { phantom: true }), available: false, time: `${slotH}:${slotM}` }
+      // bookedBy — хто зайняв: правила бази дозволяють звільнити/змінити зайнятий слот лише йому
+      return { ...(current || {}), ...(current ? {} : { phantom: true }), available: false, time: `${slotH}:${slotM}`, bookedBy: uid }
     })
     if (!result.committed) {
       await Promise.all(claimedIds.map(id =>
         runTransaction(iRef(`timeslots/${date}/${id}`), current =>
-          current ? (current.phantom ? null : { ...current, available: true }) : current
+          current ? (current.phantom ? null : { ...current, available: true, bookedBy: null }) : current
         ).catch(() => {})
       ))
       return false
@@ -358,7 +362,7 @@ export async function markSlotsUnavailable(date, startTime, durationHours, inter
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
   const daySnap = await get(iRef(`timeslots/${date}`))
-  const updates = blockRangeUpdates(daySnap.val() || {}, `timeslots/${date}/`, startMin, durationHours * 60, { step: intervalMin })
+  const updates = blockRangeUpdates(daySnap.val() || {}, `timeslots/${date}/`, startMin, durationHours * 60, { step: intervalMin, extra: { bookedBy: auth.currentUser?.uid || null } })
   await update(iRef(""), updates)
 }
 
