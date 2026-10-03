@@ -1,0 +1,38 @@
+name: Tests
+
+# Смоук-тест застосунку учня в демо-режимі (?demo=1, без Firebase), екран 320px.
+# Викликається з deploy.yml — деплой не йде, поки тест червоний.
+on:
+  workflow_call:
+  pull_request:
+  push:
+    branches:
+      - claude/id4-drive-monetization-clone-bi2iw7
+
+jobs:
+  smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - name: Build
+        run: |
+          npm ci
+          npm run build
+
+      - name: Install Playwright
+        run: |
+          cd tests/smoke
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+
+      - name: Smoke test (demo mode, 320px)
+        run: |
+          nohup npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
+          for i in $(seq 1 30); do curl -sf http://localhost:4173 > /dev/null && break; sleep 1; done
+          node tests/smoke/smoke.mjs client http://localhost:4173
