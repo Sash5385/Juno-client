@@ -1,6 +1,6 @@
 name: Tests
 
-# Смоук-тест застосунку учня в демо-режимі (?demo=1, без Firebase), екран 320px.
+# Смоук-тест застосунку учня і клієнта салону (?app=salon) у демо-режимі (?demo=1, без Firebase), екран 320px.
 # Викликається з deploy.yml — деплой не йде, поки тест червоний.
 on:
   workflow_call:
@@ -36,3 +36,5 @@ jobs:
           nohup npx vite preview --port 4173 --strictPort > preview.log 2>&1 &
           for i in $(seq 1 30); do curl -sf http://localhost:4173 > /dev/null && break; sleep 1; done
           node tests/smoke/smoke.mjs client http://localhost:4173
+          node tests/smoke/smoke.mjs salon http://localhost:4173
+          node tests/smoke/salon-flows.mjs http://localhost:4173
