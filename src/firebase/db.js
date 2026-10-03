@@ -4,6 +4,7 @@
 import { db, auth } from './config'
 import { DEMO } from '../demo/demoMode'
 import { blockRangeUpdates, restoreRangeUpdates } from '../utils/slotRules'
+import { salonPath, salonSlugPath } from '../utils/salonPaths'
 
 // ─── МУЛЬТИТЕНАНТНІСТЬ ──────────────────────────────────────────────
 // Один застосунок обслуговує студентів БАГАТЬОХ інструкторів — кожен
@@ -72,6 +73,18 @@ export async function resolveSlug(slug) {
 }
 
 export const iRef = (path) => ref(db, _iid ? `instructors/${_iid}${path ? '/' + path : ''}` : '/__no_tenant__')
+
+// Салон (клон під барбершоп/манікюр): шляхи — utils/salonPaths.js, схема — DrivePad/docs/SALON-SCHEMA.md.
+// Поки лише додано: чинний код далі працює через iRef.
+let _salonId = null
+export const setCurrentSalonId = (id) => { _salonId = id || null }
+export const getCurrentSalonId = () => _salonId
+export const sRef = (path) => ref(db, _salonId ? salonPath(_salonId, path) : '/__no_tenant__')
+// slug → salonId (читання публічне: salon_slugs/.read: true)
+export async function resolveSalonSlug(slug) {
+  const snap = await get(ref(db, salonSlugPath(slug)))
+  return snap.exists() ? snap.val()?.salonId || null : null
+}
 
 // ─── ACCESS CONTROL ─────────────────────────────────────
 // Заблокований адміном учень не бачить явного повідомлення про блок —
