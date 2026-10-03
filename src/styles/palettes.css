@@ -171,5 +171,5 @@ html[data-palette="ocean"] body[data-theme="light"] .cab-actions .cab-icon-btn:n
 html[data-palette="ocean"] body[data-theme="light"] .cab-actions .cab-icon-btn:nth-child(2){--bc:#fcd34d;background:linear-gradient(145deg,#fcd34d,#f59e0b)}
 
 /* Кнопки-кульки: іконка завжди біла; активна вкладка (Cabinet.jsx задає inline color:var(--accent)) — кільце */
-html[data-palette] body[data-theme] .cab-icon-btn{color:#fff !important;overflow:visible}
-html[data-palette] body[data-theme] .cab-icon-btn[style*="accent"]{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent),0 0 14px color-mix(in srgb,var(--accent) 60%,transparent)}
+html:is([data-palette="neon"], [data-palette="ocean"]) body[data-theme] .cab-icon-btn{color:#fff !important;overflow:visible}
+html:is([data-palette="neon"], [data-palette="ocean"]) body[data-theme] .cab-icon-btn[style*="accent"]{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent),0 0 14px color-mix(in srgb,var(--accent) 60%,transparent)}

@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 export const PALETTES = [
   { id: 'neon',  name: 'Неон-ніч', colors: ['#ff3d9a', '#22d3ee', '#8b5cf6'], bg: { dark: '#0a0614', light: '#f6f0ff' } },
   { id: 'ocean', name: 'Океан',    colors: ['#14b8a6', '#0ea5e9', '#6366f1'], bg: { dark: '#04121c', light: '#eaf6fb' } },
+  // Початкове оформлення: без перекриттів, діють базові стилі (tokens.css) і скляні кнопки шапки
+  { id: 'classic', name: 'Класична', colors: ['#ff5a3c', '#7ed957', '#5b9bff'], bg: { dark: '#1c1d21', light: '#f0f1f5' } },
 ]
 const DEFAULT_PALETTE = 'neon'
 const PALETTE_EVENT = 'dp-palette'

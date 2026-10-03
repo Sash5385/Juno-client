@@ -15,7 +15,7 @@
     <script>
       // Палітра й режим застосовуємо до першого малювання (див. hooks/useTheme.js)
       try {
-        var p = localStorage.getItem('palette'); if (p !== 'ocean') p = 'neon';
+        var p = localStorage.getItem('palette'); if (p !== 'ocean' && p !== 'classic') p = 'neon';
         document.documentElement.setAttribute('data-palette', p);
         var t = localStorage.getItem('theme'); if (t !== 'light') t = 'dark';
         document.addEventListener('DOMContentLoaded', function () { document.body.setAttribute('data-theme', t); });
