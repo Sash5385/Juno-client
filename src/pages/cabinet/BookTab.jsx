@@ -421,16 +421,25 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     const isVip = profile?.isVip === true
     const dateStr = selectedDate ? formatDateYMD(selectedDate) : ''
 
-    // Check if this date is closed per admin settings
+    // День без робочого графіка (закритий явно або вимкнений у тижневому шаблоні, напр. неділя):
+    // слоти, які адмін ВІДКРИВ ВРУЧНУ, учень бачить — джерело істини сам timeslots/{date}.
+    // Для такого дня не застосовуємо обід із шаблону (його немає). closedDay — явний override
+    // "closed": там показуємо лише вільні слоти (мітки зайнятості зі старих записів не потрібні).
+    let offDay = false
+    let closedDay = false
     if (selectedDate) {
       const ov = (adminSettings.dateOverrides || []).find(o => o.date === dateStr)
-      if (ov?.type === 'closed') return []
-      if (!ov && Object.keys(slots).length === 0) {
+      if (ov?.type === 'closed') { offDay = true; closedDay = true }
+      if (!ov) {
         const dow = (selectedDate.getDay() + 6) % 7  // Mon=0..Sun=6
         const ws = (adminSettings.weekSchedule || [])[dow]
-        if (ws && ws.enabled === false) return []
+        if (ws && ws.enabled === false) {
+          if (Object.keys(slots).length === 0) return []
+          offDay = true
+        }
       }
     }
+
 
     // "Липкий час" — як в ID4: ВИМКНЕНО за замовчуванням (раніше тут було "!== false", тобто
     // увімкнено, навіть якщо адмін його ніколи не вмикав — і в клієнта лишались лише слоти
@@ -449,6 +458,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
 
     return Object.values(slots)
       .filter(slot => !!(slot.time))
+      .filter(slot => !closedDay || (slot.available !== false && !slot.adminBlocked))
       .filter(slot => !slot.vipOnly || isVipStudent)
       .filter(slot => !slot.privateOnly || isPrivateStudent)
       .sort((a, b) => (a.time || '').localeCompare(b.time || ''))
@@ -503,7 +513,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           slotDurHours,
           isSticky,
           // lunchOverride — адмін вручну відкрив цей слот під час обіду: не ховаємо
-          lunchBlocked:   !slot.lunchOverride && isBlockedByLunch(slot.time, slotDurHours),
+          lunchBlocked:   !slot.lunchOverride && !offDay && isBlockedByLunch(slot.time, slotDurHours),
           // Розтягнутий слот — цілісний блок: проміжні документи годин поглинуті навмисно
           overlapBlocked: slot.available !== false && (isCustomDur ? false : wouldOverlapTaken(slot.time, slotDurHours)),
           // Обмеження "не пізніше ніж за N годин до уроку" (налаштування адміна bookCutoffHours)
