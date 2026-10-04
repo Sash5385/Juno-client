@@ -12,7 +12,7 @@ export default function ChatTab({ bookings, initialMaster, unread }) {
   const mids = useMemo(() => [...new Set(bookings.map((b) => b.masterId).filter(Boolean))], [bookings])
   const nameOf = (id) => masters.find((m) => m.id === id)?.name || 'Майстер'
   if (open) return <Thread masterId={open.masterId} title={open.masterId ? nameOf(open.masterId) : profile.name || 'Салон'} onBack={() => setOpen(null)} />
-  const rows = [{ key: 'salon', masterId: null, title: profile.name || 'Салон', sub: 'Адміністратор салону', icon: '💈', photo: profile.logo }, ...mids.map((id) => ({ key: id, masterId: id, title: nameOf(id), sub: 'Ваш майстер', photo: masters.find((m) => m.id === id)?.photo, name: nameOf(id) }))]
+  const rows = [{ key: 'salon', masterId: null, title: profile.name || 'Салон', sub: 'Адміністратор салону', icon: true, photo: profile.logo || '/icon-192.png' }, ...mids.map((id) => ({ key: id, masterId: id, title: nameOf(id), sub: 'Ваш майстер', photo: masters.find((m) => m.id === id)?.photo, name: nameOf(id) }))]
   return (
     <div>
       {rows.map((r) => (

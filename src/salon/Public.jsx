@@ -23,7 +23,7 @@ export default function Public() {
   return (
     <div style={{ height: '100%', overflowY: 'auto', paddingBottom: 'calc(96px + env(safe-area-inset-bottom,0px))' }}>
       <div style={{ padding: 'calc(28px + env(safe-area-inset-top,0px)) 20px 22px', textAlign: 'center', background: 'linear-gradient(160deg,color-mix(in srgb,var(--accent) 30%,transparent),transparent)' }}>
-        {profile.logo ? <Avatar url={profile.logo} name={profile.name} size={84} radius={24} style={{ margin: '0 auto' }} /> : <div style={{ fontSize: 46 }}>💈</div>}
+        <Avatar url={profile.logo || '/icon-192.png'} name={profile.name} size={84} radius={24} style={{ margin: '0 auto' }} />
         <div style={{ fontSize: 24, fontWeight: 900, marginTop: 4 }}>{profile.name}</div>
         {profile.about && <div style={{ fontSize: 14, color: 'var(--dim)', marginTop: 6, lineHeight: 1.5 }}>{profile.about}</div>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 12 }}>
