@@ -41,7 +41,8 @@ console.log("── мої записи: політика скасування, 
 check("payment status shown (deposit paid / waiting)", await has("Передоплата внесена") && await has("Чекає оплати"));
 check("unpaid online booking shows hold deadline", await has("Оплатіть до"));
 check("other client's booking is not shown", !(await has("Чужий запис", 800)));
-await page.locator("button", { hasText: "Скасувати" }).first().click();
+// порядок карток залежить від дня тижня (щойно створений запис може стати першим) — беремо картку з внесеною передоплатою
+await page.locator("div").filter({ hasText: "Доплатити" }).last().locator("button", { hasText: "Скасувати" }).click();
 check("cancel dialog explains the policy for the paid booking", await has("Скасувати запис?") && (await has("безкоштовне") || await has("не повертається")) && await has("210"));
 await page.locator("button", { hasText: "Залишити" }).click();
 check("dialog closes without cancelling", !(await has("Скасувати запис?", 600)));
@@ -75,6 +76,11 @@ check("profile shows saved data and version", (await page.locator("input").first
 await page.locator('input').first().fill("Ірина Шевченко-Коваль");
 await btn("Зберегти").click();
 check("profile saved (toast)", await has("Збережено"));
+
+console.log("── видалення акаунта");
+await page.getByText("Видалити акаунт", { exact: true }).first().click();
+check("delete account asks for confirmation", await has("Видалити акаунт?") && await has("майбутні записи скасовуються"));
+await page.getByText("Скасувати", { exact: false }).first().click().catch(() => {});
 
 check("no JS errors", errors.length === 0, "\n    " + errors.join("\n    "));
 await browser.close();

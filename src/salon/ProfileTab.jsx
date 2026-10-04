@@ -9,7 +9,8 @@ import { signOut } from '../firebase/auth-email'
 import { useTheme } from '../hooks/useTheme'
 import { APP_VERSION } from '../version.js'
 import { normalizePhone, formatPhone } from '../utils/format'
-import { Btn, Card, Chip, Field } from './kit'
+import { callFn, errText } from './api'
+import { Btn, Card, Chip, Confirm, Field } from './kit'
 
 export default function ProfileTab() {
   const { salonId, user, uProfile, profile, slug, toast } = useSalon()
@@ -19,6 +20,7 @@ export default function ProfileTab() {
   const [phone, setPhone] = useState(formatPhone(uProfile?.phone || ''))
   const [busy, setBusy] = useState(false)
   const [perm, setPerm] = useState(pushPermission())
+  const [ask, setAsk] = useState(false)
   const changed = name.trim() !== (uProfile?.name || '') || phone !== formatPhone(uProfile?.phone || '')
   const save = async () => {
     const p = normalizePhone(phone) || null
@@ -26,6 +28,11 @@ export default function ProfileTab() {
     if (!p) { toast('Невірний номер телефону', 'err'); return }
     setBusy(true)
     try { await update(sref(salonId, `users/${user.uid}/profile`), { name: name.trim(), phone: p }); toast('Збережено') } catch { toast('Не вдалося зберегти', 'err') } finally { setBusy(false) }
+  }
+  const removeAccount = async () => {
+    setBusy(true)
+    try { await callFn('salonDeleteAccount', { type: 'client' }); toast('Акаунт видалено'); await signOut().catch(() => {}); nav(`/s/${slug}`) }
+    catch (e) { toast(errText(e), 'err'); setBusy(false); setAsk(false) }
   }
   const enable = async () => { const ok = await registerClientPush(salonId, user.uid); setPerm(pushPermission()); toast(ok ? 'Сповіщення увімкнено' : 'Не вдалося увімкнути сповіщення', ok ? 'ok' : 'err') }
   return (
@@ -47,6 +54,8 @@ export default function ProfileTab() {
       </Card>
       <Btn variant="ghost" onClick={() => nav(`/s/${slug}`)} style={{ marginBottom: 8 }}>Сторінка салону «{profile.name}»</Btn>
       <Btn variant="ghost" danger onClick={async () => { await signOut(); nav(`/s/${slug}`) }}>Вийти</Btn>
+      <Btn variant="ghost" danger onClick={() => setAsk(true)} style={{ marginTop: 8 }}>Видалити акаунт</Btn>
+      {ask && <Confirm danger title="Видалити акаунт?" text={'Ваші дані, чати й сповіщення буде видалено в усіх салонах, майбутні записи скасовуються. Скасувати це неможливо.'} yes={busy ? 'Видаляю…' : 'Видалити назавжди'} onYes={() => !busy && removeAccount()} onNo={() => setAsk(false)} />}
       <div style={{ fontSize: 11, color: 'var(--faint)', textAlign: 'center', marginTop: 16 }}>Версія {APP_VERSION}</div>
     </div>
   )

@@ -4,7 +4,7 @@ import { query, limitToLast } from 'firebase/database'
 import { useSalon } from './ctx'
 import { sref, useValue, toList } from './data'
 import { sendMessage, markChatRead } from './actions'
-import { Card, Empty, Spinner, initials } from './kit'
+import { Card, Empty, Spinner, Avatar } from './kit'
 
 export default function ChatTab({ bookings, initialMaster, unread }) {
   const { salonId, user, uProfile, masters, profile } = useSalon()
@@ -12,13 +12,13 @@ export default function ChatTab({ bookings, initialMaster, unread }) {
   const mids = useMemo(() => [...new Set(bookings.map((b) => b.masterId).filter(Boolean))], [bookings])
   const nameOf = (id) => masters.find((m) => m.id === id)?.name || 'Майстер'
   if (open) return <Thread masterId={open.masterId} title={open.masterId ? nameOf(open.masterId) : profile.name || 'Салон'} onBack={() => setOpen(null)} />
-  const rows = [{ key: 'salon', masterId: null, title: profile.name || 'Салон', sub: 'Адміністратор салону', icon: '💈' }, ...mids.map((id) => ({ key: id, masterId: id, title: nameOf(id), sub: 'Ваш майстер', icon: initials(nameOf(id)) }))]
+  const rows = [{ key: 'salon', masterId: null, title: profile.name || 'Салон', sub: 'Адміністратор салону', icon: '💈', photo: profile.logo }, ...mids.map((id) => ({ key: id, masterId: id, title: nameOf(id), sub: 'Ваш майстер', photo: masters.find((m) => m.id === id)?.photo, name: nameOf(id) }))]
   return (
     <div>
       {rows.map((r) => (
         <Card key={r.key} onClick={() => setOpen({ masterId: r.masterId })} style={{ marginBottom: 8 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, padding: '12px 14px' }}>
-            <div style={{ width: 42, height: 42, borderRadius: 14, background: 'color-mix(in srgb, var(--blue) 22%, transparent)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>{r.icon}</div>
+            {r.photo || !r.icon ? <Avatar url={r.photo} name={r.name || r.title} size={42} /> : <div style={{ width: 42, height: 42, borderRadius: 14, background: 'color-mix(in srgb, var(--blue) 22%, transparent)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 20 }}>{r.icon}</div>}
             <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 15, fontWeight: 800 }}>{r.title}</div><div style={{ fontSize: 12.5, color: 'var(--dim)' }}>{r.sub}</div></div>
             {(unread[r.masterId || 'salon'] || 0) > 0 && <span style={{ minWidth: 20, height: 20, borderRadius: 10, background: 'var(--accent)', color: '#fff', fontSize: 11, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 5px' }}>{unread[r.masterId || 'salon']}</span>}
           </div>

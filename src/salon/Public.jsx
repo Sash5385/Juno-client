@@ -3,7 +3,7 @@ import { useState, useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useSalon } from './ctx'
 import BookFlow from './BookFlow'
-import { Btn, Card, Empty, Spinner, money, initials } from './kit'
+import { Btn, Card, Empty, Spinner, Avatar, money } from './kit'
 import { priceFor, serviceDuration, offersService } from '../utils/salonLogic'
 
 export default function Public() {
@@ -23,7 +23,7 @@ export default function Public() {
   return (
     <div style={{ height: '100%', overflowY: 'auto', paddingBottom: 'calc(96px + env(safe-area-inset-bottom,0px))' }}>
       <div style={{ padding: 'calc(28px + env(safe-area-inset-top,0px)) 20px 22px', textAlign: 'center', background: 'linear-gradient(160deg,color-mix(in srgb,var(--accent) 30%,transparent),transparent)' }}>
-        <div style={{ fontSize: 46 }}>💈</div>
+        {profile.logo ? <Avatar url={profile.logo} name={profile.name} size={84} radius={24} style={{ margin: '0 auto' }} /> : <div style={{ fontSize: 46 }}>💈</div>}
         <div style={{ fontSize: 24, fontWeight: 900, marginTop: 4 }}>{profile.name}</div>
         {profile.about && <div style={{ fontSize: 14, color: 'var(--dim)', marginTop: 6, lineHeight: 1.5 }}>{profile.about}</div>}
         <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap', marginTop: 12 }}>
@@ -38,7 +38,7 @@ export default function Public() {
             <div style={{ display: 'flex', gap: 10, overflowX: 'auto', paddingBottom: 6 }}>
               {masters.map((m) => (
                 <div key={m.id} style={{ flex: '0 0 auto', width: 92, textAlign: 'center' }}>
-                  <div style={{ width: 64, height: 64, borderRadius: 20, margin: '0 auto 6px', background: 'color-mix(in srgb, var(--blue) 22%, transparent)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 20 }}>{initials(m.name)}</div>
+                  <Avatar url={m.photo} name={m.name} size={64} radius={20} style={{ margin: '0 auto 6px' }} />
                   <div style={{ fontSize: 12.5, fontWeight: 800, lineHeight: 1.25 }}>{m.name}</div>
                   <div style={{ fontSize: 11, color: 'var(--dim)' }}>{m.spec}</div>
                 </div>

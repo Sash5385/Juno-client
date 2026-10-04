@@ -7,7 +7,7 @@ import { sref, useValues } from './data'
 import { callFn, errText } from './api'
 import { bookSlot, cancelBooking, joinQueue, markQueueBooked } from './actions'
 import ClientAuth from './ClientAuth'
-import { Btn, Chip, Card, Empty, Sheet, money, dateLabel, initials } from './kit'
+import { Btn, Chip, Card, Empty, Sheet, Avatar, money, dateLabel } from './kit'
 import { freeStartTimes, priceFor, serviceDuration, offersService, datesAhead, minToTime, timeToMin } from '../utils/salonLogic'
 
 const LEAD_MIN = 30   // ближче ніж за 30 хв до початку не записуємо
@@ -180,7 +180,7 @@ export default function BookFlow({ onClose, initial = {}, reschedule = null }) {
             {candidates.map((m) => (
               <Card key={m.id} onClick={() => chooseMaster(m.id)} style={{ marginBottom: 8 }}>
                 <div style={{ padding: '12px 14px', display: 'flex', gap: 12, alignItems: 'center' }}>
-                  <div style={{ width: 44, height: 44, borderRadius: 14, background: 'color-mix(in srgb, var(--blue) 22%, transparent)', color: 'var(--blue)', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900 }}>{initials(m.name)}</div>
+                  <Avatar url={m.photo} name={m.name} />
                   <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 15, fontWeight: 800 }}>{m.name}</div><div style={{ fontSize: 12.5, color: 'var(--dim)' }}>{m.spec || 'Майстер'}</div></div>
                   <div style={{ fontWeight: 900 }}>{money(priceFor(service, m.id))}</div>
                 </div>

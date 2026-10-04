@@ -73,3 +73,10 @@ export function useToastLite() {
   ) : null
   return [el, show]
 }
+
+// Аватар: фото (URL) або ініціали на кольоровому тлі
+export function Avatar({ url, name, size = 44, radius = 14, color = 'var(--blue)', style = {} }) {
+  const box = { width: size, height: size, borderRadius: radius, flexShrink: 0, overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center', ...style }
+  if (url) return <div style={box}><img src={url} alt="" loading="lazy" style={{ width: '100%', height: '100%', objectFit: 'cover' }} /></div>
+  return <div style={{ ...box, background: `color-mix(in srgb, ${color} 22%, transparent)`, color, fontWeight: 900, fontSize: Math.round(size * 0.36) }}>{initials(name)}</div>
+}
