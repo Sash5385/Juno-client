@@ -1,5 +1,5 @@
 // Моніторинг помилок: необроблені помилки браузера йдуть на /api/report-error
-// (functions: reportError → system/errorLog, журнал для суперадміна + push).
+// (functions: reportError → system/errorLog, вкладка "Помилки" в суперадмінці + push власнику).
 import { APP_VERSION } from "./version.js";
 import { DEMO } from "./demo/demoMode";
 

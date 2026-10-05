@@ -1,7 +1,7 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
-import SalonApp from './salon/index.jsx'
+import App from './App.jsx'
 import { initErrorReporter } from './errorReporter.js'
 import './styles/tokens.css'
 import './styles/global.css'
@@ -12,7 +12,7 @@ initErrorReporter()
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <BrowserRouter>
-      <SalonApp />
+      <App />
     </BrowserRouter>
   </React.StrictMode>,
 )

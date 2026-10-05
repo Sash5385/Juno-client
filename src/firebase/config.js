@@ -3,18 +3,17 @@ import { getAuth } from 'firebase/auth'
 import { getDatabase, goOffline } from 'firebase/database'
 import { DEMO, DEMO_USER } from '../demo/demoMode'
 
-// Конфіг окремого Firebase-проєкту Juno — з .env (VITE_FIREBASE_*, див. .env.example).
-// Без нього — демо-проєкт "demo-juno" (префікс demo- зарезервований під емулятор): справжні дані нікуди не пишуться,
-// працює демо-режим (?demo=1).
-// iPhone (Safari/ярлик) блокує сховище між різними доменами: вхід через Google робить редірект на authDomain і назад,
-// а результат лишається в "чужому" сховищі. Firebase Hosting віддає /__/auth/handler на КОЖНОМУ домені сайту, тож на iOS
-// робимо authDomain тим самим, що й у сайту (same-origin). Один раз додайте https://<домен клієнта>/__/auth/handler
-// в Authorized redirect URIs OAuth-клієнта (Google Cloud Console → Credentials).
-const env = import.meta.env
-const projectId = env.VITE_FIREBASE_PROJECT_ID || 'demo-juno'
-
+// Беремо з .env (Vite автоматично підставляє import.meta.env.VITE_*)
+// Якщо .env немає — fallback на дефолти (треба підставити вручну)
+// iPhone (Safari/ярлик) блокує сховище між різними доменами: вхід через Google робить
+// редірект на drivepad-86fe1.firebaseapp.com і назад на drivepad-client.web.app, а результат
+// входу лишається в "чужому" сховищі — користувач повертається невійшовшим. Firebase Hosting
+// віддає /__/auth/handler на КОЖНОМУ домені сайту, тож на iOS робимо authDomain тим самим,
+// що й у сайту (same-origin). Потрібно один раз додати
+// https://drivepad-client.web.app/__/auth/handler в Authorized redirect URIs OAuth-клієнта
+// (Google Cloud Console → Credentials). На інших платформах — як раніше.
 function defaultAuthDomain() {
-  const fallback = `${projectId}.firebaseapp.com`
+  const fallback = 'drivepad-86fe1.firebaseapp.com'
   try {
     const ua = navigator.userAgent
     const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
@@ -24,18 +23,18 @@ function defaultAuthDomain() {
   return fallback
 }
 
-export const firebaseConfig = {
-  apiKey: env.VITE_FIREBASE_API_KEY || 'demo-key',
-  authDomain: env.VITE_FIREBASE_AUTH_DOMAIN || defaultAuthDomain(),
-  databaseURL: env.VITE_FIREBASE_DATABASE_URL || `https://${projectId}-default-rtdb.europe-west1.firebasedatabase.app`,
-  projectId,
-  storageBucket: env.VITE_FIREBASE_STORAGE_BUCKET || `${projectId}.firebasestorage.app`,
-  messagingSenderId: env.VITE_FIREBASE_MESSAGING_SENDER_ID || '0',
-  appId: env.VITE_FIREBASE_APP_ID || '1:0:web:0',
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyAJFqq9jMrc2RgkceappeGt9EJ2bM2xKBI",
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || defaultAuthDomain(),
+  databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "https://drivepad-86fe1-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "drivepad-86fe1",
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "drivepad-86fe1.firebasestorage.app",
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "221725287898",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:221725287898:web:59ee63287a825801104ce3"
 }
 
 export const app = initializeApp(firebaseConfig)
-// Демо (?demo=1): фейковий вхід клієнта без звернень до Firebase Auth/бази.
+// Демо (?demo=1): фейковий вхід учня без звернень до Firebase Auth/бази.
 const demoAuth = {
   currentUser: { ...DEMO_USER, getIdToken: async () => 'demo' },
   onAuthStateChanged(cb) { setTimeout(() => cb(demoAuth.currentUser), 0); return () => {} },

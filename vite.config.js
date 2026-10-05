@@ -25,7 +25,7 @@ function versionGuard() {
   let version = ''
   let overlayJs = ''
   return {
-    name: 'juno-client-version-guard',
+    name: 'drivepad-client-version-guard',
     buildStart() {
       version = readVersion()
       // Анімація оновлення — окремий читабельний файл, вставляється в HTML інлайном.
@@ -91,11 +91,11 @@ export default defineConfig({
     versionGuard(),
     VitePWA({
       registerType: 'prompt',
-      includeAssets: ['icon-192.png', 'icon-512.png', 'icon-maskable-512.png', 'apple-touch-icon.png', 'favicon-64.png'],
+      includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Juno — запис до майстра',
-        short_name: 'Juno',
-        description: 'Онлайн-запис до салонів і майстрів',
+        name: 'DrivePad — Запис на уроки',
+        short_name: 'DrivePad',
+        description: 'Онлайн-запис на уроки водіння',
         theme_color: '#ff5a3c',
         background_color: '#1c1d21',
         display: 'standalone',
@@ -114,10 +114,10 @@ export default defineConfig({
             type: 'image/png'
           },
           {
-            src: '/icon-maskable-512.png',
+            src: '/icon-512.png',
             sizes: '512x512',
             type: 'image/png',
-            purpose: 'maskable'
+            purpose: 'any maskable'
           }
         ]
       },

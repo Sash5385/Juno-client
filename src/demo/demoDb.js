@@ -1,10 +1,10 @@
 // Фейкова Realtime Database в пам'яті для демо-режиму (див. demoMode.js).
 // Реалізує лише те, чим користується застосунок: onValue/get/set/update/remove/push/
-// runTransaction/off. Дані — з buildSalonDemoTree(); записи міняють лише цю копію в пам'яті,
+// runTransaction/off. Дані — з buildDemoTree(); записи міняють лише цю копію в пам'яті,
 // тож інтерфейс у демо "живий" (можна тапати, переносити), а Firebase лишається недоторканим.
-import { buildSalonDemoTree } from "../salon/demoData.js";
+import { buildDemoTree } from "./demoData.js";
 
-let root = buildSalonDemoTree();
+let root = buildDemoTree();
 const listeners = new Set();
 
 const norm = (p) => String(p || "").replace(/^\/+|\/+$/g, "");

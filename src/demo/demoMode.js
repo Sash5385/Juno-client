@@ -1,11 +1,14 @@
 // Демо-режим: застосунок показує ВИДУМАНІ дані, а Firebase не чіпає взагалі — ні читання,
 // ні запису (для скріншотів/реклами). Вмикається адресою з ?demo=1 і пам'ятається
 // до закриття вкладки; ?demo=0 вимикає. Без цього параметра нічого не змінюється.
-// Демо-салон (src/salon/demoData.js): дивимось очима вигаданої клієнтки.
-export const DEMO_CLIENT_UID = "demo_u03";
-export const DEMO_USER = { uid: DEMO_CLIENT_UID, email: "demo@juno.app", displayName: "Ірина Бондаренко", phoneNumber: "+380990000003", isAnonymous: false };
+// Дані спільні з адмінкою (див. DrivePad/src/demo): тут дивимось очима учениці Ірини Бондаренко.
+export const DEMO_UID = "demo-instructor"; // ключ інструктора в демо-дереві (спільний з адмінкою)
+export const DEMO_IID = DEMO_UID;
+export const DEMO_SLUG = "demo";
+export const DEMO_STUDENT_UID = "demo_u03";
+export const DEMO_USER = { uid: DEMO_STUDENT_UID, email: "demo@drivepad.pro", displayName: "Ірина Бондаренко", phoneNumber: "+380990000003", isAnonymous: false };
 
-const KEY = "juno_demo";
+const KEY = "dp_demo";
 
 function detect() {
   try {
