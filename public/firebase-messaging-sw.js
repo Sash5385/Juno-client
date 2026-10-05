@@ -8,13 +8,13 @@ self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', () => self.clients.claim())
 
 firebase.initializeApp({
-  apiKey: "AIzaSyAJFqq9jMrc2RgkceappeGt9EJ2bM2xKBI",
-  authDomain: "drivepad-86fe1.firebaseapp.com",
-  databaseURL: "https://drivepad-86fe1-default-rtdb.europe-west1.firebasedatabase.app",
-  projectId: "drivepad-86fe1",
-  storageBucket: "drivepad-86fe1.firebasestorage.app",
-  messagingSenderId: "221725287898",
-  appId: "1:221725287898:web:59ee63287a825801104ce3"
+  apiKey: "AIzaSyDu4tWzXFZWWlaJGuhlibDKz1U96Uk3Q74",
+  authDomain: "juno-booking.firebaseapp.com",
+  databaseURL: "https://juno-booking-default-rtdb.europe-west1.firebasedatabase.app",
+  projectId: "juno-booking",
+  storageBucket: "juno-booking.firebasestorage.app",
+  messagingSenderId: "852885730629",
+  appId: "1:852885730629:web:9a8f34b87d2538541cba2c"
 })
 
 const messaging = firebase.messaging()
@@ -30,7 +30,7 @@ messaging.onBackgroundMessage((payload) => {
   // тут завжди undefined, тому title/body й досі бралися з нього ніколи не
   // існуючого поля, і фонове сповіщення завжди показувалось порожнім.
   const title = payload.data?.title || 'DrivePad'
-  const url = payload.data?.url || 'https://drivepad-client.web.app/cabinet'
+  const url = payload.data?.url || 'https://juno-booking-client.web.app/cabinet'
   const options = {
     body: payload.data?.body || '',
     icon: '/icon-192.png',
@@ -49,12 +49,12 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener('notificationclick', (e) => {
   e.notification.close()
   const data = e.notification.data || {}
-  const target = data.url || 'https://drivepad-client.web.app/cabinet'
-  const fullUrl = target.startsWith('http') ? target : ('https://drivepad-client.web.app' + target)
+  const target = data.url || 'https://juno-booking-client.web.app/cabinet'
+  const fullUrl = target.startsWith('http') ? target : ('https://juno-booking-client.web.app' + target)
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
       for (const c of list) {
-        if (c.url.startsWith('https://drivepad-client.web.app') && 'focus' in c) {
+        if (c.url.startsWith('https://juno-booking-client.web.app') && 'focus' in c) {
           c.focus()
           return c.navigate(fullUrl)
         }

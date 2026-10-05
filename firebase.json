@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "drivepad-client",
+    "site": "juno-booking-client",
     "public": "dist",
     "ignore": [
       "firebase.json",
