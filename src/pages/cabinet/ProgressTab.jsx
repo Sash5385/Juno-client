@@ -12,11 +12,11 @@ export default function ProgressTab({ user, profile, bookingsData }) {
   const { bookings, schoolHours, manualHours, canBookPrivate } = bookingsData || { bookings: [], schoolHours: 0, manualHours: 0, canBookPrivate: false };
 
   const studentType = profile?.studentType || "school";
-  const isSchool = studentType === "school";
-
-  const target = 40;
+  // Розмір пакета годин задає майстер (0 — без пакета)
+  const target = Number(bookingsData?.packageHours ?? 40);
+  const hasPackage = studentType === "school" && target > 0;
   const current = Math.min(schoolHours, target);
-  const percent = (current / target) * 100;
+  const percent = target > 0 ? (current / target) * 100 : 0;
 
   const completed = useMemo(
     () => bookings.filter(b => b.status === "confirmed" && new Date(b.date) < new Date()),
@@ -135,7 +135,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           </div>
         );
       })()}
-      {isSchool && (
+      {hasPackage && (
         <div className="progress-hero">
           <div className="progress-circle-wrap">
             <svg className="progress-svg" viewBox="0 0 160 160">
@@ -178,7 +178,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
               <div className="unlock-info">
                 <div className="unlock-title">Індивідуальні записи доступні</div>
                 <div className="unlock-desc">
-                  Ти пройшов 40 годин стандартного пакета. Тепер можеш записуватись на додаткові індивідуальні записи.
+                  Ти пройшов {target} год стандартного пакета. Тепер можеш записуватись на додаткові індивідуальні записи.
                 </div>
               </div>
             </div>
@@ -255,11 +255,11 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             {[
               { emoji:'🎓', label:'1 запис',    earned: totalLessons >= 1 },
               { emoji:'🌱', label:'5 записів',  earned: totalLessons >= 5 },
-              { emoji:'🚗', label:'10 записів', earned: totalLessons >= 10 },
+              { emoji:'⭐', label:'10 записів', earned: totalLessons >= 10 },
               { emoji:'🏆', label:'20 записів', earned: totalLessons >= 20 },
               { emoji:'🌟', label:'30 записів', earned: totalLessons >= 30 },
-              ...(isSchool ? [
-                { emoji:'🔓', label:'40 год',  earned: schoolHours >= 40 },
+              ...(hasPackage ? [
+                { emoji:'🔓', label:`${target} год`,  earned: schoolHours >= target },
               ] : []),
             ].map(({ emoji, label, earned }) => (
               <div key={label} style={{

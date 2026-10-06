@@ -12,7 +12,7 @@ export function lessonEndMs(b) {
   return d.getTime() + (Number(b.durationHours) || 1) * 3600000
 }
 
-export function useBookings(uid, profile) {
+export function useBookings(uid, profile, packageHours = 40) {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   // Раз на хвилину перераховуємо, що вже минуло: запис, що закінчився, одразу стає «завершеним»
@@ -65,6 +65,7 @@ export function useBookings(uid, profile) {
     completedHours,
     manualHours,
     loading,
-    canBookPrivate: schoolHours >= 40
+    packageHours,
+    canBookPrivate: packageHours <= 0 || schoolHours >= packageHours
   }
 }

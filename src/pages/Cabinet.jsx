@@ -5,7 +5,7 @@ import { useToast } from '../hooks/useToast'
 import { useBookings } from '../hooks/useBookings'
 import { useBackClose } from '../hooks/useBackButton'
 import { signOut } from '../firebase/auth'
-import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue, subscribeMyBadges } from '../firebase/db'
+import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue, subscribeMyBadges, getAdminSettings } from '../firebase/db'
 
 import BookTab from './cabinet/BookTab'
 import BookingPaused from './cabinet/BookingPaused'
@@ -39,7 +39,12 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
   const { showToast, ToastEl } = useToast()
   const loc = useLocation()
   const nav = useNavigate()
-  const bookingsData = useBookings(user?.uid, profile)
+  // Розмір пакета годин задає майстер (admin_settings/packageHours, 0 — без пакета)
+  const [packageHours, setPackageHours] = useState(40)
+  useEffect(() => {
+    getAdminSettings().then(s => setPackageHours(Number(s?.packageHours ?? 40))).catch(() => {})
+  }, [])
+  const bookingsData = useBookings(user?.uid, profile, packageHours)
 
   // Визначаємо активну вкладку з URL
   const path = loc.pathname.replace('/cabinet', '').replace('/', '')

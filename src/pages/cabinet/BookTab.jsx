@@ -37,8 +37,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const { showToast, ToastEl } = useToast()
   const isSchool = profile?.studentType === 'school'
   const isPrivateStudent = profile?.studentType === 'private'
-  const schoolLimitReached = bookingsData.canBookPrivate // schoolHours >= 40
-  // private student: only private; school student: school until 40h, then only private
+  const schoolLimitReached = bookingsData.canBookPrivate // пакет годин пройдено (або пакета немає)
+  // private student: only private; standard student: standard until the package hours are done, then individual
   const canPrivate = isPrivateStudent || schoolLimitReached
   const isVipStudent = profile?.isVip === true
   // Знижка клієнта — фіксована сума ₴ за годину (так її задає майстер в картці клієнта і так
@@ -690,7 +690,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           {days.map((d, i) => {
             if (!d) return <div key={i} className="cal-day empty"></div>
             // Приватні й автошкільні клієнти мають окремі горизонти видимості календаря
-            // (Налаштування → Обмеження). Клієнт автошколи до 40 год — «автошкола».
+            // (Налаштування → Обмеження). Клієнт зі «Стандартом» до завершення пакета годин — «стандарт».
             const maxDays = canPrivate
               ? (adminSettings.calendarOpenDays ?? 30)
               : (adminSettings.schoolCalendarOpenDays ?? 14)
