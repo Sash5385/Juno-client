@@ -3,7 +3,8 @@ name: Deploy to Firebase
 on:
   push:
     branches:
-      - claude/optimistic-bardeen-o4gf7w
+      - ccr-0afc4178-9t5dvx
+  workflow_dispatch:
 
 jobs:
   tests:
@@ -27,12 +28,7 @@ jobs:
         run: npm run build
 
       - name: Deploy hosting to Firebase
-        uses: FirebaseExtended/action-hosting-deploy@v0
-        with:
-          repoToken: ${{ secrets.GITHUB_TOKEN }}
-          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          channelId: live
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+        run: npx firebase-tools deploy --only hosting --project juno-booking --token "${{ secrets.FIREBASE_TOKEN }}"
 
   build-android:
     runs-on: ubuntu-latest
