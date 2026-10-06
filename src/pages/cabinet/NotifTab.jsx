@@ -24,7 +24,7 @@ const TYPE_META = {
   queue_offer:         { icon: '🎉', label: 'Черга',        accent: 'blue'  },
   slot_freed:          { icon: '🚗', label: 'Слот вільний', accent: 'blue'  },
   admin_message:       { icon: '📢', label: 'Від майстра', accent: 'blue' },
-  lesson_reminder_day: { icon: '📅', label: 'Завтра урок', accent: 'gold'  },
+  lesson_reminder_day: { icon: '📅', label: 'Завтра запис', accent: 'gold'  },
   reminder:            { icon: '🔔', label: 'Нагадування', accent: 'gold'  },
   badge:               { icon: '🏅', label: 'Заохочення',      accent: 'gold'  },
   system:              { icon: '🔔', label: 'Системне',     accent: 'dim'   },
@@ -50,7 +50,7 @@ export default function NotifTab({ user, onSeen }) {
         <div className="notif-empty">
           <div className="notif-empty-icon">🔔</div>
           <div className="notif-empty-title">Немає сповіщень</div>
-          <div className="notif-empty-sub">Тут з'являться сповіщення про уроки</div>
+          <div className="notif-empty-sub">Тут з'являться сповіщення про записи</div>
         </div>
       )}
       {notifications.length > 0 && (

@@ -93,9 +93,9 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'Juno — Запис на уроки',
+        name: 'Juno — Запис',
         short_name: 'Juno',
-        description: 'Онлайн-запис на уроки водіння',
+        description: 'Онлайн-запис',
         theme_color: '#ff5a3c',
         background_color: '#1c1d21',
         display: 'standalone',

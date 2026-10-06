@@ -565,7 +565,7 @@ export function subscribeNotifications(uid, callback) {
   return () => off(r, 'value', handler)
 }
 
-// Медалі клієнта (видає майстер за урок): users/{uid}/badges/{id} = { icon, label, awardedAt, bookingId }.
+// Медалі клієнта (видає майстер за запис): users/{uid}/badges/{id} = { icon, label, awardedAt, bookingId }.
 export function subscribeMyBadges(uid, callback) {
   const r = iRef(`users/${uid}/badges`)
   const handler = onValue(r, snap => {
@@ -595,7 +595,7 @@ export async function sendWelcomeIfEnabled(uid) {
     const _dl = `${String(_n.getDate()).padStart(2,'0')}.${String(_n.getMonth()+1).padStart(2,'0')}`
     const _tl = `${String(_n.getHours()).padStart(2,'0')}:${String(_n.getMinutes()).padStart(2,'0')}`
     await Promise.all([
-      push(iRef(`notifications/${uid}`), { type:'system', title:'Вітаємо! 🎉', body:'Ваш профіль підключено. Забронюйте перший урок у вкладці «Запис».', date:_dl, time:_tl, ts:Date.now() }),
+      push(iRef(`notifications/${uid}`), { type:'system', title:'Вітаємо! 🎉', body:'Ваш профіль підключено. Забронюйте перший запис у вкладці «Запис».', date:_dl, time:_tl, ts:Date.now() }),
       update(iRef(`users/${uid}`), { welcomeSent: true }),
     ])
   } catch (_) {}

@@ -9,7 +9,7 @@ import { LicenseContext } from '../../hooks/useLicense'
 import './BookingsTab.css'
 import './BookTab.css'
 
-// Мінімальний час до уроку, коли клієнт ще може самостійно скасувати (год)
+// Мінімальний час до запису, коли клієнт ще може самостійно скасувати (год)
 const CANCEL_WINDOW_HOURS = 24
 
 function hoursUntilLesson(booking) {
@@ -20,7 +20,7 @@ function hoursUntilLesson(booking) {
   return (d.getTime() - Date.now()) / 3600000
 }
 
-// Кінець уроку (мс): початок + тривалість. Без дати/часу — нескінченність (не відкидаємо запис)
+// Кінець запису (мс): початок + тривалість. Без дати/часу — нескінченність (не відкидаємо запис)
 function lessonEndMs(b) {
   if (!b?.date || !b?.time) return Infinity
   const [h, m] = b.time.split(':').map(Number)
@@ -183,7 +183,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
       {ModalToastEl}
       <div className="dialog">
         <div className="dialog-handle" />
-        <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}>📅 Перенести урок</div>
+        <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}>📅 Перенести запис</div>
         <div style={{ fontSize: 12, color: 'var(--dim)', marginBottom: 14, textAlign: 'center' }}>
           {booking.serviceName} · {booking.date} о {booking.time}
         </div>
@@ -297,7 +297,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
 
   const handleCancel = async (booking) => {
     if (!cancelAllowed || hoursUntilLesson(booking) < cancelCutoff) {
-      showToast(`Скасувати урок можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error')
+      showToast(`Скасувати запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error')
       return
     }
     if (cancelConfirmId !== booking.id) {
@@ -307,7 +307,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
     setCancelConfirmId(null)
     try {
       await cancelBooking(user.uid, booking.id)
-      showToast(`Урок ${booking.date} о ${booking.time} скасовано`)
+      showToast(`Запис ${booking.date} о ${booking.time} скасовано`)
     } catch (e) {
       showToast('Помилка: ' + e.message, 'error')
     }
@@ -399,7 +399,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
                 </div>
               ) : goalsOpenId === b.id ? (
                 <div>
-                  <div style={{fontSize:10,color:'var(--dim)',marginBottom:5}}>🎯 Оберіть до 3 цілей уроку:</div>
+                  <div style={{fontSize:10,color:'var(--dim)',marginBottom:5}}>🎯 Оберіть до 3 цілей запису:</div>
                   <div style={{display:'flex',gap:4,flexWrap:'wrap',marginBottom:6}}>
                     {['🅿️ Паркування','🔄 Розворот','🏙 Місто','🛣 Швидкісні','⭕ Кільце','🚏 Зупинки'].map(g => {
                       const sel = goalsDraft.includes(g)
@@ -428,7 +428,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
                 <button onClick={()=>{setGoalsOpenId(b.id);setGoalsDraft(b.goals||[])}} style={{
                   fontSize:11,padding:'3px 10px',borderRadius:9,border:'1px dashed rgba(255,255,255,0.15)',
                   background:'none',color:'var(--dim)',cursor:'pointer',fontFamily:'inherit',
-                }}>🎯 Цілі уроку</button>
+                }}>🎯 Цілі запису</button>
               )}
             </div>
           )}
@@ -510,7 +510,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
         <div className="empty-state">
           <div className="empty-state-emoji">📅</div>
           <div className="empty-state-title">Поки нема записів</div>
-          <div className="empty-state-desc">Перейди на вкладку Запис і вибери час уроку</div>
+          <div className="empty-state-desc">Перейди на вкладку Запис і вибери час запису</div>
         </div>
       ) : (
         <>
@@ -524,7 +524,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
             </div>
           )}
           {upcoming.length > 0 && (() => {
-            // Сьогоднішні уроки, що вже закінчились, не вважаємо «наступним»
+            // Сьогоднішні записи, що вже закінчились, не вважаємо «наступним»
             const next = upcoming.find(b => lessonEndMs(b) > Date.now())
             if (!next) return null
             const hrs = hoursUntilLesson(next)
@@ -533,7 +533,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
             return (
               <div style={{borderRadius:18,background:'linear-gradient(135deg,rgba(99,155,255,0.1) 0%,rgba(120,80,255,0.06) 100%)',border:'1px solid rgba(99,155,255,0.18)',padding:'16px',marginBottom:16}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>
-                  <div style={{fontSize:11,color:'var(--dim)',fontWeight:700,textTransform:'uppercase',letterSpacing:1}}>Наступний урок</div>
+                  <div style={{fontSize:11,color:'var(--dim)',fontWeight:700,textTransform:'uppercase',letterSpacing:1}}>Наступний запис</div>
                   {countdown && <div className="nl-pill" style={{fontSize:11,fontWeight:800,padding:'3px 9px',borderRadius:8}}>{countdown}</div>}
                 </div>
                 <div style={{fontSize:28,fontWeight:900,color:'var(--text)',lineHeight:1}}>{next.time}</div>
@@ -580,7 +580,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
           user={user}
           profile={profile}
           onClose={() => setRescheduleBooking(null)}
-          onDone={() => { setRescheduleBooking(null); showToast('Урок перенесено') }}
+          onDone={() => { setRescheduleBooking(null); showToast('Запис перенесено') }}
         />
       )}
 

@@ -407,7 +407,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
                     <div className="radio-content">
                       <div className="radio-icon">🚗</div>
                       <div>
-                        <div className="radio-title">Приватні уроки</div>
+                        <div className="radio-title">Приватні записи</div>
                         <div className="radio-desc">Індивідуальний графік, 1 або 2 години</div>
                       </div>
                     </div>

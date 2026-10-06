@@ -43,7 +43,7 @@ export default function QueueTab({ user, profile }) {
     setAccepting(slot.slotKey)
     try {
       await claimQueueOffer(user.uid, slot.slotKey, { date: slot.date, time: slot.time }, profile)
-      showToast('✓ Урок заброньовано!')
+      showToast('✓ Запис заброньовано!')
     } catch (e) {
       showToast('Помилка: ' + e.message)
     } finally {

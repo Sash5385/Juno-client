@@ -9,7 +9,7 @@ export default function BookingPaused() {
       <div style={{ fontSize: 36, marginBottom: 10 }}>⏸️</div>
       <div style={{ fontSize: 16, fontWeight: 800, marginBottom: 8 }}>Запис тимчасово недоступний</div>
       <div style={{ fontSize: 13, color: 'var(--dim)', lineHeight: 1.5 }}>
-        Майстер зараз не приймає нові записи. Ваші заплановані уроки можна переглянути у вкладці «Мої записи».
+        Майстер зараз не приймає нові записи. Ваші заплановані записи можна переглянути у вкладці «Мої записи».
         За потреби зв'яжіться з майстром.
       </div>
     </div>

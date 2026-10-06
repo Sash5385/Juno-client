@@ -11,7 +11,7 @@ const FALLBACK_SERVICES = [
   { id:'sv2', name:'Приватний', type:'private', duration:60, price:0, colorId:'purple' },
 ]
 
-// Ціна послуги на дату уроку: заплановану зміну (nextPrice з дати nextPriceFrom) задає майстер в «Послугах»
+// Ціна послуги на дату запису: заплановану зміну (nextPrice з дати nextPriceFrom) задає майстер в «Послугах»
 function servicePriceOn(svc, dateStr) {
   if (!svc) return 0
   if (svc.nextPrice != null && svc.nextPriceFrom && dateStr && dateStr >= svc.nextPriceFrom) return svc.nextPrice
@@ -104,7 +104,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const slotDurOf = (slot) => (slot && slot.durMin ? slot.durMin / 60 : baseDurationHours)
   const selectedSlotDur = slotDurOf(selectedTime ? slots[`slot${selectedTime.replace(':', '')}`] : null)
   const durationHours = selectedTime2 ? 2 : selectedSlotDur
-  // Базова ціна уроку заданої тривалості (індивідуальна ціна або тариф послуги), без надбавки/знижки
+  // Базова ціна запису заданої тривалості (індивідуальна ціна або тариф послуги), без надбавки/знижки
   const lessonBase = (hours) => customPriceAmt != null
     ? Math.round(customPriceAmt * hours)
     : Math.round(servicePriceOn(selectedService, formatDateYMD(selectedDate)) * (hours / baseDurationHours))
@@ -162,7 +162,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       const sMin = sh * 60 + sm
       if (sMin <= startMin || sMin >= endMin) return false
       const offsetMin = sMin - startMin
-      // Слоти на рівній годинній межі — обов'язкові для багатогодинного уроку,
+      // Слоти на рівній годинній межі — обов'язкові для багатогодинного запису,
       // блокують тільки якщо вони вже зайняті.
       if (offsetMin % 60 === 0) return s.available === false
       // Нестандартне зміщення (+30хв) — конфлікт лише якщо слот зайнятий (як в ID4).
@@ -521,7 +521,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           lunchBlocked:   !slot.lunchOverride && !offDay && isBlockedByLunch(slot.time, slotDurHours),
           // Розтягнутий слот — цілісний блок: проміжні документи годин поглинуті навмисно
           overlapBlocked: slot.available !== false && (isCustomDur ? false : wouldOverlapTaken(slot.time, slotDurHours)),
-          // Обмеження "не пізніше ніж за N годин до уроку" (налаштування адміна bookCutoffHours)
+          // Обмеження "не пізніше ніж за N годин до запису" (налаштування адміна bookCutoffHours)
           cutoffBlocked:  (() => {
             const hrs = adminSettings.bookCutoffHours || 0
             if (!hrs || !selectedDate) return false
@@ -585,7 +585,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     const ms = nextLesson._ts - Date.now()
     const hours = ms / 3600000
     if (hours < 1) return `через ${Math.ceil(ms / 60000)} хв`
-    // «сьогодні/завтра» — за календарним днем, а не за кількістю годин до уроку
+    // «сьогодні/завтра» — за календарним днем, а не за кількістю годин до запису
     const dayStart = t => { const x = new Date(t); x.setHours(0, 0, 0, 0); return x.getTime() }
     const dayDiff = Math.round((dayStart(nextLesson._ts) - dayStart(Date.now())) / 86400000)
     if (dayDiff === 0) return `сьогодні о ${nextLesson.time}`
@@ -637,7 +637,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         }}>
           <span style={{fontSize:22}}>📅</span>
           <div style={{flex:1, minWidth:0}}>
-            <div className="nl-title" style={{fontWeight:700, fontSize:13}}>Найближчий урок</div>
+            <div className="nl-title" style={{fontWeight:700, fontSize:13}}>Найближчий запис</div>
             <div style={{color:'var(--text)', fontSize:12, marginTop:2}}>{nextLessonLabel}</div>
           </div>
           {nextLesson.status === 'pending' && (
@@ -662,9 +662,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           <span style={{fontSize:22}}>🎫</span>
           <div>
             <div style={{color:'#4ade80', fontWeight:600, fontSize:14}}>
-              Передоплачено {profile.lessonBalance} {profile.lessonBalance === 1 ? 'урок' : profile.lessonBalance < 5 ? 'уроки' : 'уроків'}
+              Передоплачено {profile.lessonBalance} {profile.lessonBalance === 1 ? 'запис' : profile.lessonBalance < 5 ? 'записи' : 'записів'}
             </div>
-            <div style={{color:'var(--dim)', fontSize:12}}>Бронюйте — уроки вже оплачені</div>
+            <div style={{color:'var(--dim)', fontSize:12}}>Бронюйте — записи вже оплачені</div>
           </div>
         </div>
       )}
@@ -754,7 +754,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         style={{width:'100%'}}
                         onClick={() => !isMyQueue && !isMyBooked && handleSlotClick(slot)}
                         disabled={isLunch || isOverlap || isMyBooked}
-                        title={isExactlyMine ? 'Ваш урок' : isPartOfMyBooking ? 'Ваш урок (продовження)' : isMyBooked ? 'Перетин з вашим уроком' : isLunch ? 'Обідня перерва' : isOverlap ? 'Перетин з іншим уроком' : isVipLocked ? 'VIP слот' : isMyReserved ? 'Зарезервовано для вас!' : isTaken ? 'Зайнято — стати в чергу?' : undefined}
+                        title={isExactlyMine ? 'Ваш запис' : isPartOfMyBooking ? 'Ваш запис (продовження)' : isMyBooked ? 'Перетин з вашим записом' : isLunch ? 'Обідня перерва' : isOverlap ? 'Перетин з іншим записом' : isVipLocked ? 'VIP слот' : isMyReserved ? 'Зарезервовано для вас!' : isTaken ? 'Зайнято — стати в чергу?' : undefined}
                       >
                         <div className="slot-time">{slot.time}</div>
                         {isExactlyMine ? (
@@ -878,7 +878,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)',
                 fontSize:12, color:'var(--dim)', textAlign:'center',
               }}>
-                Вартість уроку: <strong style={{color:'var(--text)'}}>{totalPrice}₴</strong>
+                Вартість запису: <strong style={{color:'var(--text)'}}>{totalPrice}₴</strong>
                 {customPriceAmt == null && discountAmt > 0 && <span style={{marginLeft:6, color:'#4ade80', fontSize:11}}>−{discountAmt * durationHours}₴</span>}
               </div>
             ) : null}
@@ -926,7 +926,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             </div>
             <div className="dialog-title">
               {successData.type === 'booking'
-                ? (successData.pending ? 'Запит надіслано!' : 'Урок заброньовано!')
+                ? (successData.pending ? 'Запит надіслано!' : 'Запис заброньовано!')
                 : 'Ти в черзі!'}
             </div>
             {successData.type === 'booking' && successData.pending && (
@@ -1003,7 +1003,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             <div className="dialog-sub">
               {dialogSlot.vipOnly
                 ? 'Коли адмін відкриє цей VIP слот — ти отримаєш сповіщення'
-                : 'Якщо клієнт скасує — отримаєте сповіщення, урок стане вашим'}
+                : 'Якщо клієнт скасує — отримаєте сповіщення, запис стане вашим'}
             </div>
             <div className="dialog-info-card">
               <div className="dialog-info-row">

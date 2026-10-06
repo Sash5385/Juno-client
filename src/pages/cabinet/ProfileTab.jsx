@@ -229,7 +229,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
         <div className="section-title">🏅 Мої заохочення{badges.length > 0 ? ` (${badges.length})` : ''}</div>
         {badges.length === 0 ? (
           <div style={{fontSize:12,color:'var(--dim)',textAlign:'center',padding:'6px 0',lineHeight:1.5}}>
-            Поки немає заохочень. Майстер видає їх за уроки.
+            Поки немає заохочень. Майстер видає їх за записи.
           </div>
         ) : (
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(96px,1fr))',gap:8}}>
@@ -265,7 +265,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
       <div className="profile-section">
         <div className="section-title">🎁 Запросити друга</div>
         <div style={{fontSize:13,color:"var(--dim)",marginBottom:10,lineHeight:1.5}}>
-          Поділіться посиланням — коли друг запишеться на перший урок, ви отримаєте бонусний урок!
+          Поділіться посиланням — коли друг запишеться на перший запис, ви отримаєте бонусний запис!
         </div>
         <div style={{display:"flex",gap:8,marginBottom:8}}>
           <button
@@ -288,7 +288,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
                 const slug = getCurrentSlug();
                 const origin = window.location.origin;
                 const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
-                navigator.share({ title: 'Juno', text: 'Запишись на уроки водіння!', url: link }).catch(() => {});
+                navigator.share({ title: 'Juno', text: 'Запишись онлайн!', url: link }).catch(() => {});
               }}
               className="edit-save"
               style={{flex:1,background:'rgba(99,155,255,0.18)',color:'#6b9bff'}}
@@ -299,12 +299,12 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
         </div>
         {(profile.referralBonusLessons || 0) > 0 && (
           <div style={{textAlign:"center",fontSize:13,color:"#fbbf24",fontWeight:700,padding:"6px 0"}}>
-            🎁 Ваш бонус: {profile.referralBonusLessons} бонусний урок{profile.referralBonusLessons > 1 ? "и" : ""}
+            🎁 Ваш бонус: {profile.referralBonusLessons} бонусний запис{profile.referralBonusLessons > 1 ? "и" : ""}
           </div>
         )}
         {(profile.lessonBalance || 0) > 0 && (
           <div style={{textAlign:"center",fontSize:13,color:"#34d399",fontWeight:700,padding:"6px 0"}}>
-            🎓 Залишок уроків: {profile.lessonBalance}
+            🎓 Залишок записів: {profile.lessonBalance}
           </div>
         )}
       </div>
@@ -318,7 +318,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
           <div style={{padding:"14px",borderRadius:14,border:"1px solid rgba(239,68,68,0.4)",background:"rgba(239,68,68,0.08)",textAlign:"left"}}>
             <div style={{fontSize:13,fontWeight:800,color:"#f87171",marginBottom:6}}>Видалити акаунт назавжди?</div>
             <div style={{fontSize:12,color:"var(--dim)",lineHeight:1.5,marginBottom:10}}>
-              Будуть видалені ваш профіль, записи, чат і сповіщення, а майбутні заняття скасовані. Це неможливо скасувати.
+              Будуть видалені ваш профіль, записи, чат і сповіщення, а майбутні записи скасовані. Це неможливо скасувати.
               Щоб підтвердити, введіть слово <b style={{color:"var(--text)"}}>ВИДАЛИТИ</b>.
             </div>
             <input value={delText} onChange={e => setDelText(e.target.value)} placeholder="ВИДАЛИТИ"

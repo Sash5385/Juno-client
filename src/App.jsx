@@ -108,7 +108,7 @@ function InstallPrompt({ active }) {
         <img src="/icon-192.png" alt="" style={{width:40, height:40, borderRadius:10, flexShrink:0}} />
         <div style={{flex:1, minWidth:0}}>
           <div style={{fontSize:14, fontWeight:800, color:'var(--text)'}}>Додайте Juno на головний екран</div>
-          <div style={{fontSize:12, color:'var(--dim)', marginTop:2}}>Запис на уроки в один дотик і сповіщення про урок</div>
+          <div style={{fontSize:12, color:'var(--dim)', marginTop:2}}>Запис в один дотик і сповіщення про запис</div>
         </div>
       </div>
       {ios && !deferredPrompt && (

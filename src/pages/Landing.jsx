@@ -192,8 +192,8 @@ export default function Landing({ user, profile }) {
               <PhotoCollageSlot photos={collageSlots[2]} phase={-8} className="hp-slot-c" />
             </div>
           )}
-          <h1>Уроки водіння</h1>
-          <button className="hero-cta" onClick={goAuth}>📅 Записатись на урок</button>
+          <h1>Записи</h1>
+          <button className="hero-cta" onClick={goAuth}>📅 Записатись</button>
         </section>
 
         {/* INSTRUCTOR */}
@@ -232,7 +232,7 @@ export default function Landing({ user, profile }) {
         {(schoolService || privateService) && (
         <Reveal>
         <section className="lsection">
-          <h2>Скільки коштує урок</h2>
+          <h2>Скільки коштує запис</h2>
           <div className="pricing-bubbles">
             {schoolService && (
               <div className="pricing-bubble" style={{ '--c': colorOfService(schoolService.colorId) }}>
@@ -375,7 +375,7 @@ export default function Landing({ user, profile }) {
         <section className="lsection">
           <button className="terms-btn" onClick={() => setTermsOpen(o => !o)}>
             <div className="terms-ico">📄</div>
-            <div className="terms-btn-label">Умови відвідування уроків</div>
+            <div className="terms-btn-label">Умови відвідування записів</div>
             <div className={`terms-chevron${termsOpen ? ' open' : ''}`}>›</div>
           </button>
           {termsOpen && (

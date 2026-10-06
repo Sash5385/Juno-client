@@ -14,9 +14,9 @@ export function googleCalendarLink(booking) {
   // Календар); старий render?action=TEMPLATE на телефонах часто губить заповнені поля. ctz — щоб час
   // не «з'їхав» через часовий пояс. Подія зберігається після натискання «Зберегти» в самому Google Календарі.
   const params = new URLSearchParams({
-    text: serviceName || 'Урок водіння',
+    text: serviceName || 'Запис',
     dates: `${startStr}/${endStr}`,
-    details: 'Juno — урок з майстром',
+    details: 'Juno — запис з майстром',
     location: 'вул. Верховинна, 44',
     ctz: 'Europe/Kyiv',
   })
@@ -36,8 +36,8 @@ export function downloadICS(booking) {
     // TZID=Europe/Kyiv без блоку VTIMEZONE багато календарів відкидають або зсувають.
     `DTSTART:${startStr}`,
     `DTEND:${endStr}`,
-    `SUMMARY:${serviceName || 'Урок водіння'}`,
-    'DESCRIPTION:Juno — урок з майстром',
+    `SUMMARY:${serviceName || 'Запис'}`,
+    'DESCRIPTION:Juno — запис з майстром',
     'LOCATION:вул. Верховинна\\, 44',
     `UID:${id || date + time.replace(':', '')}@drivepad`,
     'END:VEVENT',

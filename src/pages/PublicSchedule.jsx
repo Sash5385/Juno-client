@@ -147,7 +147,7 @@ export default function PublicSchedule({ onBook }) {
       </div>
 
       {/* 1. ТИП УРОКУ */}
-      <div className="section-title">1. Тип уроку</div>
+      <div className="section-title">1. Тип запису</div>
       <div className="service-grid">
         <div className={`svc-tile ${serviceType==='school'?'selected':''}`} onClick={() => setServiceType('school')}>
           <div className="ico bk-ico-school">🎓</div>
@@ -156,7 +156,7 @@ export default function PublicSchedule({ onBook }) {
         </div>
         <div className={`svc-tile ${serviceType==='private'?'selected':''}`} onClick={() => setServiceType('private')}>
           <div className="ico bk-ico-private">🚙</div>
-          <div className="svc-title">Приватний урок</div>
+          <div className="svc-title">Приватний запис</div>
           <div className="svc-dur">Індивідуально</div>
         </div>
       </div>
@@ -230,7 +230,7 @@ export default function PublicSchedule({ onBook }) {
                       className={`slot ${isUnavailable?'taken':''} ${isSelected?'selected':''}`}
                       onClick={() => !isUnavailable && setSelectedTime(slot.time)}
                       disabled={isUnavailable}
-                      title={slot.lunchBlocked ? 'Обідня перерва' : slot.overlapBlocked ? 'Перетин з іншим уроком' : undefined}
+                      title={slot.lunchBlocked ? 'Обідня перерва' : slot.overlapBlocked ? 'Перетин з іншим записом' : undefined}
                     >
                       <div className="slot-time">{slot.time}</div>
                       {slot.lunchBlocked && <div style={{fontSize:8, opacity:0.5}}>обід</div>}

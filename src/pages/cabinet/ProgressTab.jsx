@@ -95,7 +95,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               <span style={{fontSize:28,lineHeight:1}}>📅</span>
               <div style={{flex:1}}>
-                <div style={{fontSize:11,color:'#6b9bff',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Наступний урок</div>
+                <div style={{fontSize:11,color:'#6b9bff',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Наступний запис</div>
                 <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>{dayLabel}{next.time ? ` · ${next.time}` : ''}</div>
                 {next.serviceName && <div style={{fontSize:12,color:'var(--dim)',marginTop:2}}>{next.serviceName}</div>}
               </div>
@@ -112,11 +112,11 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           <div style={{display:'flex',alignItems:'center',gap:10}}>
             <span style={{fontSize:28,lineHeight:1}}>🎓</span>
             <div style={{flex:1}}>
-              <div style={{fontSize:11,color:'#4ade80',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Залишок уроків</div>
+              <div style={{fontSize:11,color:'#4ade80',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Залишок записів</div>
               <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>
-                {profile.lessonBalance} {profile.lessonBalance === 1 ? 'урок' : profile.lessonBalance < 5 ? 'уроки' : 'уроків'}
+                {profile.lessonBalance} {profile.lessonBalance === 1 ? 'запис' : profile.lessonBalance < 5 ? 'записи' : 'записів'}
               </div>
-              <div style={{fontSize:12,color:'var(--dim)',marginTop:2}}>Передоплачених занять</div>
+              <div style={{fontSize:12,color:'var(--dim)',marginTop:2}}>Передоплачених записів</div>
             </div>
           </div>
         </div>
@@ -133,7 +133,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               <span style={{fontSize:28,lineHeight:1}}>🏁</span>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:11,color:'rgba(192,132,252,0.9)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Останній урок</div>
+                <div style={{fontSize:11,color:'rgba(192,132,252,0.9)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Останній запис</div>
                 <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>{parseInt(dd)}.{parseInt(mm)}{last.time ? ` · ${last.time}` : ''}</div>
                 {last.serviceName && <div style={{fontSize:12,color:'var(--dim)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{last.serviceName}</div>}
               </div>
@@ -175,7 +175,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           <div className="progress-subtitle">
             {current < target
               ? `Залишилось ${target - current} годин до завершення курсу`
-              : "Курс завершено! Можеш записуватись на приватні уроки"}
+              : "Курс завершено! Можеш записуватись на приватні записи"}
           </div>
           {manualHours > 0 && (
             <div className="progress-subtitle" style={{ marginTop: 4, fontSize: 11, opacity: 0.7 }}>
@@ -187,9 +187,9 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             <div className="unlock-card">
               <div className="unlock-ico">🔓</div>
               <div className="unlock-info">
-                <div className="unlock-title">Приватні уроки доступні</div>
+                <div className="unlock-title">Приватні записи доступні</div>
                 <div className="unlock-desc">
-                  Ти пройшов 40 годин автошколи. Тепер можеш записуватись на додаткові приватні уроки.
+                  Ти пройшов 40 годин автошколи. Тепер можеш записуватись на додаткові приватні записи.
                 </div>
               </div>
             </div>
@@ -198,7 +198,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
       )}
 
       <div className="progress-hero" style={{ marginTop: 14 }}>
-        <div className="progress-title" style={{ marginBottom: 14 }}>Статистика уроків</div>
+        <div className="progress-title" style={{ marginBottom: 14 }}>Статистика записів</div>
         <div className="stat-row">
           <div className="stat-btn">
             <div className="num">{totalLessons}</div>
@@ -245,7 +245,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
         <div className="progress-hero" style={{ marginTop: 14 }}>
           <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
             <span style={{ fontSize:18 }}>🎯</span>
-            <span style={{ fontSize:13, fontWeight:800, color:'var(--text)' }}>Ціль на наступний урок</span>
+            <span style={{ fontSize:13, fontWeight:800, color:'var(--text)' }}>Ціль на наступний запис</span>
           </div>
           <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
             {nextLessonWithGoals.goals.map(g => (
@@ -264,11 +264,11 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           <div className="progress-title" style={{ marginBottom: 10 }}>🏅 Досягнення</div>
           <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
             {[
-              { emoji:'🎓', label:'1 урок',    earned: totalLessons >= 1 },
-              { emoji:'🌱', label:'5 уроків',  earned: totalLessons >= 5 },
-              { emoji:'🚗', label:'10 уроків', earned: totalLessons >= 10 },
-              { emoji:'🏆', label:'20 уроків', earned: totalLessons >= 20 },
-              { emoji:'🌟', label:'30 уроків', earned: totalLessons >= 30 },
+              { emoji:'🎓', label:'1 запис',    earned: totalLessons >= 1 },
+              { emoji:'🌱', label:'5 записів',  earned: totalLessons >= 5 },
+              { emoji:'🚗', label:'10 записів', earned: totalLessons >= 10 },
+              { emoji:'🏆', label:'20 записів', earned: totalLessons >= 20 },
+              { emoji:'🌟', label:'30 записів', earned: totalLessons >= 30 },
               ...(isSchool ? [
                 { emoji:'🔓', label:'40 год',  earned: schoolHours >= 40 },
                 { emoji:'📋', label:'Іспит',   earned: examPassed === true },
@@ -328,9 +328,9 @@ export default function ProgressTab({ user, profile, bookingsData }) {
 
       {totalLessons >= 10 && (
         <div className="progress-hero" style={{ marginTop: 14 }}>
-          <div className="progress-title" style={{ marginBottom: 6 }}>🎯 Цілі уроку</div>
+          <div className="progress-title" style={{ marginBottom: 6 }}>🎯 Цілі запису</div>
           <div className="progress-subtitle">
-            З 10-го уроку ти можеш ставити до 3 цілей на кожен запис. Це допомагає майстру краще підготуватись.
+            З 10-го запису ти можеш ставити до 3 цілей на кожен запис. Це допомагає майстру краще підготуватись.
           </div>
         </div>
       )}

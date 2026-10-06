@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { parseYMD } from '../utils/date'
 import { subscribeMyBookings, getConfirmedSchoolHours, getCompletedHours } from '../firebase/db'
 
-// Кінець уроку (мс): початок + тривалість (за замовчуванням 1 год). Без часу — кінець доби цієї дати.
+// Кінець запису (мс): початок + тривалість (за замовчуванням 1 год). Без часу — кінець доби цієї дати.
 export function lessonEndMs(b) {
   if (!b?.date) return Infinity
   const d = parseYMD(b.date)
@@ -15,7 +15,7 @@ export function lessonEndMs(b) {
 export function useBookings(uid, profile) {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
-  // Раз на хвилину перераховуємо, що вже минуло: урок, що закінчився, одразу стає «завершеним»
+  // Раз на хвилину перераховуємо, що вже минуло: запис, що закінчився, одразу стає «завершеним»
   const [tick, setTick] = useState(0)
   useEffect(() => {
     const t = setInterval(() => setTick(n => n + 1), 60000)
