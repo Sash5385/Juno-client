@@ -16,7 +16,7 @@ export function googleCalendarLink(booking) {
   const params = new URLSearchParams({
     text: serviceName || 'Урок водіння',
     dates: `${startStr}/${endStr}`,
-    details: 'DrivePad — урок з інструктором',
+    details: 'Juno — урок з інструктором',
     location: 'вул. Верховинна, 44',
     ctz: 'Europe/Kyiv',
   })
@@ -29,7 +29,7 @@ export function downloadICS(booking) {
   const ics = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//DrivePad//DrivePad//UK',
+    'PRODID:-//Juno//Juno//UK',
     'BEGIN:VEVENT',
     `DTSTAMP:${new Date().toISOString().replace(/[-:]/g, '').replace(/\.\d{3}/, '')}`,
     // Час «плаваючий» (без TZID): календар телефону сам трактує його у місцевому часі.
@@ -37,7 +37,7 @@ export function downloadICS(booking) {
     `DTSTART:${startStr}`,
     `DTEND:${endStr}`,
     `SUMMARY:${serviceName || 'Урок водіння'}`,
-    'DESCRIPTION:DrivePad — урок з інструктором',
+    'DESCRIPTION:Juno — урок з інструктором',
     'LOCATION:вул. Верховинна\\, 44',
     `UID:${id || date + time.replace(':', '')}@drivepad`,
     'END:VEVENT',
@@ -47,7 +47,7 @@ export function downloadICS(booking) {
   const url = URL.createObjectURL(blob)
   const a = document.createElement('a')
   a.href = url
-  a.download = `drivepad-${date}.ics`
+  a.download = `juno-${date}.ics`
   a.click()
   URL.revokeObjectURL(url)
 }

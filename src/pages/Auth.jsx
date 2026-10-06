@@ -433,8 +433,8 @@ export default function Auth({ user, profile, onProfileSaved }) {
       {step === 'phone' && (
         <div className="fade-up" style={{display:'flex',flexDirection:'column'}}>
           <div className="auth-logo-block">
-            <div className="auth-logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
-            <div className="auth-logo-name">DrivePad</div>
+            <div className="auth-logo-icon"><img src="/icon-192.png" alt="Juno"/></div>
+            <div className="auth-logo-name">Juno</div>
           </div>
 
           {/* Вкладки */}

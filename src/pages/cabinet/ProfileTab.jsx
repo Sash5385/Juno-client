@@ -288,7 +288,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
                 const slug = getCurrentSlug();
                 const origin = window.location.origin;
                 const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
-                navigator.share({ title: 'DrivePad', text: 'Запишись на уроки водіння!', url: link }).catch(() => {});
+                navigator.share({ title: 'Juno', text: 'Запишись на уроки водіння!', url: link }).catch(() => {});
               }}
               className="edit-save"
               style={{flex:1,background:'rgba(99,155,255,0.18)',color:'#6b9bff'}}

@@ -107,7 +107,7 @@ function InstallPrompt({ active }) {
       <div style={{display:'flex', alignItems:'center', gap:10}}>
         <img src="/icon-192.png" alt="" style={{width:40, height:40, borderRadius:10, flexShrink:0}} />
         <div style={{flex:1, minWidth:0}}>
-          <div style={{fontSize:14, fontWeight:800, color:'var(--text)'}}>Додайте DrivePad на головний екран</div>
+          <div style={{fontSize:14, fontWeight:800, color:'var(--text)'}}>Додайте Juno на головний екран</div>
           <div style={{fontSize:12, color:'var(--dim)', marginTop:2}}>Запис на уроки в один дотик і сповіщення про урок</div>
         </div>
       </div>
@@ -115,7 +115,7 @@ function InstallPrompt({ active }) {
         <ol style={{margin:'12px 0 0', paddingLeft:20, fontSize:12.5, lineHeight:1.6, color:'var(--text)'}}>
           <li>Натисніть <b>«Поділитися»</b> <span style={{fontSize:15}}>⬆︎</span> внизу Safari</li>
           <li>Оберіть <b>«На екран Домой»</b></li>
-          <li>Натисніть <b>«Додати»</b> та відкрийте DrivePad з екрана. Увійдіть там ще раз — вхід з Safari на iPhone не переноситься</li>
+          <li>Натисніть <b>«Додати»</b> та відкрийте Juno з екрана. Увійдіть там ще раз — вхід з Safari на iPhone не переноситься</li>
         </ol>
       )}
       <div style={{display:'flex', gap:8, marginTop:12}}>
@@ -311,7 +311,7 @@ export default function App() {
     return onForegroundMessage((payload) => {
       // Data-only push — payload.notification тут завжди undefined, тому
       // title/body бралися з нього ніколи не існуючого поля.
-      const title = payload.data?.title || 'DrivePad'
+      const title = payload.data?.title || 'Juno'
       const body = payload.data?.body || ''
       const url = payload.data?.url || '/'
       if (Notification.permission !== 'granted') return

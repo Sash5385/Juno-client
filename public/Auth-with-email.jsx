@@ -209,7 +209,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
 
         <div className="auth-logo">
           <div className="logo-icon">🚗</div>
-          <div className="logo-text">DrivePad</div>
+          <div className="logo-text">Juno</div>
         </div>
 
         {/* EMAIL STEP */}

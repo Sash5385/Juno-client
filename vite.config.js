@@ -93,8 +93,8 @@ export default defineConfig({
       registerType: 'prompt',
       includeAssets: ['favicon.svg'],
       manifest: {
-        name: 'DrivePad — Запис на уроки',
-        short_name: 'DrivePad',
+        name: 'Juno — Запис на уроки',
+        short_name: 'Juno',
         description: 'Онлайн-запис на уроки водіння',
         theme_color: '#ff5a3c',
         background_color: '#1c1d21',

@@ -1,4 +1,4 @@
-// Публічна сторінка "Що таке DrivePad" — показується на голій адресі
+// Публічна сторінка "Що таке Juno" — показується на голій адресі
 // (drivepad-client.web.app без /i/{slug}), коли ще ніхто не переходив за
 // посиланням-запрошенням конкретного інструктора. На відміну від екрана
 // "недійсне посилання" (App.jsx: коли slug був, але не резолвнувся), тут
@@ -32,15 +32,15 @@ export default function About() {
       textAlign: 'center',
       fontFamily: 'inherit',
     }}>
-      <img src="/icon-192.png" alt="DrivePad" style={{ width: 72, height: 72, borderRadius: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }} />
-      <h1 style={{ fontSize: 26, fontWeight: 900, margin: '18px 0 6px', letterSpacing: -0.5 }}>DrivePad</h1>
+      <img src="/icon-192.png" alt="Juno" style={{ width: 72, height: 72, borderRadius: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }} />
+      <h1 style={{ fontSize: 26, fontWeight: 900, margin: '18px 0 6px', letterSpacing: -0.5 }}>Juno</h1>
       <div style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 700, marginBottom: 28 }}>
         Онлайн-запис на уроки водіння
       </div>
 
       <div style={{ maxWidth: 480, width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 14 }}>
         <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--dim)', margin: 0 }}>
-          DrivePad — сервіс онлайн-запису для інструкторів з водіння та автошкіл.
+          Juno — сервіс онлайн-запису для інструкторів з водіння та автошкіл.
           Кожен інструктор отримує власний кабінет для ведення розкладу та персональне
           посилання, яке роздає своїм учням — учні записуються на уроки самостійно,
           без дзвінків і листування.
@@ -96,7 +96,7 @@ export default function About() {
         </div>
       </div>
 
-      <div style={{ marginTop: 40, fontSize: 11, color: 'var(--dim)' }}>© {new Date().getFullYear()} DrivePad</div>
+      <div style={{ marginTop: 40, fontSize: 11, color: 'var(--dim)' }}>© {new Date().getFullYear()} Juno</div>
       <div style={{ marginTop: 6, fontSize: 10, color: 'var(--dim)', opacity: 0.6 }}>
         {APP_VERSION} · {(window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true) ? 'ярлик' : 'браузер'} · {window.location.pathname}{window.location.search}
       </div>

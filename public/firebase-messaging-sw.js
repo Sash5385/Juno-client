@@ -29,7 +29,7 @@ messaging.onBackgroundMessage((payload) => {
   // Data-only push (без top-level/webpush "notification") — payload.notification
   // тут завжди undefined, тому title/body й досі бралися з нього ніколи не
   // існуючого поля, і фонове сповіщення завжди показувалось порожнім.
-  const title = payload.data?.title || 'DrivePad'
+  const title = payload.data?.title || 'Juno'
   const url = payload.data?.url || 'https://juno-booking-client.web.app/cabinet'
   const options = {
     body: payload.data?.body || '',

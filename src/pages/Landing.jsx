@@ -172,8 +172,8 @@ export default function Landing({ user, profile }) {
             </button>
           </div>
           <div className="logo">
-            <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
-            DrivePad
+            <div className="logo-icon"><img src="/icon-192.png" alt="Juno"/></div>
+            Juno
           </div>
           <button className="btn-login landing-topbar-login" onClick={goRegister}>
             {user ? 'Кабінет' : 'Увійти'}
@@ -390,7 +390,7 @@ export default function Landing({ user, profile }) {
         {/* FOOTER */}
         <div className="footer">
           <button className="footer-cta" onClick={goAuth}>🚗 Записатись зараз</button>
-          <div>© 2026 DrivePad. Школа водіння.</div>
+          <div>© 2026 Juno. Школа водіння.</div>
           <div className="devby">
             <small>Розробка та дизайн</small>
             <b>AlDemi Studio</b>
