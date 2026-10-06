@@ -11,7 +11,7 @@ const FALLBACK_SERVICES = [
   { id:'sv2', name:'Приватний', type:'private', duration:60, price:0, colorId:'purple' },
 ]
 
-// Ціна послуги на дату уроку: заплановану зміну (nextPrice з дати nextPriceFrom) задає інструктор в «Послугах»
+// Ціна послуги на дату уроку: заплановану зміну (nextPrice з дати nextPriceFrom) задає майстер в «Послугах»
 function servicePriceOn(svc, dateStr) {
   if (!svc) return 0
   if (svc.nextPrice != null && svc.nextPriceFrom && dateStr && dateStr >= svc.nextPriceFrom) return svc.nextPrice
@@ -41,7 +41,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   // private student: only private; school student: school until 40h, then only private
   const canPrivate = isPrivateStudent || schoolLimitReached
   const isVipStudent = profile?.isVip === true
-  // Знижка учня — фіксована сума ₴ за годину (так її задає інструктор в картці учня і так
+  // Знижка клієнта — фіксована сума ₴ за годину (так її задає майстер в картці клієнта і так
   // рахує адмінка та ID4-клієнт), а НЕ відсотки. customPrice — індивідуальна ціна ₴/год,
   // що повністю замінює тарифну (знижка тоді не діє).
   const discountAmt = Number(profile?.discount) || 0
@@ -97,7 +97,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     })
   }, [])
 
-  // Базова тривалість — з послуги. Якщо послуга годинна, учень може обрати два сусідні
+  // Базова тривалість — з послуги. Якщо послуга годинна, клієнт може обрати два сусідні
   // годинні слоти поспіль — тоді запис триває 2 години (як в ID4).
   const baseDurationHours = selectedService ? selectedService.duration / 60 : 1
   // Тривалість слота задає адмін (durMin — розтягнутий слот, напр. "2 год"); без durMin — з послуги.
@@ -220,7 +220,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     return () => unsubs.forEach(u => u())
   }, [slots, selectedDate, user?.uid])
 
-  // Сигналізуємо адміну що учень дивиться на цей слот
+  // Сигналізуємо адміну що клієнт дивиться на цей слот
   useEffect(() => {
     if (!selectedDate || !selectedTime || !user?.uid) return
     const dateStr = formatDateYMD(selectedDate)
@@ -305,7 +305,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         const slotMin = bookStartMin + i * 60
         const key = `slot${String(Math.floor(slotMin/60)).padStart(2,'0')}${String(slotMin%60).padStart(2,'0')}`
         surcharge += slots[key]?.surcharge || 0
-        // Фінальна перевірка: заборонити якщо будь-який покритий слот є VIP (для звичайних учнів)
+        // Фінальна перевірка: заборонити якщо будь-який покритий слот є VIP (для звичайних клієнтів)
         if (i > 0 && !isVipStudent && slots[key]?.vipOnly) {
           showToast('Неможливо записатись: наступна година є VIP-слотом')
           setSubmitting(false)
@@ -427,7 +427,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     const dateStr = selectedDate ? formatDateYMD(selectedDate) : ''
 
     // День без робочого графіка (закритий явно або вимкнений у тижневому шаблоні, напр. неділя):
-    // слоти, які адмін ВІДКРИВ ВРУЧНУ, учень бачить — джерело істини сам timeslots/{date}.
+    // слоти, які адмін ВІДКРИВ ВРУЧНУ, клієнт бачить — джерело істини сам timeslots/{date}.
     // Для такого дня не застосовуємо обід із шаблону (його немає). closedDay — явний override
     // "closed": там показуємо лише вільні слоти (мітки зайнятості зі старих записів не потрібні).
     let offDay = false
@@ -448,8 +448,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
 
     // "Липкий час" — як в ID4: ВИМКНЕНО за замовчуванням (раніше тут було "!== false", тобто
     // увімкнено, навіть якщо адмін його ніколи не вмикав — і в клієнта лишались лише слоти
-    // впритул до запису самого учня). Коли адмін вмикає — показуємо вільні слоти лише впритул
-    // до вже зайнятих (по ВСІХ записах дня з slots, а не лише власних учня).
+    // впритул до запису самого клієнта). Коли адмін вмикає — показуємо вільні слоти лише впритул
+    // до вже зайнятих (по ВСІХ записах дня з slots, а не лише власних клієнта).
     const stickyEnabled = !!adminSettings.stickyTimeEnabled
     const stickyMode = adminSettings.stickyTime || 'both'
     const takenIntervals = Object.values(slots)
@@ -537,7 +537,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           // Фіксована ціна слота повністю замінює тарифну
           totalPrice: slot.fixedPrice != null
             ? slot.fixedPrice
-            : lessonPrice(slotDurHours, totalSurcharge), // та сама формула, що в діалозі й на кнопці: тариф/індивідуальна ціна, надбавка, знижка учня
+            : lessonPrice(slotDurHours, totalSurcharge), // та сама формула, що в діалозі й на кнопці: тариф/індивідуальна ціна, надбавка, знижка клієнта
         }
       })
       .filter(slot => !slot.lunchBlocked && !slot.overlapBlocked && !(slot.cutoffBlocked && slot.available !== false))
@@ -620,7 +620,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         <div className="banner-avatar">{getInitials(profile?.name)}</div>
         <div className="banner-info">
           <div className="banner-greet">Привіт,</div>
-          <div className="banner-name">{profile?.name?.split(' ')[0] || 'Учень'}</div>
+          <div className="banner-name">{profile?.name?.split(' ')[0] || 'Клієнт'}</div>
           <div className="banner-tag">
             {selectedService?.type === 'school' ? '🎓 Автошкола' : '🚙 Приватний'}
           </div>
@@ -689,8 +689,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         >
           {days.map((d, i) => {
             if (!d) return <div key={i} className="cal-day empty"></div>
-            // Приватні й автошкільні учні мають окремі горизонти видимості календаря
-            // (Налаштування → Обмеження). Учень автошколи до 40 год — «автошкола».
+            // Приватні й автошкільні клієнти мають окремі горизонти видимості календаря
+            // (Налаштування → Обмеження). Клієнт автошколи до 40 год — «автошкола».
             const maxDays = canPrivate
               ? (adminSettings.calendarOpenDays ?? 30)
               : (adminSettings.schoolCalendarOpenDays ?? 14)
@@ -885,7 +885,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             <textarea
               value={studentNote}
               onChange={e => setStudentNote(e.target.value)}
-              placeholder="Коментар для інструктора (необов'язково)…"
+              placeholder="Коментар для майстра (необов'язково)…"
               maxLength={120}
               rows={2}
               style={{
@@ -930,7 +930,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 : 'Ти в черзі!'}
             </div>
             {successData.type === 'booking' && successData.pending && (
-              <div className="dialog-sub">Очікуйте підтвердження від інструктора.</div>
+              <div className="dialog-sub">Очікуйте підтвердження від майстра.</div>
             )}
             {successData.type === 'queue' && (
               <div className="dialog-sub">Як тільки слот звільниться — отримаєте сповіщення.</div>
@@ -1003,7 +1003,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             <div className="dialog-sub">
               {dialogSlot.vipOnly
                 ? 'Коли адмін відкриє цей VIP слот — ти отримаєш сповіщення'
-                : 'Якщо учень скасує — отримаєте сповіщення, урок стане вашим'}
+                : 'Якщо клієнт скасує — отримаєте сповіщення, урок стане вашим'}
             </div>
             <div className="dialog-info-card">
               <div className="dialog-info-row">
@@ -1039,7 +1039,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               <div className="dialog-info-row">
                 <span className="lbl">У черзі вже</span>
                 <span className="val">
-                  {dialogSlot.queueCount} {pluralize(dialogSlot.queueCount, ['учень','учні','учнів'])}
+                  {dialogSlot.queueCount} {pluralize(dialogSlot.queueCount, ['клієнт','клієнти','клієнтів'])}
                 </span>
               </div>
               <div className="dialog-info-row">

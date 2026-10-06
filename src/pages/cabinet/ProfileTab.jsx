@@ -174,7 +174,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
 
       {instructorProfile?.name && (
         <div className="profile-section">
-          <div className="section-title">🚗 Мій інструктор</div>
+          <div className="section-title">🚗 Мій майстер</div>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             {instructorProfile.photo
               ? <img src={instructorProfile.photo} alt="" style={{width:52,height:52,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
@@ -191,7 +191,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
 
       {iPhone && (
         <div className="profile-section">
-          <div className="section-title">Контакти інструктора</div>
+          <div className="section-title">Контакти майстра</div>
           <div className="contact-phone-block">
             <div className="contact-btns">
               <a href={`tel:${iPhone}`} className="contact-btn contact-btn--call" aria-label="Зателефонувати">
@@ -229,7 +229,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
         <div className="section-title">🏅 Мої заохочення{badges.length > 0 ? ` (${badges.length})` : ''}</div>
         {badges.length === 0 ? (
           <div style={{fontSize:12,color:'var(--dim)',textAlign:'center',padding:'6px 0',lineHeight:1.5}}>
-            Поки немає заохочень. Інструктор видає їх за уроки.
+            Поки немає заохочень. Майстер видає їх за уроки.
           </div>
         ) : (
           <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(96px,1fr))',gap:8}}>

@@ -59,7 +59,7 @@ function DirectChat({ user, profile }) {
       <div className="chat-header">
         <div className="chat-instructor-avatar">🚗</div>
         <div className="chat-instructor-info">
-          <div className="chat-instructor-name">Олександр — інструктор</div>
+          <div className="chat-instructor-name">Олександр — майстер</div>
           <div className="chat-instructor-status">Відповідає протягом дня</div>
         </div>
         {messages.length > 0 && (
@@ -92,7 +92,7 @@ function DirectChat({ user, profile }) {
           <div className="chat-empty">
             <div className="chat-empty-icon">💬</div>
             <div className="chat-empty-title">Почніть розмову</div>
-            <div className="chat-empty-sub">Напишіть інструктору будь-яке питання</div>
+            <div className="chat-empty-sub">Напишіть майстру будь-яке питання</div>
           </div>
         )}
         {messages.map(m => {
@@ -170,7 +170,7 @@ function GeneralChat({ user, profile }) {
     if (!text.trim() || sending) return
     setSending(true)
     try {
-      const name = profile?.name || 'Учень'
+      const name = profile?.name || 'Клієнт'
       await sendGeneralMessage(user.uid, name, text.trim())
       setText('')
       taRef.current?.focus()
@@ -194,7 +194,7 @@ function GeneralChat({ user, profile }) {
       <div className="chat-header">
         <div className="chat-general-avatar">👥</div>
         <div className="chat-instructor-info">
-          <div className="chat-instructor-name">Загальний чат учнів</div>
+          <div className="chat-instructor-name">Загальний чат клієнтів</div>
           <div className="chat-instructor-status">Спілкуйтесь і обмінюйтесь досвідом</div>
         </div>
       </div>
@@ -280,7 +280,7 @@ export default function ChatTab({ user, profile }) {
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">
             <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
           </svg>
-          Інструктор
+          Майстер
         </button>
         <button
           className={`chat-tab-btn ${tab === 'general' ? 'active' : ''}`}

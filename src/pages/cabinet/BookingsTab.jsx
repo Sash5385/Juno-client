@@ -9,7 +9,7 @@ import { LicenseContext } from '../../hooks/useLicense'
 import './BookingsTab.css'
 import './BookTab.css'
 
-// Мінімальний час до уроку, коли учень ще може самостійно скасувати (год)
+// Мінімальний час до уроку, коли клієнт ще може самостійно скасувати (год)
 const CANCEL_WINDOW_HOURS = 24
 
 function hoursUntilLesson(booking) {
@@ -136,7 +136,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
           return
         }
       }
-      // Ціна = стара ціна + різниця надбавки. Знижка учня — фіксована сума за годину (а не %),
+      // Ціна = стара ціна + різниця надбавки. Знижка клієнта — фіксована сума за годину (а не %),
       // тож вона вже врахована в старій ціні і на різницю надбавки не діє.
       const oldSurcharge = booking.surcharge || 0
       let newPrice = booking.price
@@ -297,7 +297,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
 
   const handleCancel = async (booking) => {
     if (!cancelAllowed || hoursUntilLesson(booking) < cancelCutoff) {
-      showToast(`Скасувати урок можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до інструктора.`, 'error')
+      showToast(`Скасувати урок можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error')
       return
     }
     if (cancelConfirmId !== booking.id) {
@@ -360,7 +360,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
             <div style={{marginTop:6,padding:'7px 10px',borderRadius:9,
               background:'rgba(59,130,246,0.08)',border:'1px solid rgba(59,130,246,0.2)',
               fontSize:11,color:'var(--text)',lineHeight:1.5}}>
-              <span style={{fontSize:9,fontWeight:700,color:'rgba(96,165,250,0.8)',display:'block',marginBottom:2}}>📝 Нотатка інструктора</span>
+              <span style={{fontSize:9,fontWeight:700,color:'rgba(96,165,250,0.8)',display:'block',marginBottom:2}}>📝 Нотатка майстра</span>
               {b.instructorNote}
             </div>
           )}
@@ -471,7 +471,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
                 </div>
               ) : (
                 <button onClick={()=>{setNoteOpenId(b.id);setNoteDraft(b.studentNote||'');}} style={{fontSize:11,padding:'3px 10px',borderRadius:9,border:'1px dashed rgba(99,211,120,0.25)',background:'none',color:'var(--dim)',cursor:'pointer',fontFamily:'inherit'}}>
-                  {b.studentNote ? `💬 ${b.studentNote}` : '💬 Нотатка інструктору'}
+                  {b.studentNote ? `💬 ${b.studentNote}` : '💬 Нотатка майстру'}
                 </button>
               )}
             </div>
@@ -519,7 +519,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
               <div style={{fontSize:22,flexShrink:0}}>💳</div>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,fontWeight:800,color:'#fca5a5'}}>Заборгованість: {totalDebt} ₴</div>
-                <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>Зверніться до інструктора для оплати</div>
+                <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>Зверніться до майстра для оплати</div>
               </div>
             </div>
           )}

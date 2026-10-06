@@ -16,7 +16,7 @@ export function googleCalendarLink(booking) {
   const params = new URLSearchParams({
     text: serviceName || 'Урок водіння',
     dates: `${startStr}/${endStr}`,
-    details: 'Juno — урок з інструктором',
+    details: 'Juno — урок з майстром',
     location: 'вул. Верховинна, 44',
     ctz: 'Europe/Kyiv',
   })
@@ -37,7 +37,7 @@ export function downloadICS(booking) {
     `DTSTART:${startStr}`,
     `DTEND:${endStr}`,
     `SUMMARY:${serviceName || 'Урок водіння'}`,
-    'DESCRIPTION:Juno — урок з інструктором',
+    'DESCRIPTION:Juno — урок з майстром',
     'LOCATION:вул. Верховинна\\, 44',
     `UID:${id || date + time.replace(':', '')}@drivepad`,
     'END:VEVENT',

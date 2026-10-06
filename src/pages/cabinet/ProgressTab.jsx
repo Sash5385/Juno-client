@@ -179,7 +179,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           </div>
           {manualHours > 0 && (
             <div className="progress-subtitle" style={{ marginTop: 4, fontSize: 11, opacity: 0.7 }}>
-              Включаючи {manualHours} год, зарахованих інструктором
+              Включаючи {manualHours} год, зарахованих майстром
             </div>
           )}
 
@@ -330,7 +330,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
         <div className="progress-hero" style={{ marginTop: 14 }}>
           <div className="progress-title" style={{ marginBottom: 6 }}>🎯 Цілі уроку</div>
           <div className="progress-subtitle">
-            З 10-го уроку ти можеш ставити до 3 цілей на кожен запис. Це допомагає інструктору краще підготуватись.
+            З 10-го уроку ти можеш ставити до 3 цілей на кожен запис. Це допомагає майстру краще підготуватись.
           </div>
         </div>
       )}

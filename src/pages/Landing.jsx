@@ -130,7 +130,7 @@ export default function Landing({ user, profile }) {
   const privateService2h = services.find(s => s.type === 'private' && Number(s.duration) === 120)
   const nearestSlot = upcomingSlots[0]
 
-  const instructorName = instructorProfile?.name || 'Інструктор'
+  const instructorName = instructorProfile?.name || 'Майстер'
   const instructorPhone = instructorProfile?.phone || ''
   const instructorAddress = instructorProfile?.address || ''
   const instructorPhoto = instructorProfile?.photoUrl || ''
@@ -151,7 +151,7 @@ export default function Landing({ user, profile }) {
   const goAuth = () => nav(user && profile ? '/cabinet' : '/schedule')
   const goRegister = () => nav(user && profile ? '/cabinet' : '/auth')
   // Публічний розклад (PublicSchedule) сам веде вибором дати й часу — тут
-  // просто відкриваємо його, конкретний слот з тизера учень обере там же.
+  // просто відкриваємо його, конкретний слот з тизера клієнт обере там же.
   const goBookSlot = () => goAuth()
 
   return (
@@ -207,13 +207,13 @@ export default function Landing({ user, profile }) {
             </div>
             <div className="instructor-info">
               <div className="instructor-name">{instructorName}</div>
-              <div className="instructor-role">Інструктор з водіння</div>
+              <div className="instructor-role">Майстер з водіння</div>
             </div>
           </div>
         </section>
         </Reveal>
 
-        {/* PORTFOLIO — текст інструктора про себе та переваги (Профіль → Портфоліо) */}
+        {/* PORTFOLIO — текст майстра про себе та переваги (Профіль → Портфоліо) */}
         {instructorAbout && (
         <Reveal>
         <section className="lsection">
@@ -298,7 +298,7 @@ export default function Landing({ user, profile }) {
         {reviews.length > 0 && (
         <Reveal>
         <section className="lsection">
-          <h2>Що кажуть учні</h2>
+          <h2>Що кажуть клієнти</h2>
           <div className="reviews-scroll">
             {reviews.map(rv => (
               <div className="review-card" key={`${rv.uid}_${rv.id}`}>
@@ -307,7 +307,7 @@ export default function Landing({ user, profile }) {
                 <div className="review-author">
                   <div className="review-avatar">{(rv.studentName || 'У').trim()[0].toUpperCase()}</div>
                   <div>
-                    <div className="review-name">{rv.studentName || 'Учень'}</div>
+                    <div className="review-name">{rv.studentName || 'Клієнт'}</div>
                     {rv.createdAt && <div className="review-date">{new Date(rv.createdAt).toLocaleDateString('uk-UA')}</div>}
                   </div>
                 </div>

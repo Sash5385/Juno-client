@@ -34,7 +34,7 @@ const firebaseConfig = {
 }
 
 export const app = initializeApp(firebaseConfig)
-// Демо (?demo=1): фейковий вхід учня без звернень до Firebase Auth/бази.
+// Демо (?demo=1): фейковий вхід клієнта без звернень до Firebase Auth/бази.
 const demoAuth = {
   currentUser: { ...DEMO_USER, getIdToken: async () => 'demo' },
   onAuthStateChanged(cb) { setTimeout(() => cb(demoAuth.currentUser), 0); return () => {} },

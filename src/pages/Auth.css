@@ -510,7 +510,7 @@
 
 .bottom-spacer { margin-top: 20px; padding-top: 4px; }
 
-/* ===== Тема «Скло» (як на екрані входу інструктора): кольорові шари за матовими панелями ===== */
+/* ===== Тема «Скло» (як на екрані входу майстра): кольорові шари за матовими панелями ===== */
 .auth-page { position: relative; isolation: isolate; }
 .auth-page::before {
   content: ""; position: fixed; inset: 0; z-index: -1; pointer-events: none;

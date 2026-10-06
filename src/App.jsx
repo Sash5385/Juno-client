@@ -188,7 +188,7 @@ export default function App() {
   const [user, setUser] = useState(null)
   const [profile, setProfile] = useState(null)
   const [loading, setLoading] = useState(true)
-  // undefined = ще визначаємо, null = посилання-інструктора нема, string = iid
+  // undefined = ще визначаємо, null = посилання-майстра нема, string = iid
   const [tenantIid, setTenantIid] = useState(undefined)
   // true лише коли в URL БУВ /i/{slug}, але він не резолвнувся (справді
   // "недійсне посилання") — на відміну від голого заходу на домен без
@@ -198,16 +198,16 @@ export default function App() {
   const pendingBookingRef = useRef(null)
   const { needRefresh, updateServiceWorker, isUpdating } = useAppUpdate()
 
-  // Визначаємо, до якого інструктора підключений цей студент — застосунок
-  // мультитенантний, спільний для студентів РІЗНИХ інструкторів. Джерело:
+  // Визначаємо, до якого майстра підключений цей студент — застосунок
+  // мультитенантний, спільний для студентів РІЗНИХ майстрів. Джерело:
   // посилання-запрошення /i/{slug} (одноразово прив'язує пристрій до
-  // інструктора) або збережений з попереднього візиту iid.
+  // майстра) або збережений з попереднього візиту iid.
   useEffect(() => {
-    if (DEMO) { setCurrentTenant(DEMO_IID, DEMO_SLUG); setTenantIid(DEMO_IID); return } // ?demo=1: вигаданий інструктор
+    if (DEMO) { setCurrentTenant(DEMO_IID, DEMO_SLUG); setTenantIid(DEMO_IID); return } // ?demo=1: вигаданий майстер
     // Slug береться з /i/{slug} АБО з ?i={slug}: параметр ми самі лишаємо в адресі
     // (див. ефект нижче), щоб ярлик "На екран Домой" (iOS зберігає ПОТОЧНУ адресу
     // сторінки, а сховище PWA на iPhone ізольоване від Safari) відкривався вже
-    // прив'язаним до свого інструктора, а не на голому домені.
+    // прив'язаним до свого майстра, а не на голому домені.
     const m = location.pathname.match(/^\/i\/([^/]+)/)
     const qSlug = new URLSearchParams(location.search).get('i')
     const rawSlug = m ? m[1] : qSlug
@@ -227,7 +227,7 @@ export default function App() {
           navigate(rest + withSlug(location.search, slug) + location.hash, { replace: true })
           return
         }
-        // slug із ?i= застарів, але є збережений інструктор — працюємо з ним
+        // slug із ?i= застарів, але є збережений майстер — працюємо з ним
         const stored = !m ? loadStoredTenant() : null
         if (stored) {
           setTenantIid(stored.iid)
@@ -248,7 +248,7 @@ export default function App() {
   // Персональний манифест: /i/{slug}/manifest.webmanifest (firebase.json віддає один
   // файл, а start_url "./" резолвиться відносно цієї адреси). iPhone (iOS 16.4+) бере
   // адресу запуску ярлика з манифесту, а не зі сторінки — зі статичним start_url "/"
-  // ярлик завжди відкривався на голому домені без інструктора.
+  // ярлик завжди відкривався на голому домені без майстра.
   useEffect(() => {
     if (!tenantIid) return
     const slug = getCurrentSlug()
@@ -264,8 +264,8 @@ export default function App() {
   }, [tenantIid])
 
   // Тримаємо ?i={slug} в адресі на КОЖНІЙ сторінці: інакше після першої ж
-  // навігації адреса стає без інструктора, і ярлик, доданий на екран Домой
-  // (iPhone), відкривається як "спільний сайт" без прив'язки до учня/інструктора.
+  // навігації адреса стає без майстра, і ярлик, доданий на екран Домой
+  // (iPhone), відкривається як "спільний сайт" без прив'язки до клієнта/майстра.
   useEffect(() => {
     if (!tenantIid) return
     const slug = getCurrentSlug()
@@ -276,15 +276,15 @@ export default function App() {
     navigate({ pathname: location.pathname, search: '?' + p.toString(), hash: location.hash }, { replace: true, state: location.state })
   }, [tenantIid, location.pathname, location.search])
 
-  // Знижка/ціна/VIP, які інструктор змінив, поки учень у застосунку, підтягуються наживо (без перезаходу)
+  // Знижка/ціна/VIP, які майстер змінив, поки клієнт у застосунку, підтягуються наживо (без перезаходу)
   useEffect(() => {
     if (!user?.uid || !profile) return
     return subscribeUserAdminFields(user.uid, fields => setProfile(p => (p ? { ...p, ...fields } : p)))
   }, [user?.uid, !!profile])
 
   useEffect(() => {
-    if (tenantIid === undefined) return // ще визначаємо інструктора
-    if (!tenantIid) { setLoading(false); return } // посилання-інструктора нема
+    if (tenantIid === undefined) return // ще визначаємо майстра
+    if (!tenantIid) { setLoading(false); return } // посилання-майстра нема
     const unsub = onAuthStateChanged(auth, async (u) => {
       setUser(u)
       if (u) {
@@ -418,7 +418,7 @@ export default function App() {
         <div>
           <div style={{ fontSize:40, marginBottom:12 }}>🔗</div>
           <p>Це посилання недійсне або застаріле.</p>
-          <p>Зверніться до вашого інструктора за коректним посиланням для запису.</p>
+          <p>Зверніться до вашого майстра за коректним посиланням для запису.</p>
         </div>
       </div>
       <InstallBanner/>

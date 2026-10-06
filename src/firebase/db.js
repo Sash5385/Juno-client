@@ -6,8 +6,8 @@ import { DEMO } from '../demo/demoMode'
 import { blockRangeUpdates, restoreRangeUpdates } from '../utils/slotRules'
 
 // ─── МУЛЬТИТЕНАНТНІСТЬ ──────────────────────────────────────────────
-// Один застосунок обслуговує студентів БАГАТЬОХ інструкторів — кожен
-// інструктор це instructors/{iid} в базі (iid = його Firebase Auth uid).
+// Один застосунок обслуговує студентів БАГАТЬОХ майстрів — кожен
+// майстер це instructors/{iid} в базі (iid = його Firebase Auth uid).
 // Поточний iid визначається один раз при заході (посилання /i/{slug} або
 // збережений з попереднього візиту) і зберігається тут на весь сеанс.
 const IID_KEY = 'dp_tenant_iid'
@@ -17,9 +17,9 @@ let _slug = null
 
 const TENANT_COOKIE = 'dp_tenant'
 
-// Дублюємо інструктора в cookie: iPhone при додаванні на екран Домой копіює cookie
+// Дублюємо майстра в cookie: iPhone при додаванні на екран Домой копіює cookie
 // Safari у сховище ярлика (localStorage НЕ копіюється) — так ярлик відкривається вже
-// прив'язаним до інструктора, навіть якщо адреса запуску втратила /i/{slug}.
+// прив'язаним до майстра, навіть якщо адреса запуску втратила /i/{slug}.
 function writeTenantCookie(iid, slug) {
   try {
     if (iid) document.cookie = `${TENANT_COOKIE}=${encodeURIComponent(iid + '|' + (slug || ''))}; max-age=31536000; path=/; SameSite=Lax`
@@ -38,7 +38,7 @@ function readTenantCookie() {
 export function setCurrentTenant(iid, slug) {
   _iid = iid || null
   _slug = slug || null
-  if (DEMO) return // демо: не прив'язуємо пристрій до вигаданого інструктора
+  if (DEMO) return // демо: не прив'язуємо пристрій до вигаданого майстра
   try {
     if (_iid) localStorage.setItem(IID_KEY, _iid); else localStorage.removeItem(IID_KEY)
     if (_slug) localStorage.setItem(SLUG_KEY, _slug); else localStorage.removeItem(SLUG_KEY)
@@ -64,7 +64,7 @@ export function loadStoredTenant() {
 export function getCurrentIid() { return _iid }
 export function getCurrentSlug() { return _slug }
 
-// Резолвить посилання-запрошення інструктора (/i/{slug}) в його iid.
+// Резолвить посилання-запрошення майстра (/i/{slug}) в його iid.
 // Читання публічне (slugs/.read: true в database.rules.json) — не потребує авторизації.
 export async function resolveSlug(slug) {
   const snap = await get(ref(db, `slugs/${slug}`))
@@ -74,7 +74,7 @@ export async function resolveSlug(slug) {
 export const iRef = (path) => ref(db, _iid ? `instructors/${_iid}${path ? '/' + path : ''}` : '/__no_tenant__')
 
 // ─── ACCESS CONTROL ─────────────────────────────────────
-// Заблокований адміном учень не бачить явного повідомлення про блок —
+// Заблокований адміном клієнт не бачить явного повідомлення про блок —
 // замість цього розклад виглядає повністю зайнятим, а приєднання до черги
 // мовчки нічого не записує. Прапорець виставляється в getUserProfile()
 // (викликається завжди тільки для поточного залогіненого користувача).
@@ -95,8 +95,8 @@ export async function getUserProfile(uid) {
   return { ...(data.profile || {}), isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 }
 }
 
-// Поля, які змінює інструктор (знижка, індивідуальна ціна, VIP, блок…): getUserProfile читає їх лише при вході,
-// тож учень з уже відкритим застосунком не бачив нової знижки. Ця підписка оновлює їх наживо.
+// Поля, які змінює майстер (знижка, індивідуальна ціна, VIP, блок…): getUserProfile читає їх лише при вході,
+// тож клієнт з уже відкритим застосунком не бачив нової знижки. Ця підписка оновлює їх наживо.
 export function subscribeUserAdminFields(uid, callback) {
   const r = iRef(`users/${uid}`)
   const handler = onValue(r, snap => {
@@ -127,7 +127,7 @@ export async function getSlotsForDate(date) {
 }
 
 // Найближчі вільні слоти для тизера на лендингу — публічний запит,
-// без прив'язки до конкретного учня (маскування заблокованих тут не
+// без прив'язки до конкретного клієнта (маскування заблокованих тут не
 // потрібне: незалогінений відвідувач ще не має _blocked).
 export async function getUpcomingFreeSlots(limit = 6) {
   const snap = await get(iRef('timeslots'))
@@ -257,7 +257,7 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
     const daySnap = await get(iRef(`timeslots/${booking.date}`))
     const updates = restoreRangeUpdates(daySnap.val() || {}, `timeslots/${booking.date}/`, startMin, durMin, { extra: { bookedBy: null } })
     // Слоти звільняє і сервер (onBookingChanged); якщо правила не пускають (слот зайнятий без bookedBy
-    // зі старої версії) — скасування запису вже збережено, тож це не помилка для учня.
+    // зі старої версії) — скасування запису вже збережено, тож це не помилка для клієнта.
     if (Object.keys(updates).length) await update(iRef(""), updates).catch(() => {})
   }
 }
@@ -329,7 +329,7 @@ export function getCompletedHours(bookings) {
 // лише стартовий слот. Раніше атомарно захоплювався тільки старт, а
 // решта діапазону позначалась недоступною вже ПІСЛЯ createBooking()
 // звичайним update() (markSlotsUnavailable) — у цьому вікні інший
-// учень міг встигнути атомарно застовпити проміжний/наступний слот під
+// клієнт міг встигнути атомарно застовпити проміжний/наступний слот під
 // власний запис, і обидва записи проходили одночасно на ту саму годину.
 // Якщо хоч один слот у діапазоні вже зайнятий — звільняє всі раніше
 // захоплені в цій же спробі й повертає false.
@@ -565,7 +565,7 @@ export function subscribeNotifications(uid, callback) {
   return () => off(r, 'value', handler)
 }
 
-// Медалі учня (видає інструктор за урок): users/{uid}/badges/{id} = { icon, label, awardedAt, bookingId }.
+// Медалі клієнта (видає майстер за урок): users/{uid}/badges/{id} = { icon, label, awardedAt, bookingId }.
 export function subscribeMyBadges(uid, callback) {
   const r = iRef(`users/${uid}/badges`)
   const handler = onValue(r, snap => {

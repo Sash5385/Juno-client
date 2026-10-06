@@ -14,7 +14,7 @@ export function useLicense(iid) {
 }
 
 // Стани ліцензії (дзеркало DrivePad/src/hooks/useLicense.js). readonly — термін + 1 пільгова доба
-// минули або інструктора призупинено: учні бачать свої записи, але записатись/переносити не можуть.
+// минули або майстра призупинено: клієнти бачать свої записи, але записатись/переносити не можуть.
 export const LICENSE_GRACE_MS = 24 * 3600 * 1000;
 
 export function licenseState(license, now = Date.now()) {
