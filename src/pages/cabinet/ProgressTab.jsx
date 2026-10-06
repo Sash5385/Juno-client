@@ -50,13 +50,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
     return streak;
   }, [completed]);
 
-  const nextLessonWithGoals = useMemo(() => {
-    const today = new Date().toISOString().slice(0, 10);
-    return bookings
-      .filter(b => b.status === 'confirmed' && b.date >= today && b.goals?.length > 0)
-      .sort((a, b_) => a.date.localeCompare(b_.date))[0] || null;
-  }, [bookings]);
-
   // Радіус кола
   const R = 70;
   const C = 2 * Math.PI * R;
@@ -230,74 +223,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
         </div>
       )}
 
-      {nextLessonWithGoals && (
-        <div className="progress-hero" style={{ marginTop: 14 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
-            <span style={{ fontSize:18 }}>🎯</span>
-            <span style={{ fontSize:13, fontWeight:800, color:'var(--text)' }}>Ціль на наступний запис</span>
-          </div>
-          <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
-            {nextLessonWithGoals.goals.map(g => (
-              <span key={g} style={{
-                fontSize:12, padding:'5px 11px', borderRadius:10,
-                background:'rgba(99,155,255,0.14)', color:'#6b9bff', fontWeight:700,
-              }}>{g}</span>
-            ))}
-          </div>
-          <div style={{ fontSize:11, color:'var(--dim)', marginTop:8 }}>{nextLessonWithGoals.date} · Готуйся!</div>
-        </div>
-      )}
-
-      {totalLessons > 0 && (
-        <div className="progress-hero" style={{ marginTop: 14 }}>
-          <div className="progress-title" style={{ marginBottom: 10 }}>🏅 Досягнення</div>
-          <div style={{ display:'flex', gap:8, overflowX:'auto', paddingBottom:4 }}>
-            {[
-              { emoji:'🎓', label:'1 запис',    earned: totalLessons >= 1 },
-              { emoji:'🌱', label:'5 записів',  earned: totalLessons >= 5 },
-              { emoji:'⭐', label:'10 записів', earned: totalLessons >= 10 },
-              { emoji:'🏆', label:'20 записів', earned: totalLessons >= 20 },
-              { emoji:'🌟', label:'30 записів', earned: totalLessons >= 30 },
-              ...(hasPackage ? [
-                { emoji:'🔓', label:`${target} год`,  earned: schoolHours >= target },
-              ] : []),
-            ].map(({ emoji, label, earned }) => (
-              <div key={label} style={{
-                flexShrink:0, display:'flex', flexDirection:'column', alignItems:'center', gap:4,
-                padding:'8px 10px', borderRadius:12,
-                background: earned ? 'rgba(251,191,36,0.12)' : 'rgba(255,255,255,0.04)',
-                border: earned ? '1px solid rgba(251,191,36,0.3)' : '1px solid rgba(255,255,255,0.07)',
-                opacity: earned ? 1 : 0.45,
-              }}>
-                <span style={{ fontSize:22, lineHeight:1 }}>{emoji}</span>
-                <span style={{ fontSize:10, fontWeight:700, color: earned ? '#fbbf24' : 'var(--dim)', whiteSpace:'nowrap' }}>{label}</span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {lessonStreak >= 2 && (
-        <div className="progress-hero" style={{ marginTop: 14 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
-            <div style={{ fontSize:36, lineHeight:1 }}>🔥</div>
-            <div>
-              <div style={{ fontSize:18, fontWeight:900, color:'#fb923c', lineHeight:1 }}>{lessonStreak}</div>
-              <div style={{ fontSize:12, fontWeight:700, color:'#fb923c' }}>тижні поспіль</div>
-              <div style={{ fontSize:11, color:'var(--dim)', marginTop:3 }}>Чудова регулярність!</div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {totalLessons >= 10 && (
-        <div className="progress-hero" style={{ marginTop: 14 }}>
-          <div className="progress-title" style={{ marginBottom: 6 }}>🎯 Цілі запису</div>
-          <div className="progress-subtitle">
-            З 10-го запису ти можеш ставити до 3 цілей на кожен запис. Це допомагає майстру краще підготуватись.
-          </div>
-        </div>
-      )}
     </div>
   );
 }

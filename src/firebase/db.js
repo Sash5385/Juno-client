@@ -229,10 +229,6 @@ export async function rateBooking(uid, bookingId, rating) {
   await update(iRef(`bookings/${uid}/${bookingId}`), { rating })
 }
 
-export async function saveGoals(uid, bookingId, goals) {
-  await update(iRef(`bookings/${uid}/${bookingId}`), { goals: goals.length ? goals : null })
-}
-
 export async function saveStudentNote(uid, bookingId, note) {
   await update(iRef(`bookings/${uid}/${bookingId}`), { studentNote: note || null })
 }
