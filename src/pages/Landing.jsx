@@ -207,7 +207,7 @@ export default function Landing({ user, profile }) {
             </div>
             <div className="instructor-info">
               <div className="instructor-name">{instructorName}</div>
-              <div className="instructor-role">Майстер з водіння</div>
+              <div className="instructor-role">Майстер</div>
             </div>
           </div>
         </section>
@@ -237,7 +237,7 @@ export default function Landing({ user, profile }) {
             {schoolService && (
               <div className="pricing-bubble" style={{ '--c': colorOfService(schoolService.colorId) }}>
                 <div className="pricing-bubble-icon">🎓</div>
-                <div className="pricing-bubble-lbl">Автошкола</div>
+                <div className="pricing-bubble-lbl">Стандарт</div>
                 <div className="pricing-bubble-num">{schoolService.price}<span>₴/год</span></div>
                 {schoolService2h && <div className="pricing-bubble-sub">2 год — <b>{schoolService2h.price}₴</b></div>}
               </div>
@@ -245,7 +245,7 @@ export default function Landing({ user, profile }) {
             {privateService && (
               <div className="pricing-bubble" style={{ '--c': colorOfService(privateService.colorId) }}>
                 <div className="pricing-bubble-icon">🚙</div>
-                <div className="pricing-bubble-lbl">Приватні</div>
+                <div className="pricing-bubble-lbl">Індивідуальні</div>
                 <div className="pricing-bubble-num">{privateService.price}<span>₴/год</span></div>
                 {privateService2h && <div className="pricing-bubble-sub">2 год — <b>{privateService2h.price}₴</b></div>}
               </div>
@@ -390,7 +390,7 @@ export default function Landing({ user, profile }) {
         {/* FOOTER */}
         <div className="footer">
           <button className="footer-cta" onClick={goAuth}>🚗 Записатись зараз</button>
-          <div>© 2026 Juno. Школа водіння.</div>
+          <div>© 2026 Juno.</div>
           <div className="devby">
             <small>Розробка та дизайн</small>
             <b>AlDemi Studio</b>

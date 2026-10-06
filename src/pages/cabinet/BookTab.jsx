@@ -7,8 +7,8 @@ import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
 
 const FALLBACK_SERVICES = [
-  { id:'sv1', name:'Автошкола', type:'school',  duration:60, price:0, colorId:'blue'   },
-  { id:'sv2', name:'Приватний', type:'private', duration:60, price:0, colorId:'purple' },
+  { id:'sv1', name:'Стандарт', type:'school',  duration:60, price:0, colorId:'blue'   },
+  { id:'sv2', name:'Індивідуальний', type:'private', duration:60, price:0, colorId:'purple' },
 ]
 
 // Ціна послуги на дату запису: заплановану зміну (nextPrice з дати nextPriceFrom) задає майстер в «Послугах»
@@ -18,7 +18,7 @@ function servicePriceOn(svc, dateStr) {
   return svc.price || 0
 }
 
-// Прибираємо дублювання тривалості з назви на плитці ("Автошкола 1 год" → "Автошкола") —
+// Прибираємо дублювання тривалості з назви на плитці ("Стандарт 1 год" → "Стандарт") —
 // тривалість вже показана окремим підписом нижче.
 function stripDurationSuffix(name) {
   return (name || '').replace(/\s+\d+(?:[.,]\d+)?\s*год\S*\.?\s*$/iu, '').trim() || name
@@ -622,7 +622,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           <div className="banner-greet">Привіт,</div>
           <div className="banner-name">{profile?.name?.split(' ')[0] || 'Клієнт'}</div>
           <div className="banner-tag">
-            {selectedService?.type === 'school' ? '🎓 Автошкола' : '🚙 Приватний'}
+            {selectedService?.type === 'school' ? '🎓 Стандарт' : '🚙 Індивідуальний'}
           </div>
         </div>
       </div>

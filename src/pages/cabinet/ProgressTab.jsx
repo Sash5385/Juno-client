@@ -171,11 +171,11 @@ export default function ProgressTab({ user, profile, bookingsData }) {
               <div className="of">з {target} год</div>
             </div>
           </div>
-          <div className="progress-title">Прогрес автошколи</div>
+          <div className="progress-title">Прогрес пакета</div>
           <div className="progress-subtitle">
             {current < target
               ? `Залишилось ${target - current} годин до завершення курсу`
-              : "Курс завершено! Можеш записуватись на приватні записи"}
+              : "Пакет завершено! Можеш записуватись на індивідуальні записи"}
           </div>
           {manualHours > 0 && (
             <div className="progress-subtitle" style={{ marginTop: 4, fontSize: 11, opacity: 0.7 }}>
@@ -187,9 +187,9 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             <div className="unlock-card">
               <div className="unlock-ico">🔓</div>
               <div className="unlock-info">
-                <div className="unlock-title">Приватні записи доступні</div>
+                <div className="unlock-title">Індивідуальні записи доступні</div>
                 <div className="unlock-desc">
-                  Ти пройшов 40 годин автошколи. Тепер можеш записуватись на додаткові приватні записи.
+                  Ти пройшов 40 годин стандартного пакета. Тепер можеш записуватись на додаткові індивідуальні записи.
                 </div>
               </div>
             </div>
@@ -206,11 +206,11 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           </div>
           <div className="stat-btn">
             <div className="num">{schoolHours}</div>
-            <div className="lbl">автошкола</div>
+            <div className="lbl">стандарт</div>
           </div>
           <div className="stat-btn">
             <div className="num">{privateLessons}</div>
-            <div className="lbl">приватні</div>
+            <div className="lbl">індивідуальні</div>
           </div>
           {attendanceRate !== null && (
             <div className="stat-btn">

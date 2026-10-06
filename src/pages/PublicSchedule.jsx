@@ -151,12 +151,12 @@ export default function PublicSchedule({ onBook }) {
       <div className="service-grid">
         <div className={`svc-tile ${serviceType==='school'?'selected':''}`} onClick={() => setServiceType('school')}>
           <div className="ico bk-ico-school">🎓</div>
-          <div className="svc-title">Автошкола</div>
+          <div className="svc-title">Стандарт</div>
           <div className="svc-dur">Повний курс</div>
         </div>
         <div className={`svc-tile ${serviceType==='private'?'selected':''}`} onClick={() => setServiceType('private')}>
           <div className="ico bk-ico-private">🚙</div>
-          <div className="svc-title">Приватний запис</div>
+          <div className="svc-title">Індивідуальний запис</div>
           <div className="svc-dur">Індивідуально</div>
         </div>
       </div>

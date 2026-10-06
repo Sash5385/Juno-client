@@ -346,7 +346,6 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
               </span>
             )}
           </div>
-          <div className="booking-meta">📍 Верховинна, 44</div>
           <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
             {(b.status === 'confirmed' || b.status === 'cancelled') && (
               <div className={`booking-status ${statusClass}`}>{statusText}</div>
@@ -538,7 +537,7 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
                 </div>
                 <div style={{fontSize:28,fontWeight:900,color:'var(--text)',lineHeight:1}}>{next.time}</div>
                 <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())} · {next.serviceName}</div>
-                <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>📍 Верховинна, 44 · {next.durationHours || 1} год</div>
+                <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{next.durationHours || 1} год</div>
                 <div className="booking-cal-row">
                   <a href={googleCalendarLink(next)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">Google Calendar</a>
                   <button className="cal-add-btn" onClick={() => downloadICS(next)}>Apple Calendar</button>

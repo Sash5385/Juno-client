@@ -369,7 +369,7 @@ export default function App() {
             date: pb.date,
             time: pb.time,
             serviceType: p.studentType || pb.serviceType,
-            serviceName: (p.studentType || pb.serviceType) === 'school' ? 'Автошкола' : 'Приватний',
+            serviceName: (p.studentType || pb.serviceType) === 'school' ? 'Стандарт' : 'Індивідуальний',
             durationHours: pb.duration,
             studentName: p.name,
             phone: p.phone || auth.currentUser.phoneNumber,

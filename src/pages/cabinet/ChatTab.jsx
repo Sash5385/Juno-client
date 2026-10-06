@@ -59,7 +59,7 @@ function DirectChat({ user, profile }) {
       <div className="chat-header">
         <div className="chat-instructor-avatar">🚗</div>
         <div className="chat-instructor-info">
-          <div className="chat-instructor-name">Олександр — майстер</div>
+          <div className="chat-instructor-name">Майстер</div>
           <div className="chat-instructor-status">Відповідає протягом дня</div>
         </div>
         {messages.length > 0 && (

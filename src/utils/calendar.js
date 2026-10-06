@@ -17,7 +17,6 @@ export function googleCalendarLink(booking) {
     text: serviceName || 'Запис',
     dates: `${startStr}/${endStr}`,
     details: 'Juno — запис з майстром',
-    location: 'вул. Верховинна, 44',
     ctz: 'Europe/Kyiv',
   })
   return `https://calendar.google.com/calendar/r/eventedit?${params}`
@@ -38,7 +37,6 @@ export function downloadICS(booking) {
     `DTEND:${endStr}`,
     `SUMMARY:${serviceName || 'Запис'}`,
     'DESCRIPTION:Juno — запис з майстром',
-    'LOCATION:вул. Верховинна\\, 44',
     `UID:${id || date + time.replace(':', '')}@drivepad`,
     'END:VEVENT',
     'END:VCALENDAR',
