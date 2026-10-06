@@ -1,7 +1,4 @@
-import { useMemo, useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { onValue } from "firebase/database";
-import { iRef } from "../../firebase/db";
+import { useMemo } from "react";
 import "./ProgressTab.css";
 
 const getWeekStart = dateStr => {
@@ -12,19 +9,11 @@ const getWeekStart = dateStr => {
 };
 
 export default function ProgressTab({ user, profile, bookingsData }) {
-  const navigate = useNavigate()
   const { bookings, schoolHours, manualHours, canBookPrivate } = bookingsData || { bookings: [], schoolHours: 0, manualHours: 0, canBookPrivate: false };
 
   const studentType = profile?.studentType || "school";
   const isSchool = studentType === "school";
 
-  const [examPassed, setExamPassed] = useState(null);
-  useEffect(() => {
-    if (!user?.uid || !isSchool) return;
-    const r = iRef(`users/${user.uid}/internalExam/passed`);
-    const unsub = onValue(r, snap => setExamPassed(snap.exists() ? snap.val() : undefined));
-    return () => unsub();
-  }, [user?.uid, isSchool]);
   const target = 40;
   const current = Math.min(schoolHours, target);
   const percent = (current / target) * 100;
@@ -174,7 +163,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           <div className="progress-title">Прогрес пакета</div>
           <div className="progress-subtitle">
             {current < target
-              ? `Залишилось ${target - current} годин до завершення курсу`
+              ? `Залишилось ${target - current} годин до завершення пакета`
               : "Пакет завершено! Можеш записуватись на індивідуальні записи"}
           </div>
           {manualHours > 0 && (
@@ -271,7 +260,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
               { emoji:'🌟', label:'30 записів', earned: totalLessons >= 30 },
               ...(isSchool ? [
                 { emoji:'🔓', label:'40 год',  earned: schoolHours >= 40 },
-                { emoji:'📋', label:'Іспит',   earned: examPassed === true },
               ] : []),
             ].map(({ emoji, label, earned }) => (
               <div key={label} style={{
@@ -302,30 +290,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
         </div>
       )}
 
-      {isSchool && (
-        <div className="progress-hero" style={{ marginTop: 14 }}>
-          <div className="progress-title" style={{ marginBottom: 14 }}>Внутрішній іспит</div>
-          {examPassed === true && (
-            <div className="exam-card exam-card--pass">
-              <span className="exam-ico">✓</span>
-              <span className="exam-lbl">Складено</span>
-            </div>
-          )}
-          {examPassed === false && (
-            <div className="exam-card exam-card--fail">
-              <span className="exam-ico">✗</span>
-              <span className="exam-lbl">Не складено</span>
-            </div>
-          )}
-          {(examPassed === null || examPassed === undefined) && (
-            <div className="exam-card exam-card--pending">
-              <span className="exam-ico">⏳</span>
-              <span className="exam-lbl">Очікується</span>
-            </div>
-          )}
-        </div>
-      )}
-
       {totalLessons >= 10 && (
         <div className="progress-hero" style={{ marginTop: 14 }}>
           <div className="progress-title" style={{ marginBottom: 6 }}>🎯 Цілі запису</div>
@@ -334,26 +298,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           </div>
         </div>
       )}
-
-      <div className="progress-hero" style={{ marginTop: 14 }}>
-        <div className="progress-title" style={{ marginBottom: 8 }}>🚦 Тест ПДР</div>
-        <div className="progress-subtitle">
-          Перевір знання правил дорожнього руху на перехрестях — проїзд, знаки, світлофор, кільце.
-        </div>
-        {(() => { try { const b=JSON.parse(localStorage.getItem('id4quiz_best')||'null'); if(!b) return null; return (<div style={{display:'flex',alignItems:'center',gap:8,padding:'8px 10px',marginTop:8,borderRadius:10,background:'rgba(246,178,27,0.08)',border:'1px solid rgba(246,178,27,0.18)'}}><span style={{fontSize:18}}>🏆</span><div><div style={{fontSize:9,color:'#f6b21b',fontWeight:700,textTransform:'uppercase',letterSpacing:0.5}}>Найкращий результат</div><div style={{fontSize:14,fontWeight:800,color:'var(--text)'}}>{b.score}/{b.total} · {Math.round(b.p*100)}%</div></div></div>); } catch { return null; } })()}
-        <button
-          onClick={() => navigate('/cabinet/test')}
-          style={{
-            display: 'block', width: '100%', marginTop: 14, padding: 14,
-            borderRadius: 14, border: 'none', cursor: 'pointer',
-            background: 'linear-gradient(135deg, #f6b21b, #e09500)',
-            color: '#1a1206', fontSize: 14, fontWeight: 800, fontFamily: 'inherit',
-            boxShadow: '0 4px 14px rgba(246,178,27,0.4)',
-          }}
-        >
-          Пройти тест →
-        </button>
-      </div>
     </div>
   );
 }

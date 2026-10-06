@@ -52,8 +52,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
     setForm({
       name: profile.name || "",
       studentType: profile.studentType || "school",
-      experience: profile.experience || "no_license",
-      filmingConsent: profile.filmingConsent ?? true,
     });
     setEditing(true);
   };
@@ -73,8 +71,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
       await updateUserProfile(user.uid, {
         name: form.name.trim(),
         studentType: form.studentType,
-        experience: form.experience,
-        filmingConsent: form.filmingConsent,
       });
       await onProfileUpdate?.();
       setEditing(false);
@@ -136,10 +132,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
               <span className="key">Імʼя</span>
               <span className="val">{profile.name || "—"}</span>
             </div>
-            <div className="profile-row">
-              <span className="key">Зйомка відео/аудіо для реклами</span>
-              <span className="val">{profile.filmingConsent ? "Так" : "Ні"}</span>
-            </div>
           </>
         ) : (
           <div className="profile-edit">
@@ -150,16 +142,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
               value={form.name}
               onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
             />
-
-            <div className="edit-toggle-row">
-              <span className="key">Зйомка відео/аудіо для реклами</span>
-              <button
-                className={`edit-switch${form.filmingConsent ? " on" : ""}`}
-                onClick={() => setForm(f => ({ ...f, filmingConsent: !f.filmingConsent }))}
-              >
-                <span className="edit-switch-knob" />
-              </button>
-            </div>
 
             <div className="edit-actions">
               <button className="edit-cancel" onClick={cancelEdit} disabled={saving}>Скасувати</button>

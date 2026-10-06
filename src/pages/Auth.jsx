@@ -98,8 +98,6 @@ export default function Auth({ user, profile, onProfileSaved }) {
   const [surveyNameError, setSurveyNameError] = useState('')
   const [surveyPhone, setSurveyPhone] = useState('')
   const [studentType, setStudentType] = useState('school')
-  const [experience, setExperience] = useState('no_license')
-  const [filmingConsent, setFilmingConsent] = useState(true)
   const [termsAgreed, setTermsAgreed] = useState(false)
   const [savingProfile, setSavingProfile] = useState(false)
 
@@ -245,8 +243,6 @@ export default function Auth({ user, profile, onProfileSaved }) {
         name: `${name.trim()} ${surname.trim()}`,
         phone: user.phoneNumber || `+380${surveyPhone.trim()}`,
         studentType,
-        experience,
-        filmingConsent,
         termsAccepted: true,
         createdAt: Date.now()
       }
@@ -714,16 +710,6 @@ export default function Auth({ user, profile, onProfileSaved }) {
               </div>
             </div>
           )}
-
-          <div className="toggle-row" onClick={()=>setFilmingConsent(v=>!v)}>
-            <div className="toggle-ico">🎬</div>
-            <div className="toggle-info">
-              <div className="toggle-title">Зйомка відео/аудіо для реклами</div>
-            </div>
-            <button className={`switch${filmingConsent?' on':''}`} onClick={e=>{e.stopPropagation();setFilmingConsent(v=>!v)}}>
-              <div className="switch-knob"/>
-            </button>
-          </div>
 
           <button className={`terms-survey-btn${termsAgreed?' agreed':''}`} onClick={()=>termsAgreed?setTermsAgreed(false):setTermsOpen(v=>!v)}>
             <div className="terms-survey-ico">{termsAgreed?'✓':'📋'}</div>

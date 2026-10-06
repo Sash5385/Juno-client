@@ -16,20 +16,18 @@ import ProfileTab from './cabinet/ProfileTab'
 import ChatTab from './cabinet/ChatTab'
 import NotifTab from './cabinet/NotifTab'
 import QueueTab from './cabinet/QueueTab'
-import TestTab from './cabinet/TestTab'
 
 import { formatDateLabel } from '../utils/date'
 import { useMosaicSwitch, MosaicOverlay } from '../mosaic'
 import './Cabinet.css'
 
-const TAB_COMPONENT_KEYS = ['book', 'bookings', 'progress', 'queue', 'chat', 'notifications', 'profile', 'test']
+const TAB_COMPONENT_KEYS = ['book', 'bookings', 'progress', 'queue', 'chat', 'notifications', 'profile']
 
 const TITLES = {
   book: 'Записатись',
   bookings: 'Мої записи',
   progress: 'Прогрес',
   queue: 'Черга',
-  test: 'Тест ПДР',
   chat: 'Чат',
   notifications: 'Повідомлення',
   profile: 'Профіль'
@@ -310,7 +308,6 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
           {displayedTab === 'chat' && <ChatTab user={user} profile={profile} />}
           {displayedTab === 'notifications' && <NotifTab user={user} onSeen={markNotifsSeen} />}
           {displayedTab === 'profile' && <ProfileTab user={user} profile={profile} bookingsData={bookingsData} badges={badges} onProfileUpdate={onProfileUpdate} />}
-          {displayedTab === 'test' && <TestTab />}
         </div>
         <MosaicOverlay phase={mosaicPhase} tileColor="var(--bg-deep)" speed={0.5}/>
       </div>
