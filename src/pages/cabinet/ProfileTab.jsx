@@ -7,6 +7,7 @@ import { APP_VERSION } from "../../version.js";
 import { auth } from "../../firebase/config";
 import { getCurrentIid } from "../../firebase/db";
 import { signOut } from "../../firebase/auth";
+import PhotoCropModal from "./PhotoCropModal";
 import "./ProfileTab.css";
 
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
@@ -82,6 +83,27 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
     }
   };
 
+  // Фото профілю: кадрування (рух + масштаб) → 160×160 JPEG (≈6 КБ) прямо в users/{uid}/profile/photo
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const savePhoto = async (photo) => {
+    setPhotoBusy(true);
+    try {
+      await updateUserProfile(user.uid, { photo });
+      await onProfileUpdate?.();
+    } catch (e) {
+      showToast("Не вдалося зберегти фото");
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+  const [cropFile, setCropFile] = useState(null);
+  const onPhotoPick = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) setCropFile(file);
+  };
+  const removePhoto = () => savePhoto(null);
+
   const forceUpdate = async () => {
     try {
       const regs = await navigator.serviceWorker?.getRegistrations?.() || [];
@@ -106,7 +128,12 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
   return (
     <div className="profile-tab">
       <div className="profile-banner">
-        <div className="profile-avatar">{getInitials(profile.name)}</div>
+        <label className={`profile-avatar profile-avatar--edit${profile.photo ? ' has-photo' : ''}`} title="Змінити фото">
+          {profile.photo ? <img src={profile.photo} alt="" /> : getInitials(profile.name)}
+          <span className="profile-avatar-cam" aria-hidden="true">📷</span>
+          <input type="file" accept="image/*" hidden disabled={photoBusy} onChange={onPhotoPick} />
+        </label>
+        {profile.photo && <button type="button" className="profile-photo-del" onClick={removePhoto} disabled={photoBusy}>Видалити фото</button>}
         <div className="profile-name">{profile.name}</div>
         <div className="profile-phone">{formatPhone(profile.phone || user?.phoneNumber)}</div>
       </div>
@@ -158,8 +185,8 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         <div className="profile-section">
           <div className="section-title">🚗 Мій майстер</div>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
-            {instructorProfile.photo
-              ? <img src={instructorProfile.photo} alt="" style={{width:52,height:52,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
+            {(instructorProfile.photoUrl || instructorProfile.photo)
+              ? <img src={instructorProfile.photoUrl || instructorProfile.photo} alt="" style={{width:52,height:52,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
               : <div className="profile-avatar" style={{width:52,height:52,fontSize:18,margin:0,flexShrink:0}}>{getInitials(instructorProfile.name)}</div>}
             <div style={{minWidth:0}}>
               <div style={{fontSize:15,fontWeight:800,color:'var(--text)',wordBreak:'break-word'}}>{instructorProfile.name}</div>
@@ -301,6 +328,13 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         {APP_VERSION}
       </div>
 
+      {cropFile && (
+        <PhotoCropModal
+          file={cropFile} round outSize={160} title="Фото профілю"
+          onCancel={() => setCropFile(null)}
+          onDone={(dataUrl) => { setCropFile(null); savePhoto(dataUrl); }}
+        />
+      )}
       {ToastEl}
     </div>
   );
