@@ -523,31 +523,6 @@ export function subscribeDirectUnread(uid, callback) {
   return () => off(r, 'value', handler)
 }
 
-// ─── GENERAL CHAT ─────────────────────────────────────────────────
-export function subscribeGeneralChat(callback) {
-  const r = iRef('chats/general')
-  const handler = onValue(r, snap => {
-    const data = snap.val() || {}
-    const msgs = Object.entries(data)
-      .map(([id, m]) => ({ ...m, id }))
-      .sort((a, b) => (a.ts || 0) - (b.ts || 0))
-    callback(msgs)
-  })
-  return () => off(r, 'value', handler)
-}
-
-export async function sendGeneralMessage(uid, name, text) {
-  const time = new Date().toLocaleTimeString('uk', { hour: '2-digit', minute: '2-digit' })
-  await push(iRef('chats/general'), {
-    uid,
-    name,
-    from: 'student',
-    text,
-    time,
-    ts: Date.now(),
-  })
-}
-
 // ─── NOTIFICATIONS ────────────────────────────────────────────────
 export function subscribeNotifications(uid, callback) {
   const r = iRef(`notifications/${uid}`)
