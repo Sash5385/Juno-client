@@ -536,16 +536,6 @@ export function subscribeNotifications(uid, callback) {
   return () => off(r, 'value', handler)
 }
 
-// Медалі клієнта (видає майстер за запис): users/{uid}/badges/{id} = { icon, label, awardedAt, bookingId }.
-export function subscribeMyBadges(uid, callback) {
-  const r = iRef(`users/${uid}/badges`)
-  const handler = onValue(r, snap => {
-    const data = snap.val() || {}
-    callback(Object.entries(data).map(([id, b]) => ({ ...b, id })).sort((a, b) => (b.awardedAt || 0) - (a.awardedAt || 0)))
-  }, () => callback([]))
-  return () => off(r, 'value', handler)
-}
-
 export function clearNotification(uid, notifId) {
   return remove(iRef(`notifications/${uid}/${notifId}`))
 }

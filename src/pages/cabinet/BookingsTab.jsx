@@ -270,7 +270,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
 }
 
 // ─── MAIN ────────────────────────────────────────────────────────
-export default function BookingsTab({ user, profile, bookingsData, badges = [] }) {
+export default function BookingsTab({ user, profile, bookingsData }) {
   const { readOnly: licenseReadOnly } = useContext(LicenseContext)
   const { upcoming, completed, loading } = bookingsData
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
@@ -359,16 +359,6 @@ export default function BookingsTab({ user, profile, bookingsData, badges = [] }
               fontSize:11,color:'var(--text)',lineHeight:1.5}}>
               <span style={{fontSize:9,fontWeight:700,color:'rgba(96,165,250,0.8)',display:'block',marginBottom:2}}>📝 Нотатка майстра</span>
               {b.instructorNote}
-            </div>
-          )}
-          {isPast && b.status === 'confirmed' && badges.some(x => x.bookingId === b.id) && (
-            <div style={{marginTop:6,display:'flex',flexWrap:'wrap',gap:5}}>
-              {badges.filter(x => x.bookingId === b.id).map(x => (
-                <span key={x.id} style={{display:'inline-flex',alignItems:'center',gap:4,padding:'3px 9px',borderRadius:999,fontSize:11,fontWeight:700,
-                  color:'#fbbf24',background:'rgba(251,191,36,0.12)',border:'1px solid rgba(251,191,36,0.3)'}}>
-                  <span style={{fontSize:14,lineHeight:1}}>{x.icon}</span>{x.label}
-                </span>
-              ))}
             </div>
           )}
           {isPast && b.status === 'confirmed' && (

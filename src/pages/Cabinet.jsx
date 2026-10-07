@@ -5,7 +5,7 @@ import { useToast } from '../hooks/useToast'
 import { useBookings } from '../hooks/useBookings'
 import { useBackClose } from '../hooks/useBackButton'
 import { signOut } from '../firebase/auth'
-import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue, subscribeMyBadges } from '../firebase/db'
+import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue } from '../firebase/db'
 
 import BookTab from './cabinet/BookTab'
 import BookingPaused from './cabinet/BookingPaused'
@@ -111,12 +111,6 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
   useEffect(() => {
     if (!user?.uid) return
     return subscribeNotifications(user.uid, setAllNotifs)
-  }, [user?.uid])
-
-  const [badges, setBadges] = useState([])
-  useEffect(() => {
-    if (!user?.uid) return
-    return subscribeMyBadges(user.uid, setBadges)
   }, [user?.uid])
 
   const handleBellClick = () => {
@@ -302,12 +296,12 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
       >
         <div className="fade-up" key={displayedTab} style={displayedTab === 'chat' ? { display:'flex', flexDirection:'column', flex:1, minHeight:0 } : undefined}>
           {displayedTab === 'book' && (licenseReadOnly ? <BookingPaused /> : <BookTab user={user} profile={profile} bookingsData={bookingsData} notifParams={notifParams} />)}
-          {displayedTab === 'bookings' && <BookingsTab user={user} profile={profile} bookingsData={bookingsData} badges={badges} />}
+          {displayedTab === 'bookings' && <BookingsTab user={user} profile={profile} bookingsData={bookingsData} />}
           {displayedTab === 'progress' && <ProgressTab user={user} profile={profile} bookingsData={bookingsData} />}
           {displayedTab === 'queue' && <QueueTab user={user} profile={profile} />}
           {displayedTab === 'chat' && <ChatTab user={user} profile={profile} />}
           {displayedTab === 'notifications' && <NotifTab user={user} onSeen={markNotifsSeen} />}
-          {displayedTab === 'profile' && <ProfileTab user={user} profile={profile} bookingsData={bookingsData} badges={badges} onProfileUpdate={onProfileUpdate} />}
+          {displayedTab === 'profile' && <ProfileTab user={user} profile={profile} bookingsData={bookingsData} onProfileUpdate={onProfileUpdate} />}
         </div>
         <MosaicOverlay phase={mosaicPhase} tileColor="var(--bg-deep)" speed={0.5}/>
       </div>

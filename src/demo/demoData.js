@@ -200,10 +200,6 @@ export function buildDemoTree() {
       hours: Math.round(hoursByUid[s.uid] || 0),
       discount: s.discount || 0, customPrice: s.customPrice ?? null,
       notes: i === 3 ? "Постійний клієнт, віддає перевагу ранковим годинам" : "", blocked: false, isVip: !!s.vip, noIntervalLimit: false,
-      badges: (() => { // по медалі за останній минулий запис — щоб у демо було видно «Мої медалі»
-        const past = list.filter(x => x.uid === s.uid && x.b.date < ymd(today) && x.b.status === "confirmed").sort((a, c) => c.b.date.localeCompare(a.b.date))[0];
-        return past ? { demob1: { icon: "⭐", label: "Чудовий паркінг", awardedAt: nowTs - 86400000, bookingId: past.b.id } } : {};
-      })(),
     };
   });
 

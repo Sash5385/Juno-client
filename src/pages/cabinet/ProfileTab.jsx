@@ -9,7 +9,7 @@ import { getCurrentIid } from "../../firebase/db";
 import { signOut } from "../../firebase/auth";
 import "./ProfileTab.css";
 
-export default function ProfileTab({ user, profile, onProfileUpdate, badges = [] }) {
+export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const { palette, setPalette } = useTheme();
   const { showToast, ToastEl } = useToast();
 
@@ -206,26 +206,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate, badges = []
           )}
         </div>
       )}
-
-      <div className="profile-section">
-        <div className="section-title">🏅 Мої заохочення{badges.length > 0 ? ` (${badges.length})` : ''}</div>
-        {badges.length === 0 ? (
-          <div style={{fontSize:12,color:'var(--dim)',textAlign:'center',padding:'6px 0',lineHeight:1.5}}>
-            Поки немає заохочень. Майстер видає їх за записи.
-          </div>
-        ) : (
-          <div style={{display:'grid',gridTemplateColumns:'repeat(auto-fill,minmax(96px,1fr))',gap:8}}>
-            {badges.map(x => (
-              <div key={x.id} style={{textAlign:'center',padding:'10px 6px',borderRadius:12,
-                background:'rgba(251,191,36,0.08)',border:'1px solid rgba(251,191,36,0.25)'}}>
-                <div style={{fontSize:30,lineHeight:1.1}}>{x.icon}</div>
-                <div style={{fontSize:11,fontWeight:800,color:'var(--text)',marginTop:4,lineHeight:1.25,wordBreak:'break-word'}}>{x.label}</div>
-                {x.awardedAt && <div style={{fontSize:9,color:'var(--dim)',marginTop:3}}>{new Date(x.awardedAt).toLocaleDateString('uk-UA', { day:'2-digit', month:'2-digit', year:'2-digit' })}</div>}
-              </div>
-            ))}
-          </div>
-        )}
-      </div>
 
       <div className="profile-section">
         <div className="section-title">🎨 Оформлення</div>
