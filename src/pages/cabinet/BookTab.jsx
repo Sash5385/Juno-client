@@ -611,7 +611,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   }
 
   return (
-    <div className="fade-up">
+    <div className="fade-up book-tab">
       {ToastEl}
 
       {/* USER BANNER */}
@@ -668,6 +668,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         </div>
       )}
 
+      <div className="book-cols">
+      <div className="book-col">
       {/* 1. ДАТА */}
       <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>1. Дата</div>
       <div className="cal-card" onTouchStart={handleCalTouchStart} onTouchEnd={handleCalTouchEnd}>
@@ -716,6 +718,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         </div>
       </div>
 
+      </div>
+      <div className="book-col">
       {/* 3. ЧАС */}
       {selectedDate && (
         <>
@@ -901,6 +905,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           </div>
         )
       })()}
+      </div>
+      </div>
 
       {/* DIALOG: успішний запис / черга */}
       {successData && (

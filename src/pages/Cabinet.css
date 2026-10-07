@@ -203,3 +203,12 @@
 @media (prefers-reduced-motion: reduce) {
   .botnav-fab-glow { animation: none; opacity: 0.5; }
 }
+
+/* ПК: кабінет ширший, запис у дві колонки (дата ліворуч, час праворуч) */
+@media (min-width: 900px) {
+  .cabinet-page { max-width: 1080px; width: 100%; }
+  .botnav { position: fixed; left: 50%; right: auto; width: min(1080px, 100%); transform: translateX(-50%); }
+  .cab-content > * { max-width: 860px; margin-left: auto; margin-right: auto; width: 100%; box-sizing: border-box; }
+  .cab-content > .book-tab { max-width: 1040px; }
+  .book-cols { display: grid; grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr); gap: 28px; align-items: start; }
+}
