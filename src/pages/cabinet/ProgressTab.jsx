@@ -9,14 +9,7 @@ const getWeekStart = dateStr => {
 };
 
 export default function ProgressTab({ user, profile, bookingsData }) {
-  const { bookings, schoolHours, manualHours, canBookPrivate } = bookingsData || { bookings: [], schoolHours: 0, manualHours: 0, canBookPrivate: false };
-
-  const studentType = profile?.studentType || "school";
-  // Розмір пакета годин задає майстер (0 — без пакета)
-  const target = Number(bookingsData?.packageHours ?? 40);
-  const hasPackage = studentType === "school" && target > 0;
-  const current = Math.min(schoolHours, target);
-  const percent = target > 0 ? (current / target) * 100 : 0;
+  const { bookings, schoolHours } = bookingsData || { bookings: [], schoolHours: 0 };
 
   const completed = useMemo(
     () => bookings.filter(b => b.status === "confirmed" && new Date(b.date) < new Date()),
@@ -49,11 +42,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
     }
     return streak;
   }, [completed]);
-
-  // Радіус кола
-  const R = 70;
-  const C = 2 * Math.PI * R;
-  const dashOffset = C - (C * percent) / 100;
 
   return (
     <div className="progress-tab">
@@ -128,57 +116,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           </div>
         );
       })()}
-      {hasPackage && (
-        <div className="progress-hero">
-          <div className="progress-circle-wrap">
-            <svg className="progress-svg" viewBox="0 0 160 160">
-              <defs>
-                <linearGradient id="gradOrange" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0%" stopColor="#ff7a5c" />
-                  <stop offset="100%" stopColor="#ff5a3c" />
-                </linearGradient>
-              </defs>
-              <circle className="track" cx="80" cy="80" r={R} />
-              <circle
-                className="fill"
-                cx="80"
-                cy="80"
-                r={R}
-                strokeDasharray={C}
-                strokeDashoffset={dashOffset}
-              />
-            </svg>
-            <div className="progress-num">
-              <div className="big">{current}</div>
-              <div className="of">з {target} год</div>
-            </div>
-          </div>
-          <div className="progress-title">Прогрес пакета</div>
-          <div className="progress-subtitle">
-            {current < target
-              ? `Залишилось ${target - current} годин до завершення пакета`
-              : "Пакет завершено! Можеш записуватись на індивідуальні записи"}
-          </div>
-          {manualHours > 0 && (
-            <div className="progress-subtitle" style={{ marginTop: 4, fontSize: 11, opacity: 0.7 }}>
-              Включаючи {manualHours} год, зарахованих майстром
-            </div>
-          )}
-
-          {canBookPrivate && (
-            <div className="unlock-card">
-              <div className="unlock-ico">🔓</div>
-              <div className="unlock-info">
-                <div className="unlock-title">Індивідуальні записи доступні</div>
-                <div className="unlock-desc">
-                  Ти пройшов {target} год стандартного пакета. Тепер можеш записуватись на додаткові індивідуальні записи.
-                </div>
-              </div>
-            </div>
-          )}
-        </div>
-      )}
-
       <div className="progress-hero" style={{ marginTop: 14 }}>
         <div className="progress-title" style={{ marginBottom: 14 }}>Статистика записів</div>
         <div className="stat-row">

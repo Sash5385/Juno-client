@@ -92,7 +92,7 @@ export async function getUserProfile(uid) {
   if (!snap.exists()) { _blocked = false; return null }
   const data = snap.val()
   _blocked = !!data.blocked
-  return { ...(data.profile || {}), isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 }
+  return { ...(data.profile || {}), isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, lessonBalance: data.lessonBalance || 0 }
 }
 
 // Поля, які змінює майстер (знижка, індивідуальна ціна, VIP, блок…): getUserProfile читає їх лише при вході,
@@ -103,7 +103,7 @@ export function subscribeUserAdminFields(uid, callback) {
     const data = snap.val()
     if (!data) return
     _blocked = !!data.blocked
-    callback({ isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 })
+    callback({ isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, lessonBalance: data.lessonBalance || 0 })
   }, () => {})
   return () => off(r, 'value', handler)
 }

@@ -12,7 +12,7 @@ export function lessonEndMs(b) {
   return d.getTime() + (Number(b.durationHours) || 1) * 3600000
 }
 
-export function useBookings(uid, profile, packageHours = 40) {
+export function useBookings(uid, profile) {
   const [bookings, setBookings] = useState([])
   const [loading, setLoading] = useState(true)
   // Раз на хвилину перераховуємо, що вже минуло: запис, що закінчився, одразу стає «завершеним»
@@ -43,8 +43,7 @@ export function useBookings(uid, profile, packageHours = 40) {
     return unsub
   }, [uid, profile?.phone])
 
-  const manualHours = profile?.hoursOffset || 0
-  const schoolHours = getConfirmedSchoolHours(bookings) + manualHours
+  const schoolHours = getConfirmedSchoolHours(bookings)
   const completedHours = getCompletedHours(bookings)
   // Майбутні — ті, що ще не закінчились (за часом, а не лише за датою); решта — історія, найновіші першими
   const { upcoming, completed } = useMemo(() => {
@@ -63,9 +62,6 @@ export function useBookings(uid, profile, packageHours = 40) {
     completed,
     schoolHours,
     completedHours,
-    manualHours,
-    loading,
-    packageHours,
-    canBookPrivate: packageHours <= 0 || schoolHours >= packageHours
+    loading
   }
 }
