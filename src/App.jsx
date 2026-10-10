@@ -23,6 +23,7 @@ import Cabinet from './pages/Cabinet'
 import Landing from './pages/Landing'
 import PublicSchedule from './pages/PublicSchedule'
 import About from './pages/About'
+import SalonPage from './pages/SalonPage'
 
 // ─── PWA INSTALL PROMPT (пропонуємо зберегти застосунок лише при
 // першому вході — раз показали (banner з'явився), більше не пропонуємо,
@@ -393,6 +394,10 @@ export default function App() {
     pendingBookingRef.current = booking
     navigate('/auth')
   }
+
+  // Публічна сторінка салону /s/{slug} — не залежить від майстра й входу
+  const salonMatch = location.pathname.match(/^\/s\/([a-z0-9-]{3,40})\/?$/)
+  if (salonMatch) return <SalonPage slug={salonMatch[1]} />
 
   if (loading) {
     return (

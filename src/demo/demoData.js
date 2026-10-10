@@ -349,8 +349,23 @@ export function buildDemoTree() {
     services: SERVICES,
   };
 
+  // Демо-салон /s/demo: власник — демо-майстер + ще двоє майстрів із власними послугами
+  const extraMaster = (name, slug, city, services) => ({
+    admin_settings: { profile: { name, slug, city, photo: null } },
+    admin_data: { services },
+  });
   return {
+    salons: {
+      demo: { ownerIid: DEMO_UID, name: "Beauty Studio Juno", createdAt: nowTs - 86400000 * 30, masters: { [DEMO_UID]: "owner", demo2: "demo-token", demo3: "demo-token" } },
+    },
     instructors: {
+      demo2: extraMaster("Олена Ковальчук", "olena", "Київ", [
+        { id: "x1", name: "Консультація 1 год", price: 700, duration: 60, colorId: "teal", active: true },
+        { id: "x2", name: "Розширена сесія", price: 1200, duration: 90, colorId: "purple", active: true },
+      ]),
+      demo3: extraMaster("Максим Бондар", "maksym", "Київ", [
+        { id: "y1", name: "Індивідуальний запис", price: 900, duration: 60, colorId: "yellow", active: true },
+      ]),
       [DEMO_UID]: {
         admin_settings,
         admin_data: { services: SERVICES },
