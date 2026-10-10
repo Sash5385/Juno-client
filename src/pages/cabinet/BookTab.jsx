@@ -1,8 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
+import { createPortal } from 'react-dom'
+import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, getMyIntake, saveMyIntake, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, parseYMD } from '../../utils/date'
 import { getInitials, pluralize } from '../../utils/format'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
+import { normIntake, answersOf, missingRequired, intakeNeeded, buildItems, YES, NO } from '../../intake'
 import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
@@ -40,6 +42,9 @@ function formatDurShort(min) {
   return h === 0 ? `${m} хв` : m === 0 ? `${h} год` : `${h} год ${m} хв`
 }
 
+// Діалоги виносимо в body: предок .fade-up лишає transform, і position:fixed рахувався б від нього, а не від екрана
+const Portal = ({ children }) => createPortal(children, document.body)
+
 export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const { showToast, ToastEl } = useToast()
   const isSchool = profile?.studentType === 'school'
@@ -56,6 +61,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const [selectedService, setSelectedService] = useState(null)
   const [services, setServices] = useState([])   // усі активні послуги майстра — для кроку «Послуга»
   const [addonIds, setAddonIds] = useState([])    // обрані допуслуги вибраної послуги
+  // Анкета клієнта: форму задає майстер; клієнт відповідає один раз перед записом
+  const [intakeSaved, setIntakeSaved] = useState(undefined) // undefined — ще вантажиться, null — не заповнював
+  const [intakeOpen, setIntakeOpen] = useState(false)
+  const [intakeAnswers, setIntakeAnswers] = useState({})
+  const [intakeBusy, setIntakeBusy] = useState(false)
   const [today] = useState(() => { const d = new Date(); d.setHours(0,0,0,0); return d })
   const [viewMonth, setViewMonth] = useState(() => {
     if (notifParams?.date) {
@@ -92,6 +102,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const [studentNote, setStudentNote] = useState("")
 
   useEffect(() => { setSelectedTime2(null) }, [selectedService?.id])
+  useEffect(() => {
+    if (!user?.uid) return
+    getMyIntake(user.uid).then(v => setIntakeSaved(v || null)).catch(() => setIntakeSaved(null))
+  }, [user?.uid])
   useEffect(() => { setAddonIds([]) }, [selectedService?.id])
 
   useEffect(() => {
@@ -340,8 +354,33 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     setSelectedTime2(null)
   }
 
-  const handleBook = async () => {
+  const intakeForm = normIntake(adminSettings.intake)
+
+  const submitIntake = async () => {
+    const miss = missingRequired(intakeForm, intakeAnswers)
+    if (miss.length) { showToast(`Заповніть: ${miss[0].label}`); return }
+    setIntakeBusy(true)
+    try {
+      const items = buildItems(intakeForm, intakeAnswers)
+      await saveMyIntake(user.uid, items)
+      setIntakeSaved({ at: Date.now(), items })
+      setIntakeOpen(false)
+      handleBook(true) // анкету збережено — продовжуємо запис
+    } catch (e) {
+      showToast('Не вдалося зберегти анкету: ' + e.message)
+    } finally {
+      setIntakeBusy(false)
+    }
+  }
+
+  const handleBook = async (intakeDone = false) => {
     if (!selectedDate || !selectedTime || !selectedService) return
+    // Анкета: до першого запису (або коли майстер додав нове обов'язкове питання)
+    if (!intakeDone && intakeForm.enabled && intakeSaved !== undefined && intakeNeeded(intakeForm, intakeSaved)) {
+      setIntakeAnswers(answersOf(intakeSaved))
+      setIntakeOpen(true)
+      return
+    }
     const startTime = selectedTime2 && timeToMin(selectedTime2) < timeToMin(selectedTime) ? selectedTime2 : selectedTime
     const slotDt = new Date(selectedDate)
     const [slotH, slotM] = startTime.split(':').map(Number)
@@ -1049,7 +1088,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 boxSizing:'border-box', outline:'none',
               }}
             />
-            <button className="btn-primary" style={{marginTop:8}} onClick={handleBook} disabled={submitting}>
+            <button className="btn-primary" style={{marginTop:8}} onClick={() => handleBook()} disabled={submitting}>
               {submitting ? 'Записуємо...' : `✓ Записатись ${dateLabel} о ${ctaStart}${durationHours > baseDurationHours ? ` на ${formatDurShort(Math.round(durationHours * 60))}` : ''}${totalPrice ? ` · ${totalPrice}₴` : ''}`}
             </button>
           </div>
@@ -1058,8 +1097,51 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       </div>
       </div>
 
+      {/* DIALOG: анкета клієнта (один раз перед першим записом) */}
+      {intakeOpen && (
+        <Portal>
+        <div className="dialog-backdrop show" onClick={e => e.target.classList.contains('dialog-backdrop') && !intakeBusy && setIntakeOpen(false)}>
+          <div className="dialog" style={{maxHeight:'88vh', overflowY:'auto'}}>
+            <div className="dialog-handle"></div>
+            <div className="dialog-icon">📋</div>
+            <div className="dialog-title">Коротка анкета</div>
+            <div className="dialog-sub">Відповісте один раз — майстер побачить це в вашій картці.</div>
+            <div style={{display:'flex', flexDirection:'column', gap:12, padding:'4px 4px 8px'}}>
+              {intakeForm.fields.map(f => {
+                const val = intakeAnswers[f.id] || ''
+                const set = (v) => setIntakeAnswers(a => ({ ...a, [f.id]: v }))
+                const box = { width:'100%', padding:'10px 12px', borderRadius:12, border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.04)', color:'var(--text)', fontSize:14, fontFamily:'inherit', boxSizing:'border-box', outline:'none' }
+                return (
+                  <div key={f.id}>
+                    <div style={{fontSize:12, fontWeight:700, color:'var(--text)', marginBottom:5}}>{f.label}{f.required && <span style={{color:'#f87171'}}> *</span>}</div>
+                    {f.type === 'text' && <input value={val} maxLength={200} onChange={e => set(e.target.value)} style={box} />}
+                    {f.type === 'date' && <input type="date" value={val} onChange={e => set(e.target.value)} style={box} />}
+                    {f.type === 'yesno' && (
+                      <div className="dur-switch">
+                        {[YES, NO].map(o => <button key={o} type="button" className={`dur-pill${val === o ? ' active' : ''}`} onClick={() => set(val === o ? '' : o)}>{o}</button>)}
+                      </div>
+                    )}
+                    {f.type === 'select' && (
+                      <div style={{display:'flex', flexWrap:'wrap', gap:8}}>
+                        {f.options.map(o => <button key={o} type="button" className={`dur-pill${val === o ? ' active' : ''}`} style={{padding:'8px 12px'}} onClick={() => set(val === o ? '' : o)}>{o}</button>)}
+                      </div>
+                    )}
+                  </div>
+                )
+              })}
+            </div>
+            <div className="dialog-actions">
+              <button className="dialog-btn secondary" onClick={() => setIntakeOpen(false)} disabled={intakeBusy}>Скасувати</button>
+              <button className="dialog-btn primary" onClick={submitIntake} disabled={intakeBusy}>{intakeBusy ? '...' : 'Зберегти й записатись'}</button>
+            </div>
+          </div>
+        </div>
+        </Portal>
+      )}
+
       {/* DIALOG: успішний запис / черга */}
       {successData && (
+        <Portal>
         <div className="dialog-backdrop show" onClick={e => e.target.classList.contains('dialog-backdrop') && setSuccessData(null)}>
           <div className="dialog">
             <div className="dialog-handle"></div>
@@ -1154,10 +1236,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             </div>
           </div>
         </div>
+        </Portal>
       )}
 
       {/* DIALOG: стати в чергу */}
       {dialogSlot && (
+        <Portal>
         <div className="dialog-backdrop show" onClick={(e) => e.target.classList.contains('dialog-backdrop') && setDialogSlot(null)}>
           <div className="dialog">
             <div className="dialog-handle"></div>
@@ -1218,6 +1302,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             </div>
           </div>
         </div>
+        </Portal>
       )}
 
     </div>

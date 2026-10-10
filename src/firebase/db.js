@@ -478,6 +478,16 @@ export async function getAdminSettings() {
   return snap.exists() ? snap.val() : { lunchEnabled: false, lunchStart: 12, lunchEnd: 13, workStart: 9, workEnd: 18, interval: 30 }
 }
 
+// Анкета клієнта (форму задає майстер у admin_settings/intake): відповіді лежать у users/{uid}/intake
+export async function getMyIntake(uid) {
+  const snap = await get(iRef(`users/${uid}/intake`))
+  return snap.exists() ? snap.val() : null
+}
+
+export async function saveMyIntake(uid, items) {
+  await set(iRef(`users/${uid}/intake`), { at: Date.now(), items })
+}
+
 export async function getAdminServices() {
   const snap = await get(iRef('admin_data/services'))
   if (!snap.exists()) return []
