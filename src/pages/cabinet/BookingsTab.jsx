@@ -151,6 +151,9 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
       } else if (newSurcharge > 0) {
         newPrice = newSurcharge
       }
+      // За пакетом ціну (лише допуслуги) і надбавку не чіпаємо
+      const isPkg = !!booking.packageId && !booking.packageError
+      if (isPkg) newPrice = booking.price
 
       // 1. Атомарно займаємо весь новий діапазон ДО скасування старого
       const claimed = await claimSlot(newDate, selectedTime, durationHours, adminSettings.interval || 30, bufferMin)
@@ -169,12 +172,16 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         serviceId: booking.serviceId,
         serviceName: booking.serviceName,
         price: newPrice,
-        surcharge: newSurcharge || undefined,
+        surcharge: isPkg ? undefined : (newSurcharge || undefined),
         discountAmt: booking.discountAmt || undefined,
         durationHours,
         addons: normAddons(booking.addons).length ? normAddons(booking.addons) : undefined,
         addonsPrice: booking.addonsPrice || undefined,
         bufferMin: bufferMin || undefined,
+        // Запис за пакетом: новий запис успадковує пакет, а ключ списання лишається старим (сервер не спише двічі)
+        packageId: booking.packageId && !booking.packageError ? booking.packageId : undefined,
+        packageName: booking.packageId && !booking.packageError ? booking.packageName : undefined,
+        packageUseId: booking.packageId && !booking.packageError ? (booking.packageUseId || booking.id) : undefined,
         studentName: booking.studentName,
         phone: booking.phone,
         rescheduledFrom: `${booking.date} ${booking.time}`,
@@ -353,6 +360,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               </span>
             )}
           </div>
+          {b.packageId && !b.packageError && <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}>🎫 З пакета «{b.packageName}»</div>}
           {normAddons(b.addons).length > 0 && (
             <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}>➕ {addonsLabel(normAddons(b.addons))}</div>
           )}

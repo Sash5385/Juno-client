@@ -488,6 +488,12 @@ export async function saveMyIntake(uid, items) {
   await set(iRef(`users/${uid}/intake`), { at: Date.now(), items })
 }
 
+// Пакети (абонементи) клієнта: users/{uid}/packages — додає майстер, списує сервер; клієнт лише читає
+export async function getMyPackages(uid) {
+  const snap = await get(iRef(`users/${uid}/packages`))
+  return snap.exists() ? snap.val() : null
+}
+
 export async function getAdminServices() {
   const snap = await get(iRef('admin_data/services'))
   if (!snap.exists()) return []

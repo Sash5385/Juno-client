@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, getMyIntake, saveMyIntake, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
+import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, parseYMD } from '../../utils/date'
 import { getInitials, pluralize } from '../../utils/format'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
+import { normPackages, pickPackage, expiresLabel } from '../../packages'
 import { normIntake, answersOf, missingRequired, intakeNeeded, buildItems, YES, NO } from '../../intake'
 import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { useToast } from '../../hooks/useToast'
@@ -62,6 +63,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const [services, setServices] = useState([])   // усі активні послуги майстра — для кроку «Послуга»
   const [addonIds, setAddonIds] = useState([])    // обрані допуслуги вибраної послуги
   // Анкета клієнта: форму задає майстер; клієнт відповідає один раз перед записом
+  const [packages, setPackages] = useState([])     // пакети клієнта (абонементи)
+  const [usePackage, setUsePackage] = useState(true) // списати запис із пакета
   const [intakeSaved, setIntakeSaved] = useState(undefined) // undefined — ще вантажиться, null — не заповнював
   const [intakeOpen, setIntakeOpen] = useState(false)
   const [intakeAnswers, setIntakeAnswers] = useState({})
@@ -104,6 +107,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   useEffect(() => { setSelectedTime2(null) }, [selectedService?.id])
   useEffect(() => {
     if (!user?.uid) return
+    getMyPackages(user.uid).then(v => setPackages(normPackages(v))).catch(() => {})
+  }, [user?.uid, successData])
+  useEffect(() => {
+    if (!user?.uid) return
     getMyIntake(user.uid).then(v => setIntakeSaved(v || null)).catch(() => setIntakeSaved(null))
   }, [user?.uid])
   useEffect(() => { setAddonIds([]) }, [selectedService?.id])
@@ -136,6 +143,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const addonTot = addonsTotals(chosenAddons)
   const addonHours = addonTot.minutes / 60
   const bufferMin = bufferOf(selectedService)
+  // Пакет, з якого можна списати запис на цю послугу в обрану дату (найближчий за терміном)
+  const pkgAvail = selectedService ? pickPackage(packages, selectedService.id, selectedDate ? formatDateYMD(selectedDate) : undefined) : null
+  const pkgOn = !!pkgAvail && usePackage
   // Тривалість запису = послуга + допуслуги (округлено, щоб 65 хв не давали 1.0833333…)
   const durationHours = Math.round((baseHours + addonHours) * 10000) / 10000
   // Базова ціна запису заданої тривалості (індивідуальна ціна або тариф послуги), без надбавки/знижки
@@ -414,9 +424,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       // Фіксована ціна слота (адмін) повністю замінює тарифну (не для злитих двох слотів)
       const fixedPrice = !selectedTime2 ? (slots[`slot${startTime.replace(':', '')}`]?.fixedPrice ?? null) : null
       // Допуслуги не входять у тариф за годину й знижку — додаються окремо
-      const totalPrice = (fixedPrice != null
+      // Запис за пакетом: послуга (з надбавкою) оплачена пакетом, платяться лише допуслуги
+      const totalPrice = (pkgOn ? 0 : (fixedPrice != null
         ? fixedPrice
-        : lessonPrice(baseHours, surcharge)) + addonTot.price
+        : lessonPrice(baseHours, surcharge))) + addonTot.price
       const currentSlot = slots[`slot${startTime.replace(':', '')}`]
       const isOfferedToMe = !!currentSlot?.offeredTo?.[user?.uid]
       // Атомарно займаємо весь діапазон (перша година вже зарезервована
@@ -456,9 +467,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         serviceId: selectedService.id,
         serviceName: selectedService.name,
         price: totalPrice || undefined,
-        surcharge: fixedPrice != null ? undefined : (surcharge || undefined),
-        discountAmt: (fixedPrice != null || customPriceAmt != null) ? undefined : (discountAmt || undefined),
+        surcharge: (pkgOn || fixedPrice != null) ? undefined : (surcharge || undefined),
+        discountAmt: (pkgOn || fixedPrice != null || customPriceAmt != null) ? undefined : (discountAmt || undefined),
         durationHours,
+        packageId: pkgOn ? pkgAvail.id : undefined,
+        packageName: pkgOn ? pkgAvail.name : undefined,
         addons: chosenAddons.length ? addonsSnapshot(chosenAddons) : undefined,
         addonsPrice: chosenAddons.length ? addonTot.price : undefined,
         bufferMin: bufferMin || undefined,
@@ -472,7 +485,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       }
       setSelectedTime(null)
       setSelectedTime2(null)
-      setSuccessData({ type: 'booking', date: formatDateYMD(selectedDate), time: startTime, service: selectedService, surcharge, durationHours, baseHours, price: totalPrice, addons: chosenAddons, addonsPrice: addonTot.price, pending: !!adminSettings.pendingEnabled })
+      setSuccessData({ type: 'booking', date: formatDateYMD(selectedDate), time: startTime, service: selectedService, surcharge, durationHours, baseHours, price: totalPrice, addons: chosenAddons, addonsPrice: addonTot.price, packageName: pkgOn ? pkgAvail.name : null, pending: !!adminSettings.pendingEnabled })
     } catch (e) {
       showToast('Помилка: ' + e.message)
     } finally {
@@ -599,7 +612,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         // Тривалість запису з допуслугами — за нею перевіряємо обід, перетини й вартість
         const needHours = slotDurHours + addonHours
         let totalSurcharge = 0
-        for (let i = 0; i < Math.ceil(needHours); i++) {
+        for (let i = 0; !pkgOn && i < Math.ceil(needHours); i++) {
           const coveredMin = slotStartMin + i * 60
           const coveredKey = `slot${String(Math.floor(coveredMin/60)).padStart(2,'0')}${String(coveredMin%60).padStart(2,'0')}`
           totalSurcharge += slots[coveredKey]?.surcharge || 0
@@ -651,9 +664,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           vipBlocked,
           totalSurcharge,
           // Фіксована ціна слота повністю замінює тарифну; допуслуги додаються поверх
-          totalPrice: (slot.fixedPrice != null
+          totalPrice: (pkgOn ? 0 : (slot.fixedPrice != null
             ? slot.fixedPrice
-            : lessonPrice(slotDurHours, totalSurcharge)) + addonTot.price, // та сама формула, що в діалозі й на кнопці: тариф/індивідуальна ціна, надбавка, знижка клієнта
+            : lessonPrice(slotDurHours, totalSurcharge))) + addonTot.price, // та сама формула, що в діалозі й на кнопці: тариф/індивідуальна ціна, надбавка, знижка клієнта
         }
       })
       .filter(slot => !slot.lunchBlocked && !slot.overlapBlocked && !(slot.cutoffBlocked && slot.available !== false))
@@ -680,7 +693,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         return slotDt > new Date()
       })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slots, baseDurationHours, adminSettings, profile?.isVip, profile?.discount, profile?.customPrice, selectedDate, selectedService, addonIds, bookingsData.upcoming])
+  }, [slots, baseDurationHours, adminSettings, profile?.isVip, profile?.discount, profile?.customPrice, selectedDate, selectedService, addonIds, pkgOn, bookingsData.upcoming])
 
   const nextLesson = useMemo(() => {
     const now = Date.now()
@@ -761,6 +774,20 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           )}
         </div>
       )}
+
+      {/* ПАКЕТИ клієнта */}
+      {packages.filter(p => p.left > 0 && (!p.expiresAt || p.expiresAt > Date.now())).map(p => (
+        <div key={p.id} style={{
+          background:'linear-gradient(135deg,rgba(247,201,72,0.14),rgba(247,201,72,0.05))', border:'1px solid rgba(247,201,72,0.3)',
+          borderRadius:12, padding:'9px 14px', display:'flex', alignItems:'center', gap:10, marginTop:8, marginBottom:4,
+        }}>
+          <span style={{fontSize:20}}>🎫</span>
+          <div style={{minWidth:0}}>
+            <div style={{fontWeight:700, fontSize:13, color:'var(--text)'}}>{p.name}: лишилось {p.left} з {p.total}</div>
+            <div style={{fontSize:11, color:'var(--dim)'}}>{expiresLabel(p)}</div>
+          </div>
+        </div>
+      ))}
 
       {/* LESSON BALANCE BANNER */}
       {(profile?.lessonBalance > 0) && (
@@ -1025,10 +1052,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           const key = `slot${String(Math.floor(slotMin/60)).padStart(2,'0')}${String(slotMin%60).padStart(2,'0')}`
           surcharge += slots[key]?.surcharge || 0
         }
-        const ctaFixed = !selectedTime2 ? (slots[`slot${ctaStart.replace(':', '')}`]?.fixedPrice ?? null) : null
+        const ctaFixed = (!pkgOn && !selectedTime2) ? (slots[`slot${ctaStart.replace(':', '')}`]?.fixedPrice ?? null) : null
         const baseP = lessonBase(baseHours)
         // Ціна самої послуги (тариф/надбавка/знижка) і разом із допуслугами
-        const servicePrice = ctaFixed != null ? ctaFixed : lessonPrice(baseHours, surcharge)
+        const servicePrice = pkgOn ? 0 : (ctaFixed != null ? ctaFixed : lessonPrice(baseHours, surcharge))
         const totalPrice = servicePrice + addonTot.price
         const dateLabel = formatDateYMD(selectedDate).slice(-5).split('-').reverse().join('.')
         return (
@@ -1041,7 +1068,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               }}>
                 Фіксована ціна: <strong>{ctaFixed}₴</strong>
               </div>
-            ) : surcharge > 0 ? (
+            ) : (!pkgOn && surcharge > 0) ? (
               <div style={{
                 marginTop:12, padding:'12px 14px', borderRadius:12,
                 background:'rgba(247,201,72,0.08)', border:'1px solid rgba(247,201,72,0.35)',
@@ -1064,6 +1091,18 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 {customPriceAmt == null && discountAmt > 0 && <span style={{marginLeft:6, color:'#4ade80', fontSize:11}}>−{discountAmt * baseHours}₴</span>}
               </div>
             ) : null}
+            {pkgAvail && (
+              <button type="button" onClick={() => setUsePackage(v => !v)} style={{
+                display:'flex', alignItems:'center', gap:10, width:'100%', marginTop:12, padding:'10px 14px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', textAlign:'left',
+                background: pkgOn ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.04)',
+                border: pkgOn ? '1px solid rgba(74,222,128,0.35)' : '1px solid rgba(255,255,255,0.08)',
+                fontSize:13, fontWeight:700, color: pkgOn ? '#4ade80' : 'var(--dim)',
+              }}>
+                <span style={{fontSize:18}}>🎫</span>
+                <span style={{flex:1}}>Списати з пакета «{pkgAvail.name}» <span style={{fontWeight:600, color:'var(--dim)'}}>(лишилось {pkgAvail.left}, {expiresLabel(pkgAvail)})</span></span>
+                <span>{pkgOn ? '✓' : '○'}</span>
+              </button>
+            )}
             {chosenAddons.length > 0 && (
               <div style={{
                 marginTop:8, padding:'8px 14px', borderRadius:12,
@@ -1187,6 +1226,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 <span className="lbl">Послуга</span>
                 <span className="val">{successData.service?.name || successData.service}</span>
               </div>
+              {successData.packageName && (
+                <div className="dialog-info-row">
+                  <span className="lbl">Пакет</span>
+                  <span className="val">🎫 {successData.packageName}</span>
+                </div>
+              )}
               {successData.addons?.length > 0 && (
                 <div className="dialog-info-row">
                   <span className="lbl">Допуслуги</span>
@@ -1204,8 +1249,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   <span className="lbl">Ціна</span>
                   <span className="val" style={{color:'var(--gold)'}}>
                     {successData.price != null ? successData.price : lessonPrice(successData.durationHours, successData.surcharge || 0)} ₴
-                    {successData.surcharge > 0 && <span style={{fontSize:10, color:'var(--gold)', opacity:0.7}}> (+{successData.surcharge}₴)</span>}
-                    {customPriceAmt == null && discountAmt > 0 && <span style={{fontSize:10, color:'#4ade80', marginLeft:4}}>−{discountAmt * (successData.baseHours ?? successData.durationHours)}₴</span>}
+                    {successData.surcharge > 0 && !successData.packageName && <span style={{fontSize:10, color:'var(--gold)', opacity:0.7}}> (+{successData.surcharge}₴)</span>}
+                    {customPriceAmt == null && discountAmt > 0 && !successData.packageName && <span style={{fontSize:10, color:'#4ade80', marginLeft:4}}>−{discountAmt * (successData.baseHours ?? successData.durationHours)}₴</span>}
                   </span>
                 </div>
               )}
