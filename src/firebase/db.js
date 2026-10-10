@@ -200,9 +200,14 @@ export function subscribeMyBookings(uid, _phone, callback) {
   return () => off(r, 'value', handler)
 }
 
+// Ключ нового запису наперед (груповий запис: місце в групі займається до створення запису)
+export function newBookingId(uid) {
+  return push(iRef(`bookings/${uid}`)).key
+}
+
 export async function createBooking(uid, booking) {
   if (_blocked) throw new Error('Не вдалося виконати запис, спробуйте пізніше')
-  const r = push(iRef(`bookings/${uid}`))
+  const r = booking.id ? iRef(`bookings/${uid}/${booking.id}`) : push(iRef(`bookings/${uid}`))
   const clean = Object.fromEntries(Object.entries(booking).filter(([,v]) => v !== undefined))
   await set(r, {
     ...clean,
@@ -245,8 +250,9 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
   })
 
   // Повертаємо день до стану ДО запису: phantom видаляємо, справжні слоти
-  // відновлюємо, відсутні не створюємо (єдині правила — utils/slotRules.js)
-  if (booking.date && booking.time) {
+  // відновлюємо, відсутні не створюємо (єдині правила — utils/slotRules.js).
+  // Груповий запис слотів не чіпає: їх звільняє сервер, коли піде останній учасник групи.
+  if (booking.date && booking.time && !booking.groupKey) {
     const [h, m] = booking.time.split(':').map(Number)
     const startMin = h * 60 + m
     const durMin = Math.round((booking.durationHours || 1) * 60) + Math.max(0, Math.min(120, Number(booking.bufferMin) || 0))
@@ -320,6 +326,28 @@ export function getCompletedHours(bookings) {
   return bookings
     .filter(b => b.status === 'confirmed' && new Date(b.date) < new Date())
     .reduce((sum, b) => sum + (b.durationHours || 1), 0)
+}
+
+// ─── ГРУПОВІ ЗАПИСИ ──────────────────────────────────────────────
+// Місця групи: groupSeats/{date}/{HHMM} = { serviceId, capacity, count, seats: { bookingId: uid } }
+export function subscribeGroupSeats(date, callback) {
+  const r = iRef(`groupSeats/${date}`)
+  const handler = onValue(r, snap => callback(snap.val() || {}), () => callback({}))
+  return () => off(r, 'value', handler)
+}
+
+// Атомарно займає місце в групі (або створює групу). false — місць немає / у цей час інша група.
+export async function joinGroupSeat(date, time, serviceId, capacity, bookingId, uid) {
+  if (_blocked) return false
+  const r = iRef(`groupSeats/${date}/${time.replace(':', '')}`)
+  const res = await runTransaction(r, cur => {
+    if (!cur) return { serviceId, capacity, count: 1, seats: { [bookingId]: uid } }
+    if (cur.serviceId !== serviceId) return undefined
+    const count = Number(cur.count) || 0
+    if (count >= (Number(cur.capacity) || 0)) return undefined
+    return { ...cur, count: count + 1, seats: { ...(cur.seats || {}), [bookingId]: uid } }
+  })
+  return res.committed
 }
 
 // ─── TIMESLOTS ───────────────────────────────────────────────────

@@ -1,9 +1,10 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
+import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, subscribeGroupSeats, joinGroupSeat, newBookingId, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, parseYMD } from '../../utils/date'
 import { getInitials, pluralize } from '../../utils/format'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
+import { isGroupService, capacityOf, groupKeyOf, seatTimeKey, canJoinGroup, seatsLeft, seatsLabel } from '../../groups'
 import { normPackages, pickPackage, expiresLabel } from '../../packages'
 import { normIntake, answersOf, missingRequired, intakeNeeded, buildItems, YES, NO } from '../../intake'
 import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, bufferOf, rangeTaken } from '../../addons'
@@ -63,6 +64,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const [services, setServices] = useState([])   // усі активні послуги майстра — для кроку «Послуга»
   const [addonIds, setAddonIds] = useState([])    // обрані допуслуги вибраної послуги
   // Анкета клієнта: форму задає майстер; клієнт відповідає один раз перед записом
+  const [groupSeats, setGroupSeats] = useState({})   // групові місця обраного дня: { HHMM: { serviceId, capacity, count } }
   const [packages, setPackages] = useState([])     // пакети клієнта (абонементи)
   const [usePackage, setUsePackage] = useState(true) // списати запис із пакета
   const [intakeSaved, setIntakeSaved] = useState(undefined) // undefined — ще вантажиться, null — не заповнював
@@ -138,7 +140,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   // Тривалість самої послуги (або двох слотів поспіль) — за нею рахується тариф
   const baseHours = selectedTime2 ? 2 : selectedSlotDur
   // Допуслуги вибраної послуги: ціна додається до запису, хвилини — до тривалості; перерва — після запису
-  const svcAddons = useMemo(() => normAddons(selectedService?.addons), [selectedService])
+  const isGroup = isGroupService(selectedService)
+  // Групові послуги без допуслуг (час групи однаковий для всіх)
+  const svcAddons = useMemo(() => (isGroupService(selectedService) ? [] : normAddons(selectedService?.addons)), [selectedService])
   const chosenAddons = useMemo(() => pickAddons(selectedService, addonIds), [selectedService, addonIds])
   const addonTot = addonsTotals(chosenAddons)
   const addonHours = addonTot.minutes / 60
@@ -277,6 +281,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     return unsub
   }, [selectedDate])
 
+  // Місця в групах обраного дня (для групових послуг)
+  useEffect(() => {
+    if (!selectedDate) { setGroupSeats({}); return }
+    return subscribeGroupSeats(formatDateYMD(selectedDate), setGroupSeats)
+  }, [selectedDate])
+
   // Підписка на чергу для всіх зайнятих слотів
   useEffect(() => {
     if (!selectedDate) return
@@ -327,6 +337,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       setSelectedTime2(null)
       return
     }
+    if (slot.available === false && groupSeats[seatTimeKey(slot.time)] && isGroup) {
+      showToast('Група заповнена — оберіть інший час')
+      return
+    }
     if (slot.available === false) {
       // Зайнятий або зарезервований для іншого
       // якщо слот запропонований комусь — і не мені — дозволяємо стати в чергу
@@ -347,7 +361,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     }
     // Тап на сусідній вільний годинний слот, коли вже обрано один — об'єднуємо в один
     // запис на 2 години замість заміни вибору (лише для годинної послуги).
-    if (slot.slotDurHours === 1 && selectedTime && !selectedTime2 && !slot.vipOnly
+    if (!isGroup && slot.slotDurHours === 1 && selectedTime && !selectedTime2 && !slot.vipOnly
         && Math.abs(timeToMin(slot.time) - timeToMin(selectedTime)) === 60) {
       const first = slots[`slot${selectedTime.replace(':', '')}`]
       if (first && first.available !== false && !first.vipOnly && !first.offeredTo?.[user?.uid] && slotDurOf(first) === 1) {
@@ -433,7 +447,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       // Атомарно займаємо весь діапазон (перша година вже зарезервована
       // саме для мене через чергу — атомарно займаємо лише решту, якщо
       // бронювання довше 1 год)
-      if (!isOfferedToMe) {
+      // Групова послуга: приєднуємось до наявної групи (слоти вже зайняті) або створюємо нову
+      const joiningGroup = isGroup && canJoinGroup(groupSeats[seatTimeKey(startTime)], selectedService.id)
+      if (joiningGroup) {
+        // слоти групи вже зайняті — потрібне лише місце (займається нижче)
+      } else if (!isOfferedToMe) {
         const claimed = await claimSlot(dateStr, startTime, durationHours, adminSettings.interval || 30, bufferMin)
         if (!claimed) {
           showToast('Цей слот щойно зайняли. Оберіть інший час.')
@@ -460,7 +478,20 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           return
         }
       }
+      let bookingId
+      if (isGroup) {
+        bookingId = newBookingId(user.uid)
+        const seated = await joinGroupSeat(dateStr, startTime, selectedService.id, capacityOf(selectedService), bookingId, user.uid)
+        if (!seated) {
+          showToast('Не вдалося зайняти місце в групі — можливо, місця вже закінчились. Оберіть інший час.')
+          setSubmitting(false)
+          return
+        }
+      }
       await createBooking(user.uid, {
+        id: bookingId,
+        groupKey: isGroup ? groupKeyOf(dateStr, startTime) : undefined,
+        groupCap: isGroup ? capacityOf(selectedService) : undefined,
         date: dateStr,
         time: startTime,
         serviceType: selectedService.type,
@@ -607,6 +638,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         }
         const [th, tm] = (slot.time || '0:0').split(':').map(Number)
         const slotStartMin = th * 60 + tm
+        // Групова послуга: слот уже зайнятий групою цієї послуги, але в ній є вільні місця — можна приєднатись
+        const seatNode = isGroup ? groupSeats[seatTimeKey(slot.time)] : null
+        const joinGroup = !!seatNode && canJoinGroup(seatNode, selectedService?.id)
         // Тривалість цього слота (адмін міг розтягнути його) — вона ж і тривалість послуги в записі
         const slotDurHours = slotDurOf(slot)
         // Тривалість запису з допуслугами — за нею перевіряємо обід, перетини й вартість
@@ -642,6 +676,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             )
         return {
           ...slot,
+          ...(joinGroup ? { available: true, joinGroup: true, groupLeft: seatsLeft(seatNode) } : {}),
           slotDurHours,
           needHours,
           isSticky,
@@ -649,7 +684,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           lunchBlocked:   !slot.lunchOverride && !offDay && isBlockedByLunch(slot.time, needHours),
           // Розтягнутий слот — цілісний блок: проміжні документи годин поглинуті навмисно (fitsAt це враховує).
           // Допуслуги й перерва після запису теж мають вміщатися — інакше слот не пропонуємо.
-          overlapBlocked: slot.available !== false && !fitsAt(slot, addonTot.minutes),
+          overlapBlocked: slot.available !== false && !fitsAt(slot, addonTot.minutes),   // приєднання до групи (joinGroup) — слот уже зайнятий (available:false), тож тут не рахується
           // Обмеження "не пізніше ніж за N годин до запису" (налаштування адміна bookCutoffHours)
           cutoffBlocked:  (() => {
             const hrs = adminSettings.bookCutoffHours || 0
@@ -693,7 +728,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         return slotDt > new Date()
       })
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [slots, baseDurationHours, adminSettings, profile?.isVip, profile?.discount, profile?.customPrice, selectedDate, selectedService, addonIds, pkgOn, bookingsData.upcoming])
+  }, [slots, baseDurationHours, adminSettings, profile?.isVip, profile?.discount, profile?.customPrice, selectedDate, selectedService, addonIds, pkgOn, groupSeats, bookingsData.upcoming])
 
   const nextLesson = useMemo(() => {
     const now = Date.now()
@@ -990,6 +1025,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                             <div className="slot-dur" style={{fontSize:10, fontWeight:700}}>{formatDurShort(Math.round((slot.needHours || slot.slotDurHours || baseDurationHours) * 60))}</div>
                             {slot.totalPrice > 0 && (
                               <div className="slot-price" style={{fontSize:10, fontWeight:700}}>{slot.totalPrice}₴</div>
+                            )}
+                            {isGroup && (
+                              <div style={{fontSize:9, fontWeight:700, color:'#93c5fd'}}>👥 {slot.joinGroup ? seatsLabel(slot.groupLeft) : `до ${capacityOf(selectedService)}`}</div>
                             )}
                           </div>
                         )}

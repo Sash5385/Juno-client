@@ -444,7 +444,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            {!licenseReadOnly && <button className="action-btn" title="Перенести" onClick={() => setRescheduleBooking(b)}>📅</button>}
+            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" onClick={() => setRescheduleBooking(b)}>📅</button>}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: '#e53935', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
