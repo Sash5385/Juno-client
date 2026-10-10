@@ -32,3 +32,10 @@ export function pluralize(n, forms) {
   if (mod10 >= 2 && mod10 <= 4 && (mod100 < 10 || mod100 >= 20)) return forms[1]
   return forms[2]
 }
+
+export function formatDurHours(hours) {
+  // 1 → '1 год', 1.25 → '1 год 15 хв', 0.5 → '30 хв' (тривалість запису з допуслугами не завжди ціла)
+  const min = Math.round((Number(hours) || 1) * 60)
+  const h = Math.floor(min / 60), m = min % 60
+  return h === 0 ? `${m} хв` : m === 0 ? `${h} год` : `${h} год ${m} хв`
+}

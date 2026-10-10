@@ -249,9 +249,12 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
   if (booking.date && booking.time) {
     const [h, m] = booking.time.split(':').map(Number)
     const startMin = h * 60 + m
-    const durMin = (booking.durationHours || 1) * 60
+    const durMin = Math.round((booking.durationHours || 1) * 60) + Math.max(0, Math.min(120, Number(booking.bufferMin) || 0))
     const daySnap = await get(iRef(`timeslots/${booking.date}`))
-    const updates = restoreRangeUpdates(daySnap.val() || {}, `timeslots/${booking.date}/`, startMin, durMin, { extra: { bookedBy: null } })
+    // Лише слоти, які зайняв цей клієнт (bookedBy): чужі правила БД не дозволять змінити, а один відхилений шлях
+    // скасував би весь пакетний update. Решту (перерва, слоти без bookedBy) звільняє сервер (onBookingChanged).
+    const day = Object.fromEntries(Object.entries(daySnap.val() || {}).filter(([, n]) => n && n.bookedBy === uid))
+    const updates = restoreRangeUpdates(day, `timeslots/${booking.date}/`, startMin, durMin, { extra: { bookedBy: null } })
     // Слоти звільняє і сервер (onBookingChanged); якщо правила не пускають (слот зайнятий без bookedBy
     // зі старої версії) — скасування запису вже збережено, тож це не помилка для клієнта.
     if (Object.keys(updates).length) await update(iRef(""), updates).catch(() => {})
@@ -329,27 +332,48 @@ export function getCompletedHours(bookings) {
 // власний запис, і обидва записи проходили одночасно на ту саму годину.
 // Якщо хоч один слот у діапазоні вже зайнятий — звільняє всі раніше
 // захоплені в цій же спробі й повертає false.
-export async function claimSlot(date, startTime, durationHours = 1, intervalMin = 30) {
+// bufferMin — перерва після запису: слоти за записом теж займаються, але «м'яко»: лише наявні, не закриті майстром
+// і не зарезервовані для іншого. Якщо такий слот уже зайнятий записом — діапазон не береться (перерва потрібна).
+export async function claimSlot(date, startTime, durationHours = 1, intervalMin = 30, bufferMin = 0) {
   if (_blocked) return false
   const uid = auth.currentUser?.uid || null
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
-  const endMin = startMin + durationHours * 60
+  const mainEnd = startMin + durationHours * 60
+  const endMin = mainEnd + (bufferMin > 0 ? bufferMin : 0)
   const claimedIds = []
   for (let min = startMin; min < endMin; min += intervalMin) {
     const slotH = String(Math.floor(min / 60)).padStart(2, '0')
     const slotM = String(min % 60).padStart(2, '0')
     const slotId = `slot${slotH}${slotM}`
     const slotRef = iRef(`timeslots/${date}/${slotId}`)
-    const result = await runTransaction(slotRef, current => {
-      if (current && current.available === false) {
-        return undefined // вже зайнятий — скасувати транзакцію
-      }
-      // Документа не було (current === null) — він існує лише під цей запис: phantom,
-      // щоб скасування видалило його, а не лишило окремим вільним слотом.
-      // bookedBy — хто зайняв: правила бази дозволяють звільнити/змінити зайнятий слот лише йому
-      return { ...(current || {}), ...(current ? {} : { phantom: true }), available: false, time: `${slotH}:${slotM}`, bookedBy: uid }
-    })
+    const soft = min >= mainEnd // позиція перерви
+    let skipSoft = false
+    let result
+    try {
+      result = await runTransaction(slotRef, current => {
+        skipSoft = false
+        if (soft) {
+          // Перерву беремо лише на наявні слоти: закритий майстром або зарезервований для іншого — пропускаємо.
+          // current === null може означати лише «ще не в кеші»: повертаємо null, щоб SDK звірив із сервером і повторив
+          // виклик зі справжнім значенням (якщо слота справді немає — запис null відхилять правила, це ловить catch нижче).
+          if (!current) return current
+          const reservedForOther = current.reservedFor && current.reservedFor !== uid && (current.reservedUntil || 0) > Date.now()
+          if (current.adminBlocked || reservedForOther) { skipSoft = true; return undefined }
+        }
+        if (current && current.available === false) {
+          return undefined // вже зайнятий — скасувати транзакцію
+        }
+        // Документа не було (current === null) — він існує лише під цей запис: phantom,
+        // щоб скасування видалило його, а не лишило окремим вільним слотом.
+        // bookedBy — хто зайняв: правила бази дозволяють звільнити/змінити зайнятий слот лише йому
+        return { ...(current || {}), ...(current ? {} : { phantom: true }), available: false, time: `${slotH}:${slotM}`, bookedBy: uid }
+      })
+    } catch (e) {
+      if (soft) continue // перерва необов'язкова: слот, який не вдалося взяти, просто пропускаємо
+      throw e
+    }
+    if (soft && skipSoft) continue
     if (!result.committed) {
       await Promise.all(claimedIds.map(id =>
         runTransaction(iRef(`timeslots/${date}/${id}`), current =>

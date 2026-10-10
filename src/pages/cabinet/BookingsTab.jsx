@@ -3,6 +3,8 @@ import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
 import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
+import { formatDurHours } from '../../utils/format'
+import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { LicenseContext } from '../../hooks/useLicense'
@@ -60,6 +62,8 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
   const [monthAvail, setMonthAvail] = useState({})
 
   const durationHours = booking.durationHours || 1
+  // Перерва після запису (з послуги на момент запису) переходить на нове місце разом із записом
+  const bufferMin = bufferOf(booking)
 
   useEffect(() => {
     getAdminSettings().then(s => setAdminSettings(s)).catch(() => {})
@@ -93,12 +97,14 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
     const [h, m] = time.split(':').map(Number)
     const startMin = h * 60 + m
     const endMin = startMin + durationHours * 60
-    return Object.values(slots).some(s => {
+    if (Object.values(slots).some(s => {
       if (s.available !== false) return false
       const [sh, sm] = (s.time || '').split(':').map(Number)
       const sMin = sh * 60 + sm
       return sMin >= startMin && sMin < endMin
-    })
+    })) return true
+    // Слоти одразу після запису мають бути вільні — там перерва
+    return bufferMin > 0 && rangeTaken(slots, endMin, endMin + bufferMin, { ignoreClosed: true })
   }
 
   const slotsList = useMemo(() => Object.values(slots)
@@ -147,7 +153,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
       }
 
       // 1. Атомарно займаємо весь новий діапазон ДО скасування старого
-      const claimed = await claimSlot(newDate, selectedTime, durationHours, adminSettings.interval || 30)
+      const claimed = await claimSlot(newDate, selectedTime, durationHours, adminSettings.interval || 30, bufferMin)
       if (!claimed) {
         showModalToast('Цей слот щойно зайняли. Оберіть інший час.')
         setSaving(false)
@@ -166,6 +172,9 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         surcharge: newSurcharge || undefined,
         discountAmt: booking.discountAmt || undefined,
         durationHours,
+        addons: normAddons(booking.addons).length ? normAddons(booking.addons) : undefined,
+        addonsPrice: booking.addonsPrice || undefined,
+        bufferMin: bufferMin || undefined,
         studentName: booking.studentName,
         phone: booking.phone,
         rescheduledFrom: `${booking.date} ${booking.time}`,
@@ -316,7 +325,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
     const endTime = b.time && b.durationHours
       ? (() => {
           const [h, m] = b.time.split(':').map(Number)
-          const total = h * 60 + (m || 0) + b.durationHours * 60
+          const total = h * 60 + (m || 0) + Math.round(b.durationHours * 60)
           return `${String(Math.floor(total / 60)).padStart(2,'0')}:${String(total % 60).padStart(2,'0')}`
         })()
       : null
@@ -337,13 +346,16 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {b.serviceType === 'school' ? '🎓' : '🚙'} {b.serviceName} · {b.durationHours || 1} год
+            {b.serviceType === 'school' ? '🎓' : '🚙'} {b.serviceName} · {formatDurHours(b.durationHours || 1)}
             {(b.price > 0) && (
               <span style={{marginLeft:6, color:'var(--gold)', fontWeight:700}}>
                 {b.price} ₴{b.surcharge > 0 ? ` (+${b.surcharge}₴)` : ''}
               </span>
             )}
           </div>
+          {normAddons(b.addons).length > 0 && (
+            <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}>➕ {addonsLabel(normAddons(b.addons))}</div>
+          )}
           <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
             {(b.status === 'confirmed' || b.status === 'cancelled') && (
               <div className={`booking-status ${statusClass}`}>{statusText}</div>
@@ -483,7 +495,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 </div>
                 <div style={{fontSize:28,fontWeight:900,color:'var(--text)',lineHeight:1}}>{next.time}</div>
                 <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())} · {next.serviceName}</div>
-                <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{next.durationHours || 1} год</div>
+                <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{formatDurHours(next.durationHours || 1)}{normAddons(next.addons).length > 0 ? ` · ➕ ${addonsLabel(normAddons(next.addons))}` : ''}</div>
                 <div className="booking-cal-row">
                   <a href={googleCalendarLink(next)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">Google Calendar</a>
                   <button className="cal-add-btn" onClick={() => downloadICS(next)}>Apple Calendar</button>
