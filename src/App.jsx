@@ -6,8 +6,9 @@ import { App as CapacitorApp } from '@capacitor/app'
 import { auth } from './firebase/config'
 import {
   getUserProfile, subscribeUserAdminFields, updateUserProfile, createBooking, claimSlot,
-  setCurrentTenant, loadStoredTenant, resolveSlug, getCurrentSlug,
+  setCurrentTenant, loadStoredTenant, resolveSlug, getCurrentSlug, getAdminSettings,
 } from './firebase/db'
+import { startTerms } from './terms'
 import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
 import { useAppUpdate } from './hooks/useAppUpdate'
 import { useLicense, isLicenseReadOnly, LicenseContext } from './hooks/useLicense'
@@ -249,6 +250,12 @@ export default function App() {
   // файл, а start_url "./" резолвиться відносно цієї адреси). iPhone (iOS 16.4+) бере
   // адресу запуску ярлика з манифесту, а не зі сторінки — зі статичним start_url "/"
   // ярлик завжди відкривався на голому домені без майстра.
+  // Напрямок послуг майстра (admin_settings/direction): підміняє «майстер/клієнт/запис» у тексті
+  useEffect(() => {
+    if (!tenantIid) return
+    getAdminSettings().then(s => startTerms(s?.direction)).catch(() => {})
+  }, [tenantIid])
+
   useEffect(() => {
     if (!tenantIid) return
     const slug = getCurrentSlug()

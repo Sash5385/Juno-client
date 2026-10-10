@@ -35,7 +35,7 @@ export default function About() {
       <img src="/icon-192.png" alt="Juno" style={{ width: 72, height: 72, borderRadius: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }} />
       <h1 style={{ fontSize: 26, fontWeight: 900, margin: '18px 0 6px', letterSpacing: -0.5 }}>Juno</h1>
       <div style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 700, marginBottom: 28 }}>
-        Онлайн-запис на записи
+        Онлайн-запис до майстра
       </div>
 
       <div style={{ maxWidth: 480, width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 14 }}>
