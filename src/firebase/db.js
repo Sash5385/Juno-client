@@ -90,6 +90,13 @@ export function parseQKey(key) {
 export const slotsRoot = (m = _master) => (m && m !== _iid ? `timeslots_m/${m}` : 'timeslots')
 
 // Публічний список майстрів салону: [{ id, name, color, owner }] (власник першим). Порожній — акаунт «Один майстер».
+// Власні графік і ціни майстра салону (master_settings/{mid}); немає запису → null (діють налаштування салону)
+export function subscribeMasterSettings(mid, callback) {
+  const r = iRef(`master_settings/${mid}`)
+  const handler = onValue(r, snap => callback(snap.val() || null), () => callback(null))
+  return () => off(r, 'value', handler)
+}
+
 export function subscribeMasters(callback) {
   const r = iRef('masters')
   const handler = onValue(r, snap => {

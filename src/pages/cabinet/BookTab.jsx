@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, subscribeGroupSeats, joinGroupSeat, newBookingId, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability, subscribeMasters, setClientMaster, getCurrentIid } from '../../firebase/db'
+import { mergeMasterSchedule, mergeMasterServices } from '../../masterSettings'
+import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, subscribeMasterSettings, claimSlot, claimReservedSlot, subscribeGroupSeats, joinGroupSeat, newBookingId, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability, subscribeMasters, setClientMaster, getCurrentIid } from '../../firebase/db'
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, parseYMD } from '../../utils/date'
 import { getInitials, pluralize } from '../../utils/format'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
@@ -60,8 +61,17 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const discountAmt = Number(profile?.discount) || 0
   const customPriceAmt = profile?.customPrice > 0 ? Number(profile.customPrice) : null
   const applyDiscount = (price, hours = 1) => discountAmt > 0 ? Math.max(0, Math.round(price - discountAmt * hours)) : price
-  const [selectedService, setSelectedService] = useState(null)
-  const [services, setServices] = useState([])   // усі активні послуги майстра — для кроку «Послуга»
+  const [selectedServiceRaw, setSelectedService] = useState(null)
+  const [servicesRaw, setServices] = useState([])   // усі активні послуги салону
+  // Власні графік і ціни обраного майстра салону (master_settings): поверх налаштувань і послуг салону
+  const [masterMs, setMasterMs] = useState(null)
+  const msUnsub = useRef(null)
+  useEffect(() => () => { msUnsub.current?.() }, [])
+  const services = useMemo(() => mergeMasterServices(servicesRaw, masterMs).filter(s => s.active !== false), [servicesRaw, masterMs])
+  const selectedService = useMemo(() => (selectedServiceRaw ? services.find(s => s.id === selectedServiceRaw.id) || null : null), [selectedServiceRaw, services])
+  useEffect(() => {
+    if (selectedServiceRaw && !selectedService && services.length) setSelectedService(services[0]) // послугу вимкнено в цього майстра
+  }, [selectedServiceRaw, selectedService, services])
   const [addonIds, setAddonIds] = useState([])    // обрані допуслуги вибраної послуги
   // Анкета клієнта: форму задає майстер; клієнт відповідає один раз перед записом
   const [groupSeats, setGroupSeats] = useState({})   // групові місця обраного дня: { HHMM: { serviceId, capacity, count } }
@@ -95,7 +105,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     setSelectedTime(null)
     setSelectedTime2(null)
   }, [selectedDate])
-  const [adminSettings, setAdminSettings] = useState({ lunchEnabled: true, lunchStart: 12, lunchEnd: 13 })
+  const [adminSettingsRaw, setAdminSettings] = useState({ lunchEnabled: true, lunchStart: 12, lunchEnd: 13 })
+  const adminSettings = useMemo(() => mergeMasterSchedule(adminSettingsRaw, masterMs), [adminSettingsRaw, masterMs])
   const [monthAvail, setMonthAvail] = useState({})
   const timeSectionRef = useRef(null)
   const ctaSectionRef = useRef(null)
@@ -125,6 +136,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const ownerId = getCurrentIid()
   const masterBooking = pickedMaster && pickedMaster !== ownerId ? pickedMaster : undefined // для власника поле не пишемо
   const pickMaster = (id) => {
+    msUnsub.current?.(); setMasterMs(null)
+    msUnsub.current = id === getCurrentIid() ? null : subscribeMasterSettings(id, setMasterMs)
     setClientMaster(id)           // спершу корінь слотів — потім стан, щоб підписки одразу читали календар цього майстра
     try { localStorage.setItem(`dp_master_${ownerId}`, id) } catch {}
     setSelectedTime(null); setSelectedTime2(null); setSlots({}); setMonthAvail({})
