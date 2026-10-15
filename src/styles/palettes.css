@@ -1,4 +1,4 @@
-/* Палітри клієнта: «Неон-ніч» (neon) і «Океан» (ocean), у темному й світлому режимі.
+/* Палітри клієнта: «Туман» (fog), «Неон-ніч» (neon) і «Океан» (ocean), у темному й світлому режимі.
    Активна палітра — атрибут data-palette на <html> (див. hooks/useTheme.js), режим — data-theme на <body>.
    Селектори мають вищу специфічність, ніж базові правила з [data-theme="light"] у компонентних CSS. */
 
@@ -173,3 +173,54 @@ html[data-palette="ocean"] body[data-theme="light"] .cab-actions .cab-icon-btn:n
 /* Кнопки-кульки: іконка завжди біла; активна вкладка (Cabinet.jsx задає inline color:var(--accent)) — кільце */
 html:is([data-palette="neon"], [data-palette="ocean"]) body[data-theme] .cab-icon-btn{color:#fff !important;overflow:visible}
 html:is([data-palette="neon"], [data-palette="ocean"]) body[data-theme] .cab-icon-btn[style*="accent"]{box-shadow:0 0 0 2px var(--bg),0 0 0 4px var(--accent),0 0 14px color-mix(in srgb,var(--accent) 60%,transparent)}
+
+
+/* ── Туман · dark (скло як в адмінці) ── */
+html[data-palette="fog"] body[data-theme="dark"]{--bg:#10141c;--bg-deep:#0b0f16;--surface:#171d2a;--surf-hi:#1f2738;--surf-lo:#0f141d;--border:rgba(255,255,255,0.1);--text:#e8edf6;--dim:#8c98ae;--faint:#5f6b80;--accent:#60a5fa;--acc-hi:#93c5fd;--green:#4ade80;--blue:#60a5fa;--gold:#fbbf24;--shadow:none;color-scheme:dark;}
+html[data-palette="fog"] body[data-theme="dark"] #root::before{background:radial-gradient(circle at 0% 0%,rgba(96,165,250,.35),transparent 48%),radial-gradient(circle at 100% 80%,rgba(129,140,248,.3),transparent 50%)}
+html[data-palette="fog"] body[data-theme="dark"] .cab-topbar{background:transparent;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+html[data-palette="fog"] body[data-theme="dark"] .cal-card,html[data-palette="fog"] body[data-theme="dark"] .svc-tile,html[data-palette="fog"] body[data-theme="dark"] .user-banner,html[data-palette="fog"] body[data-theme="dark"] .booking-card,html[data-palette="fog"] body[data-theme="dark"] .profile-section,html[data-palette="fog"] body[data-theme="dark"] .profile-banner,html[data-palette="fog"] body[data-theme="dark"] .empty-state{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:18px;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .cal-day{border-radius:12px;border:1px solid transparent}
+html[data-palette="fog"] body[data-theme="dark"] .cal-day.day-free{background:rgba(74,222,128,.2);border-color:rgba(74,222,128,.45);color:#bbf7d0;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .cal-day.day-partial{background:rgba(251,191,36,.2);border-color:rgba(251,191,36,.45);color:#fde68a;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .cal-day.day-full{background:rgba(248,113,113,.16);border-color:rgba(248,113,113,.38);color:#fecaca;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .cal-day.selected{background:linear-gradient(145deg,#93c5fd,#60a5fa);color:#06182e !important;border-color:transparent;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .cal-day.today:not(.selected)::before{border-radius:12px}
+html[data-palette="fog"] body[data-theme="dark"] .slot{border-radius:14px;background:rgba(74,222,128,.2);border:1px solid rgba(74,222,128,.45);color:var(--text)}
+html[data-palette="fog"] body[data-theme="dark"] .slot.taken{background:rgba(248,113,113,.16);border-color:rgba(248,113,113,.38)}
+html[data-palette="fog"] body[data-theme="dark"] .slot.selected{background:linear-gradient(145deg,#93c5fd,#60a5fa);color:#06182e;border-color:transparent}
+html[data-palette="fog"] body[data-theme="dark"] .btn-primary,html[data-palette="fog"] body[data-theme="dark"] .btn-login{background:linear-gradient(145deg,#93c5fd,#60a5fa);color:#06182e;border:none;border-radius:16px;font-weight:700;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-inner{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:26px;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-ico{color:var(--text)}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-lbl{color:var(--faint)}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-btn.active .botnav-ico,html[data-palette="fog"] body[data-theme="dark"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-fab{background:linear-gradient(145deg,#93c5fd,#60a5fa);color:#06182e;border-color:var(--bg);box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-fab-glow{background:radial-gradient(circle,rgba(96,165,250,.3),transparent 70%)}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-badge,html[data-palette="fog"] body[data-theme="dark"] .cab-icon-btn .badge{background:var(--accent);color:#06182e}
+html[data-palette="fog"] body[data-theme="dark"] .cab-icon-btn{width:30px;height:30px;overflow:visible;border-radius:50%;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.1);color:#e8edf6;box-shadow:none;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+html[data-palette="fog"] body[data-theme="dark"] .cab-icon-btn::before{display:none}
+
+/* ── Туман · light (скло як в адмінці) ── */
+html[data-palette="fog"] body[data-theme="light"]{--bg:#e9eef8;--bg-deep:#dfe7f5;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#eef2fa;--border:rgba(23,35,58,0.1);--text:#17233a;--dim:#5d6c88;--faint:#8f9bb3;--accent:#3b82f6;--acc-hi:#60a5fa;--green:#16a34a;--blue:#3b82f6;--gold:#d97706;--shadow:0 4px 18px rgba(60,80,120,.12);color-scheme:light;}
+html[data-palette="fog"] body[data-theme="light"] #root::before{background:radial-gradient(circle at 0% 0%,rgba(96,165,250,.3),transparent 48%),radial-gradient(circle at 100% 80%,rgba(129,140,248,.22),transparent 50%)}
+html[data-palette="fog"] body[data-theme="light"] .cab-topbar{background:transparent;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
+html[data-palette="fog"] body[data-theme="light"] .cal-card,html[data-palette="fog"] body[data-theme="light"] .svc-tile,html[data-palette="fog"] body[data-theme="light"] .user-banner,html[data-palette="fog"] body[data-theme="light"] .booking-card,html[data-palette="fog"] body[data-theme="light"] .profile-section,html[data-palette="fog"] body[data-theme="light"] .profile-banner,html[data-palette="fog"] body[data-theme="light"] .empty-state{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(23,35,58,.1);border-radius:18px;box-shadow:0 4px 18px rgba(60,80,120,.12)}
+html[data-palette="fog"] body[data-theme="light"] .cal-day{border-radius:12px;border:1px solid transparent}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.day-free{background:rgba(22,163,74,.14);border-color:rgba(22,163,74,.4);color:#15803d;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.day-partial{background:rgba(217,119,6,.14);border-color:rgba(217,119,6,.4);color:#b45309;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.day-full{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.34);color:#b91c1c;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff !important;border-color:transparent;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.today:not(.selected)::before{border-radius:12px}
+html[data-palette="fog"] body[data-theme="light"] .slot{border-radius:14px;background:rgba(22,163,74,.14);border:1px solid rgba(22,163,74,.4);color:var(--text)}
+html[data-palette="fog"] body[data-theme="light"] .slot.taken{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.34)}
+html[data-palette="fog"] body[data-theme="light"] .slot.selected{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff;border-color:transparent}
+html[data-palette="fog"] body[data-theme="light"] .btn-primary,html[data-palette="fog"] body[data-theme="light"] .btn-login{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff;border:none;border-radius:16px;font-weight:700;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .botnav-inner{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(23,35,58,.1);border-radius:26px;box-shadow:0 4px 18px rgba(60,80,120,.12)}
+html[data-palette="fog"] body[data-theme="light"] .botnav-ico{color:var(--text)}
+html[data-palette="fog"] body[data-theme="light"] .botnav-lbl{color:var(--faint)}
+html[data-palette="fog"] body[data-theme="light"] .botnav-btn.active .botnav-ico,html[data-palette="fog"] body[data-theme="light"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
+html[data-palette="fog"] body[data-theme="light"] .botnav-fab{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff;border-color:var(--bg);box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .botnav-fab-glow{background:radial-gradient(circle,rgba(96,165,250,.3),transparent 70%)}
+html[data-palette="fog"] body[data-theme="light"] .botnav-badge,html[data-palette="fog"] body[data-theme="light"] .cab-icon-btn .badge{background:var(--accent);color:#fff}
+html[data-palette="fog"] body[data-theme="light"] .cab-icon-btn{width:30px;height:30px;overflow:visible;border-radius:50%;background:rgba(255,255,255,.72);border:1px solid rgba(23,35,58,.1);color:#17233a;box-shadow:none;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
+html[data-palette="fog"] body[data-theme="light"] .cab-icon-btn::before{display:none}

@@ -2,16 +2,19 @@ import { useEffect, useState } from 'react'
 
 // Палітри оформлення (styles/palettes.css). Режим (темний/світлий) — окремо, кнопка в шапці.
 export const PALETTES = [
+  { id: 'fog',   name: 'Туман',    colors: ['#60a5fa', '#818cf8', '#93c5fd'], bg: { dark: '#10141c', light: '#e9eef8' } },
   { id: 'neon',  name: 'Неон-ніч', colors: ['#ff3d9a', '#22d3ee', '#8b5cf6'], bg: { dark: '#0a0614', light: '#f6f0ff' } },
   { id: 'ocean', name: 'Океан',    colors: ['#14b8a6', '#0ea5e9', '#6366f1'], bg: { dark: '#04121c', light: '#eaf6fb' } },
   // Початкове оформлення: без перекриттів, діють базові стилі (tokens.css) і скляні кнопки шапки
   { id: 'classic', name: 'Класична', colors: ['#ff5a3c', '#7ed957', '#5b9bff'], bg: { dark: '#1c1d21', light: '#f0f1f5' } },
 ]
-const DEFAULT_PALETTE = 'neon'
+const DEFAULT_PALETTE = 'fog'
 const PALETTE_EVENT = 'dp-palette'
 
 function readPalette() {
   try {
+    // Одноразовий перехід на «Туман» (v2): раніше збережена палітра була лише автозбереженням типового значення
+    if (localStorage.getItem('palette_v') !== '2') { localStorage.setItem('palette_v', '2'); localStorage.setItem('palette', 'fog'); return 'fog' }
     const p = localStorage.getItem('palette')
     return PALETTES.some(x => x.id === p) ? p : DEFAULT_PALETTE
   } catch { return DEFAULT_PALETTE }
