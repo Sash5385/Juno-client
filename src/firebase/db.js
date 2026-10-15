@@ -77,6 +77,16 @@ export async function resolveSlug(slug) {
 let _master = null
 export const setClientMaster = (id) => { _master = id && id !== _iid ? id : null }
 export const getClientMaster = () => _master
+// Ключ черги: власник — «YYYY-MM-DD_HH:MM», календар майстра — «{masterId}~YYYY-MM-DD_HH:MM»
+export const qKey = (date, time, m = _master) => `${m && m !== _iid ? m + '~' : ''}${date}_${time}`
+export function parseQKey(key) {
+  const s = String(key || '')
+  const i = s.indexOf('~')
+  const master = i > 0 ? s.slice(0, i) : null
+  const rest = i > 0 ? s.slice(i + 1) : s
+  const j = rest.indexOf('_')
+  return { master, date: rest.slice(0, j), time: rest.slice(j + 1) }
+}
 export const slotsRoot = (m = _master) => (m && m !== _iid ? `timeslots_m/${m}` : 'timeslots')
 
 // Публічний список майстрів салону: [{ id, name, color, owner }] (власник першим). Порожній — акаунт «Один майстер».
@@ -290,7 +300,7 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
 // в”Ђв”Ђв”Ђ QUEUE (Р»РёСЃС‚ РѕС‡С–РєСѓРІР°РЅРЅСЏ) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 export async function joinQueue(uid, date, time, studentType, durationHours = 1, name = '', phone = '') {
   if (_blocked) throw new Error('Не вдалося приєднатись до черги, спробуйте пізніше')
-  const slotKey = `${date}_${time}`
+  const slotKey = qKey(date, time)
   await set(iRef(`queue/${slotKey}/entries/${uid}`), {
     uid,
     studentType,
@@ -302,31 +312,32 @@ export async function joinQueue(uid, date, time, studentType, durationHours = 1,
   })
 }
 
-export async function claimReservedSlot(date, time, uid) {
-  const slotKey = `${date}_${time}`
+export async function claimReservedSlot(date, time, uid, master = _master) {
+  const slotKey = qKey(date, time, master)
   const slotId = `slot${time.replace(':', '')}`
+  const root = slotsRoot(master)
   const updates = {}
   updates[`queue/${slotKey}/entries/${uid}/status`] = 'booked'
-  updates[`timeslots/${date}/${slotId}/offeredTo/${uid}`] = null
-  updates[`timeslots/${date}/${slotId}/reservedFor`] = null
-  updates[`timeslots/${date}/${slotId}/reservedUntil`] = null
+  updates[`${root}/${date}/${slotId}/offeredTo/${uid}`] = null
+  updates[`${root}/${date}/${slotId}/reservedFor`] = null
+  updates[`${root}/${date}/${slotId}/reservedUntil`] = null
   await update(iRef(""), updates)
 }
 
 export async function leaveQueue(uid, date, time) {
-  const slotKey = `${date}_${time}`
+  const slotKey = qKey(date, time)
   await remove(iRef(`queue/${slotKey}/entries/${uid}`))
 }
 
 export async function getQueueForSlot(date, time) {
-  const slotKey = `${date}_${time}`
+  const slotKey = qKey(date, time)
   const snap = await get(iRef(`queue/${slotKey}/entries`))
   if (!snap.exists()) return []
   return Object.values(snap.val())
 }
 
 export function subscribeQueueForSlot(date, time, callback) {
-  const slotKey = `${date}_${time}`
+  const slotKey = qKey(date, time)
   const r = iRef(`queue/${slotKey}/entries`)
   const handler = onValue(r, snap => {
     if (!snap.exists()) return callback([])
@@ -440,11 +451,11 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
 // лише для випадку, коли перший слот діапазону вже гарантовано
 // заброньований одержувачем через чергу (offeredTo/reservedFor
 // блокує інших від початку), тож гонки за нього немає.
-export async function markSlotsUnavailable(date, startTime, durationHours, intervalMin = 30) {
+export async function markSlotsUnavailable(date, startTime, durationHours, intervalMin = 30, master = _master) {
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
-  const daySnap = await get(iRef(`${slotsRoot()}/${date}`))
-  const updates = blockRangeUpdates(daySnap.val() || {}, `${slotsRoot()}/${date}/`, startMin, durationHours * 60, { step: intervalMin, extra: { bookedBy: auth.currentUser?.uid || null } })
+  const daySnap = await get(iRef(`${slotsRoot(master)}/${date}`))
+  const updates = blockRangeUpdates(daySnap.val() || {}, `${slotsRoot(master)}/${date}/`, startMin, durationHours * 60, { step: intervalMin, extra: { bookedBy: auth.currentUser?.uid || null } })
   await update(iRef(""), updates)
 }
 
@@ -473,6 +484,7 @@ export async function clearQueueOffer(uid, slotKey) {
 }
 
 export async function claimQueueOffer(uid, slotKey, offer, profile) {
+  const { master } = parseQKey(slotKey) // запрошення з календаря майстра — бронюємо саме там
   const entrySnap = await get(iRef(`queue/${slotKey}/entries/${uid}`))
   const entry = entrySnap.val()
   if (!entry) throw new Error('Queue entry not found')
@@ -482,11 +494,12 @@ export async function claimQueueOffer(uid, slotKey, offer, profile) {
     time: offer.time,
     serviceType: entry.studentType,
     durationHours,
+    ...(master ? { masterId: master } : {}),
     studentName: entry.name || profile?.name || '',
     phone: entry.phone || profile?.phone || '',
   })
-  await markSlotsUnavailable(offer.date, offer.time, durationHours, 30)
-  await claimReservedSlot(offer.date, offer.time, uid)
+  await markSlotsUnavailable(offer.date, offer.time, durationHours, 30, master)
+  await claimReservedSlot(offer.date, offer.time, uid, master)
   await clearQueueOffer(uid, slotKey)
 }
 
@@ -498,10 +511,8 @@ export function subscribeUserQueue(uid, callback) {
     Object.entries(data).forEach(([slotKey, slotData]) => {
       const entry = slotData?.entries?.[uid]
       if (!entry) return
-      const parts = slotKey.split('_')
-      const date = parts[0]
-      const time = parts.slice(1).join('_')
-      slots.push({ slotKey, date, time, ...entry })
+      const { master, date, time } = parseQKey(slotKey)
+      slots.push({ slotKey, date, time, master, ...entry })
     })
     slots.sort((a, b) => {
       if (a.date !== b.date) return a.date.localeCompare(b.date)
@@ -514,9 +525,10 @@ export function subscribeUserQueue(uid, callback) {
 
 export async function declineQueueOffer(uid, slotKey, date, time) {
   const slotId = `slot${time.replace(':', '')}`
+  const { master } = parseQKey(slotKey)
   await update(iRef(""), {
     [`queue/${slotKey}/entries/${uid}`]: null,
-    [`timeslots/${date}/${slotId}/offeredTo/${uid}`]: null,
+    [`${slotsRoot(master)}/${date}/${slotId}/offeredTo/${uid}`]: null,
     [`users/${uid}/queueOffers/${slotKey}`]: null,
   })
 }

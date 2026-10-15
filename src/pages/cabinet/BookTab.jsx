@@ -366,7 +366,6 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     if (slot.available === false) {
       // Зайнятий або зарезервований для іншого
       // якщо слот запропонований комусь — і не мені — дозволяємо стати в чергу
-      if (masterBooking) { showToast('Цей час зайнятий. Оберіть інший'); return } // черга очікування поки лише для календаря власника
       const q = queueMap[slot.time]
       if (q?.mine) return
       setDialogSlot({ ...slot, queueCount: q?.count || 0 })
