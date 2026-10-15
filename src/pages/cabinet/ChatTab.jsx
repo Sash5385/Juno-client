@@ -69,7 +69,7 @@ function DirectChat({ user, profile }) {
                 onClick={handleClear}
               >Очистити</button>
               <button
-                style={{ fontSize: 11, padding: '3px 8px', background: 'rgba(255,255,255,0.08)', color: 'var(--dim)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: 6, cursor: 'pointer' }}
+                style={{ fontSize: 11, padding: '3px 8px', background: 'var(--field-bg)', color: 'var(--dim)', border: '1px solid var(--field-bd)', borderRadius: 6, cursor: 'pointer' }}
                 onClick={() => setClearPending(false)}
               >Ні</button>
             </div>
@@ -117,7 +117,7 @@ function DirectChat({ user, profile }) {
           {['Підтверджую ✅','Скасовую ❌','Запізнюся ⏱','Дякую! 🙏','Коли наступний запис?'].map(q => (
             <button key={q} onClick={() => setText(q)} style={{
               flexShrink:0,fontSize:11,padding:'5px 11px',borderRadius:20,
-              border:'1px solid rgba(255,255,255,0.1)',background:'rgba(255,255,255,0.05)',
+              border:'1px solid var(--field-bd)',background:'var(--field-bg)',
               color:'var(--dim)',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',
             }}>{q}</button>
           ))}
@@ -137,7 +137,7 @@ function DirectChat({ user, profile }) {
             onClick={send}
             disabled={!text.trim() || sending}
           >
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
               <line x1="22" y1="2" x2="11" y2="13"/>
               <polygon points="22 2 15 22 11 13 2 9 22 2"/>
             </svg>

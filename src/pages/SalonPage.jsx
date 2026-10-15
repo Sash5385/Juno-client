@@ -74,7 +74,7 @@ export default function SalonPage({ slug }) {
               <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
                 {m.photo
                   ? <img src={m.photo} alt="" style={{ width: 56, height: 56, borderRadius: 16, objectFit: 'cover', flexShrink: 0 }} />
-                  : <div style={{ width: 56, height: 56, borderRadius: 16, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 18, color: '#fff', background: 'linear-gradient(145deg,#c084fc,#7c3aed)' }}>{getInitials(m.name)}</div>}
+                  : <div style={{ width: 56, height: 56, borderRadius: 16, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 900, fontSize: 18, color: '#fff', background: 'linear-gradient(145deg,#9333ea,#6d28d9)' }}>{getInitials(m.name)}</div>}
                 <div style={{ flex: 1, minWidth: 0 }}>
                   <div style={{ fontSize: 17, fontWeight: 800, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{m.name}</div>
                   {m.city && <div style={{ fontSize: 12, color: 'var(--dim)' }}>{m.city}</div>}

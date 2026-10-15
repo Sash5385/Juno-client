@@ -107,9 +107,11 @@
 
 .stat-row {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
+/* непарна остання плитка (3 або 5 показників) займає весь рядок, а не лишається «півплиткою» */
+.stat-row > :last-child:nth-child(odd) { grid-column: 1 / -1; }
 
 .stat-btn {
   background: rgba(255,90,60,0.08);
@@ -127,7 +129,7 @@
 }
 
 .stat-btn .lbl {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--faint);
   letter-spacing: 0.5px;
   text-transform: uppercase;

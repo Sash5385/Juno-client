@@ -60,7 +60,7 @@ export default function About() {
               <div style={{
                 flexShrink: 0, width: 22, height: 22, borderRadius: '50%',
                 background: 'linear-gradient(145deg,var(--acc-hi),var(--accent))',
-                color: '#fff', fontSize: 11, fontWeight: 800,
+                color: 'var(--on-accent, #fff)', fontSize: 11, fontWeight: 800,
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
               }}>{i + 1}</div>
               <div style={{ fontSize: 13, lineHeight: 1.5, color: 'var(--text)' }}>{step}</div>
@@ -79,25 +79,25 @@ export default function About() {
           <div style={{ fontSize: 12, fontWeight: 800, color: 'var(--dim)', textTransform: 'uppercase', letterSpacing: 0.5, marginBottom: 8 }}>
             Вже маєте посилання від майстра?
           </div>
-          <div style={{ display: 'flex', gap: 8 }}>
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: 8 }}>
             <input
               value={code}
               onChange={e => setCode(e.target.value)}
               placeholder="Вставте посилання або код"
               autoCapitalize="none" autoCorrect="off" spellCheck={false}
-              style={{ flex: 1, minWidth: 0, padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}
+              style={{ flex: '1 1 200px', minWidth: 0, padding: '10px 12px', borderRadius: 10, border: '1px solid var(--border)', background: 'var(--bg)', color: 'var(--text)', fontSize: 14 }}
             />
             <button
               disabled={!slug}
               onClick={() => { window.location.href = '/i/' + encodeURIComponent(slug) }}
-              style={{ padding: '10px 14px', borderRadius: 10, border: 'none', background: 'linear-gradient(145deg,var(--acc-hi),var(--accent))', color: '#fff', fontWeight: 800, fontSize: 14, opacity: slug ? 1 : 0.5 }}
+              style={{ flex: '1 1 100px', padding: '10px 14px', borderRadius: 10, border: 'none', background: 'linear-gradient(145deg,var(--acc-hi),var(--accent))', color: 'var(--on-accent, #fff)', fontWeight: 800, fontSize: 14, opacity: slug ? 1 : 0.5 }}
             >Відкрити</button>
           </div>
         </div>
       </div>
 
       <div style={{ marginTop: 40, fontSize: 11, color: 'var(--dim)' }}>© {new Date().getFullYear()} Juno</div>
-      <div style={{ marginTop: 6, fontSize: 10, color: 'var(--dim)', opacity: 0.6 }}>
+      <div style={{ marginTop: 6, fontSize: 11, color: 'var(--dim)' }}>
         {APP_VERSION} · {(window.matchMedia?.('(display-mode: standalone)').matches || window.navigator.standalone === true) ? 'ярлик' : 'браузер'} · {window.location.pathname}{window.location.search}
       </div>
     </div>

@@ -139,7 +139,7 @@ button { font-family: inherit; touch-action: manipulation; }
 
 /* Section title */
 .section-title {
-  font-size: 9px;
+  font-size: 11px;
   color: var(--faint);
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -149,9 +149,12 @@ button { font-family: inherit; touch-action: manipulation; }
 
 .update-banner {
   position: fixed;
-  bottom: 80px;
+  bottom: calc(100px + env(safe-area-inset-bottom, 0px)); /* над нижньою навігацією з виступаючою кнопкою */
+  left: 16px;
   right: 16px;
-  background: #ff5a3c;
+  justify-content: center;
+  text-align: center;
+  background: #d6361a;
   color: #fff;
   padding: 12px 24px;
   border-radius: 24px;
@@ -160,11 +163,12 @@ button { font-family: inherit; touch-action: manipulation; }
   cursor: pointer;
   z-index: 9999;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
-  white-space: nowrap;
   display: flex;
   align-items: center;
   gap: 8px;
 }
+.has-update-banner .cab-content:not(.cab-content--chat),
+.has-update-banner .chat-tab { padding-bottom: calc(176px + 2 * env(safe-area-inset-bottom, 0px)); }
 .update-banner--loading {
   opacity: 0.85;
   pointer-events: none;

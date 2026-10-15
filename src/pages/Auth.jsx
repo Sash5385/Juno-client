@@ -434,7 +434,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
           </div>
 
           {/* Вкладки */}
-          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6,marginBottom:20,background:'rgba(255,255,255,0.07)',border:'1px solid rgba(255,255,255,0.16)',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',borderRadius:14,padding:4}}>
+          <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6,marginBottom:20,background:'var(--auth-bg, rgba(255,255,255,0.07))',border:'1px solid var(--auth-bd, rgba(255,255,255,0.16))',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',borderRadius:14,padding:4}}>
             {[
               {id:'sms', label:'📱 SMS'},
               {id:'email-login', label:'✉️ Email'},
@@ -443,7 +443,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
               return (
                 <button key={tab.id} onClick={()=>{setAuthMode(tab.id);setPhoneError('')}} style={{
                   padding:'9px 0',borderRadius:11,border:'none',cursor:'pointer',fontWeight:700,fontSize:12,
-                  background:isActive?'rgba(255,255,255,0.16)':'transparent',
+                  background:isActive?'var(--auth-hi, rgba(255,255,255,0.16))':'transparent',
                   color:isActive?'var(--text)':'var(--dim)',
                   boxShadow:'none',transition:'all .15s'
                 }}>{tab.label}</button>
@@ -466,8 +466,8 @@ export default function Auth({ user, profile, onProfileSaved }) {
                 disabled={googleLoading}
                 style={{
                   display:'flex',alignItems:'center',justifyContent:'center',gap:10,
-                  width:'100%',padding:'12px 0',borderRadius:14,border:'1px solid rgba(255,255,255,0.18)',
-                  background:'rgba(255,255,255,0.09)',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',cursor:'pointer',fontSize:15,fontWeight:600,
+                  width:'100%',padding:'12px 0',borderRadius:14,border:'1px solid var(--auth-bd, rgba(255,255,255,0.18))',
+                  background:'var(--auth-bg, rgba(255,255,255,0.09))',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',cursor:'pointer',fontSize:15,fontWeight:600,
                   color:'var(--text)',boxShadow:'none',transition:'all .15s'
                 }}
               >
@@ -569,7 +569,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:6}}>
                   <div className="field-label" style={{margin:0}}>Пароль</div>
                   <button onClick={()=>{setResetMode(true);setResetEmail(email);setResetError('');setResetDone(false)}} style={{
-                    background:'none',border:'none',color:'var(--accent)',fontSize:12,cursor:'pointer',fontWeight:700,padding:0
+                    background:'none',border:'none',color:'var(--link, var(--accent))',fontSize:12,cursor:'pointer',fontWeight:700,padding:0
                   }}>Забули пароль?</button>
                 </div>
                 <input className="text-input" type="password" placeholder="Ваш пароль"
@@ -588,7 +588,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
                 </div>
                 <button onClick={()=>{setAuthMode('email-register');setPhoneError('')}} style={{
                   background:'var(--surf-lo)',border:'2px solid var(--accent)',borderRadius:14,
-                  color:'var(--accent)',fontWeight:700,cursor:'pointer',fontSize:16,padding:'12px 0',
+                  color:'var(--link, var(--accent))',fontWeight:700,cursor:'pointer',fontSize:16,padding:'12px 0',
                   boxShadow:'var(--shadow)',transition:'all .15s'
                 }}>Зареєструватись →</button>
               </div>
@@ -616,7 +616,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
             <p style={{textAlign:'center',fontSize:13,color:'var(--dim)',marginTop:16}}>
               Вже є акаунт?{' '}
               <button onClick={()=>{setAuthMode('email-login');setPhoneError('')}} style={{
-                background:'none',border:'none',color:'var(--accent)',fontWeight:700,cursor:'pointer',fontSize:13,padding:0
+                background:'none',border:'none',color:'var(--link, var(--accent))',fontWeight:700,cursor:'pointer',fontSize:13,padding:0
               }}>Увійти</button>
             </p>
           </>)}

@@ -12,7 +12,7 @@ export function useToast() {
     <>
       <style>{`@keyframes _toast-in{from{opacity:0;transform:translateX(-50%) translateY(10px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}`}</style>
       <div style={{
-        position: 'fixed', bottom: 88, left: '50%', transform: 'translateX(-50%)',
+        position: 'fixed', bottom: 'calc(100px + env(safe-area-inset-bottom, 0px))', left: '50%', transform: 'translateX(-50%)',
         zIndex: 9999, maxWidth: 340, width: 'calc(100% - 32px)',
         background: 'var(--surface)',
         borderRadius: 12, padding: '11px 16px',

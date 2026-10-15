@@ -11,6 +11,7 @@
 }
 
 .banner-avatar {
+  text-shadow: 0 1px 2px rgba(0,0,0,0.45);
   width: 28px;
   height: 28px;
   border-radius: 8px;
@@ -43,11 +44,11 @@
 
 .banner-tag {
   display: inline-block;
-  background: linear-gradient(165deg, #5b9bff, #2563eb);
+  background: linear-gradient(165deg, #2f6fee, #1d4ed8);
   color: white;
   padding: 2px 6px;
   border-radius: 6px;
-  font-size: 8px;
+  font-size: 11px;
   font-weight: 800;
   letter-spacing: 0.5px;
   text-transform: uppercase;
@@ -56,9 +57,12 @@
 
 .service-grid {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 10px;
 }
+/* непарна остання плитка не лишається «півплиткою» — займає весь рядок */
+.service-grid > :last-child:nth-child(odd),
+.dur-switch > :last-child:nth-child(odd) { grid-column: 1 / -1; }
 
 .svc-tile {
   background: rgba(0,0,0,0.62);
@@ -116,11 +120,11 @@
 
 .svc-title { font-size: 13px; font-weight: 800; margin-bottom: 3px; }
 .svc-dur { font-size: 11px; color: var(--dim); }
-.svc-lock { font-size: 10px; color: var(--faint); margin-top: 4px; font-style: italic; }
+.svc-lock { font-size: 11px; color: var(--faint); margin-top: 4px; font-style: italic; }
 
 .dur-switch {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 8px;
 }
 
@@ -174,14 +178,14 @@
 }
 
 .cal-nav-btn {
-  width: 22px;
-  height: 22px;
+  width: 30px;
+  height: 30px;
   border-radius: 50%;
   background: #1e2028;
   border: 1px solid rgba(255,255,255,0.1);
   cursor: pointer;
   color: var(--text);
-  font-size: 12px;
+  font-size: 16px;
   font-weight: 900;
   display: flex;
   align-items: center;
@@ -219,7 +223,7 @@
 
 .cal-wd {
   text-align: center;
-  font-size: 9px;
+  font-size: 11px;
   color: var(--faint);
   font-weight: 700;
   letter-spacing: 0.5px;
@@ -331,9 +335,14 @@
 
 .slots-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 10px;
 }
+/* 3 плитки в рядок; неповний останній рядок (1 або 2 плитки) розтягується на всю ширину */
+.slots-grid > * { grid-column: span 2; display: flex; }
+.slots-grid > :last-child:nth-child(3n+1) { grid-column: span 6; }
+.slots-grid > :nth-last-child(2):nth-child(3n+1),
+.slots-grid > :last-child:nth-child(3n+2) { grid-column: span 3; }
 
 .slot {
   background: rgba(34, 197, 94, 0.30);
@@ -393,7 +402,7 @@
 
 .slot.taken .slot-time {
   text-decoration: line-through;
-  opacity: 0.5;
+  opacity: 0.75;
 }
 
 .slot.my-queue {
@@ -435,7 +444,7 @@
 .slot.my-queue .slot-queue svg { color: white; }
 
 .slot-queue-num {
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   color: var(--gold);
   margin-left: 2px;
@@ -452,7 +461,7 @@
   background: var(--surf-lo);
   border-radius: 10px;
   box-shadow: var(--shadow-in);
-  font-size: 10px;
+  font-size: 11px;
   color: var(--dim);
   align-items: center;
   flex-wrap: wrap;
@@ -566,7 +575,8 @@
 }
 
 .dialog-btn {
-  flex: 1;
+  flex: 1 1 0;
+  min-width: 0;
   padding: 14px;
   border-radius: 14px;
   border: none;

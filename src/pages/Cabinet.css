@@ -15,7 +15,8 @@
   display: flex;
   flex-direction: column;
   padding: 0 16px;
-  padding-bottom: calc(80px + 2 * env(safe-area-inset-bottom));
+  /* Нижня навігація ≈60px + кругла кнопка «Записатись» виступає ще на 24px: з запасом, щоб останній елемент не ховався під нею */
+  padding-bottom: calc(100px + 2 * env(safe-area-inset-bottom));
 }
 
 .cab-content--chat {
@@ -30,8 +31,11 @@
     position: relative;
     box-shadow: 0 0 80px rgba(0,0,0,0.6);
   }
-
-  .botnav {
+}
+/* Планшет 600–899px: навігація в межах вузької колонки (раніше це правило перебивалось базовим position:fixed нижче
+   і панель розтягувалась на весь екран, а контент лишався колонкою 430px) */
+@media (min-width: 600px) and (max-width: 899px) {
+  .cabinet-page > .botnav {
     position: absolute;
     left: 0;
     right: 0;
@@ -61,6 +65,19 @@
 .cab-title { font-size: 13px; font-weight: 800; letter-spacing: -0.3px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 6px; }
 
 .cab-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
+.cab-nav-group { display: flex; gap: 4px; flex-shrink: 0; }
+
+/* Вузькі екрани: 8 кнопок шапки забирають майже всю ширину — стискаємо проміжки й кегль, щоб назва вкладки читалась, а не «З…» */
+@media (max-width: 420px) {
+  .cab-topbar { padding-left: 8px; padding-right: 8px; }
+  .cab-nav-group { gap: 2px; }
+  .cab-actions { gap: 2px; }
+  .cab-title { font-size: 12px; padding: 0 4px; }
+}
+/* ≤359px (320): для назви взагалі немає місця — ховаємо її замість обрізання до «…» (активна вкладка видна в навігації) */
+@media (max-width: 359px) {
+  .cab-title { display: none; }
+}
 
 .cab-icon-btn {
   width: 28px; height: 28px; border-radius: 9px;
@@ -97,7 +114,7 @@
   position: absolute; top: -2px; right: -2px;
   background: var(--accent); color: white;
   border-radius: 10px; padding: 1px 6px;
-  font-size: 9px; font-weight: 800;
+  font-size: 11px; font-weight: 800;
   box-shadow: 0 0 8px rgba(255,90,60,0.6);
 }
 
@@ -137,7 +154,7 @@
   flex: 1 1 0; min-width: 0;
   background: transparent; border: none; cursor: pointer;
   display: flex; flex-direction: column; align-items: center;
-  gap: 3px; padding: 10px 2px 9px;
+  gap: 3px; padding: 10px 0 9px;
   position: relative;
 }
 
@@ -155,7 +172,8 @@
 
 [data-theme="light"] .botnav-btn.active .botnav-ico { color: var(--accent); }
 
-.botnav-lbl { font-size: 8px; font-weight: 700; color: rgba(255,255,255,0.45); white-space: nowrap; }
+.botnav-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.45); white-space: nowrap; }
+@media (min-width: 360px) { .botnav-lbl { font-size: 11px; } }
 [data-theme="light"] .botnav-lbl { color: var(--faint); }
 .botnav-btn.active .botnav-lbl { color: var(--accent); }
 
@@ -163,7 +181,7 @@
   position: absolute; top: 0; right: 30%;
   background: var(--accent); color: white;
   border-radius: 10px; padding: 1px 5px;
-  font-size: 9px; font-weight: 800;
+  font-size: 11px; font-weight: 800;
   box-shadow: 0 0 8px rgba(255,90,60,0.6);
 }
 

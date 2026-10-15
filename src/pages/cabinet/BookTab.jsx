@@ -841,7 +841,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             <div style={{color:'var(--text)', fontSize:12, marginTop:2}}>{nextLessonLabel}</div>
           </div>
           {nextLesson.status === 'pending' && (
-            <div className="nl-pending" style={{fontSize:10, fontWeight:700, padding:'2px 8px', borderRadius:6, flexShrink:0}}>очікує</div>
+            <div className="nl-pending" style={{fontSize:11, fontWeight:700, padding:'2px 8px', borderRadius:6, flexShrink:0}}>очікує</div>
           )}
         </div>
       )}
@@ -875,7 +875,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         }}>
           <span style={{fontSize:22}}>🎫</span>
           <div>
-            <div style={{color:'#4ade80', fontWeight:600, fontSize:14}}>
+            <div style={{color:'var(--ok)', fontWeight:600, fontSize:14}}>
               Передоплачено {profile.lessonBalance} {profile.lessonBalance === 1 ? 'запис' : profile.lessonBalance < 5 ? 'записи' : 'записів'}
             </div>
             <div style={{color:'var(--dim)', fontSize:12}}>Бронюйте — записи вже оплачені</div>
@@ -987,7 +987,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                     <div className="svc-dur">{formatDurShort(svc.duration || 60)}</div>
                     <div style={{fontSize:12, fontWeight:700, color:'var(--dim)', marginTop:2}}>{price > 0 ? `${price} ₴` : ''}</div>
                     {normAddons(svc.addons).length > 0 && (
-                      <div style={{fontSize:10, color:'var(--faint)', marginTop:3}}>+ допуслуги</div>
+                      <div style={{fontSize:11, color:'var(--faint)', marginTop:3}}>+ допуслуги</div>
                     )}
                   </div>
                 )
@@ -1003,7 +1003,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   return (
                     <button key={a.id} type="button" className={`dur-pill${on ? ' active' : ''}`} onClick={() => toggleAddon(a.id)} style={{padding:'8px 6px'}}>
                       <div style={{fontSize:12, fontWeight:800}}>{on ? '✓ ' : '+ '}{a.name}</div>
-                      <div style={{fontSize:10, fontWeight:700, opacity:0.8, marginTop:2}}>{a.price > 0 ? `${a.price} ₴` : 'безкоштовно'}{a.minutes > 0 ? ` · +${a.minutes} хв` : ''}</div>
+                      <div style={{fontSize:11, fontWeight:700, opacity:0.9, marginTop:2}}>{a.price > 0 ? `${a.price} ₴` : 'безкоштовно'}{a.minutes > 0 ? ` · +${a.minutes} хв` : ''}</div>
                     </button>
                   )
                 })}
@@ -1056,18 +1056,18 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                       >
                         <div className="slot-time">{slot.time}</div>
                         {isExactlyMine ? (
-                          <div className="slot-mine" style={{fontSize:8, fontWeight:700}}>ваш</div>
+                          <div className="slot-mine" style={{fontSize:11, fontWeight:700}}>ваш</div>
                         ) : isPartOfMyBooking ? null
                         : isMyReserved ? (
-                          <div style={{fontSize:8, color:'white', fontWeight:700}}>ваш!</div>
+                          <div style={{fontSize:11, color:'inherit', fontWeight:700}}>ваш!</div>
                         ) : isLunch ? (
-                          <div style={{fontSize:8, opacity:0.5}}>обід</div>
+                          <div style={{fontSize:11, opacity:0.75}}>обід</div>
                         ) : isVipLocked ? (
-                          <div style={{fontSize:8, opacity:0.5}}>👑</div>
+                          <div style={{fontSize:11, opacity:0.75}}>👑</div>
                         ) : isTakenByOthers || isOverlap ? (
-                          <div style={{fontSize:8, opacity:0.7}}>зайнято</div>
+                          <div style={{fontSize:11, opacity:0.85}}>зайнято</div>
                         ) : slot.totalSurcharge ? (
-                          <div className="slot-sur" style={{fontSize:8, fontWeight:700}}>{slot.totalPrice}₴</div>
+                          <div className="slot-sur" style={{fontSize:11, fontWeight:700}}>{slot.totalPrice}₴</div>
                         ) : isMyQueue ? (
                           <div className="slot-queue">
                             <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
@@ -1078,12 +1078,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         ) : (
                           // Тривалість і ціна прямо на плитці — як в ID4
                           <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:1}}>
-                            <div className="slot-dur" style={{fontSize:10, fontWeight:700}}>{formatDurShort(Math.round((slot.needHours || slot.slotDurHours || baseDurationHours) * 60))}</div>
+                            <div className="slot-dur" style={{fontSize:11, fontWeight:700}}>{formatDurShort(Math.round((slot.needHours || slot.slotDurHours || baseDurationHours) * 60))}</div>
                             {slot.totalPrice > 0 && (
-                              <div className="slot-price" style={{fontSize:10, fontWeight:700}}>{slot.totalPrice}₴</div>
+                              <div className="slot-price" style={{fontSize:11, fontWeight:700}}>{slot.totalPrice}₴</div>
                             )}
                             {isGroup && (
-                              <div style={{fontSize:9, fontWeight:700, color:'#93c5fd'}}>👥 {slot.joinGroup ? seatsLabel(slot.groupLeft) : `до ${capacityOf(selectedService)}`}</div>
+                              <div style={{fontSize:11, fontWeight:700, color:'var(--info)'}}>👥 {slot.joinGroup ? seatsLabel(slot.groupLeft) : `до ${capacityOf(selectedService)}`}</div>
                             )}
                           </div>
                         )}
@@ -1092,11 +1092,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         <button
                           onClick={() => leaveQueue(user.uid, formatDateYMD(selectedDate), slot.time)}
                           style={{
-                            position:'absolute', top:-6, right:-6,
-                            width:16, height:16, borderRadius:'50%',
+                            position:'absolute', top:-8, right:-8,
+                            width:22, height:22, borderRadius:'50%',
                             background:'rgba(239,68,68,0.9)', border:'none', cursor:'pointer',
                             display:'flex', alignItems:'center', justifyContent:'center',
-                            fontSize:9, color:'white', fontWeight:900, lineHeight:1,
+                            fontSize:11, color:'white', fontWeight:900, lineHeight:1,
                             boxShadow:'0 2px 6px rgba(239,68,68,0.6)', zIndex:5,
                           }}
                           title="Вийти з черги"
@@ -1158,7 +1158,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               <div style={{
                 marginTop:12, padding:'10px 14px', borderRadius:12,
                 background:'rgba(74,222,128,0.08)', border:'1px solid rgba(74,222,128,0.35)',
-                fontSize:13, color:'#4ade80', fontWeight:700, textAlign:'center',
+                fontSize:13, color:'var(--ok)', fontWeight:700, textAlign:'center',
               }}>
                 Фіксована ціна: <strong>{ctaFixed}₴</strong>
               </div>
@@ -1168,29 +1168,29 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 background:'rgba(247,201,72,0.08)', border:'1px solid rgba(247,201,72,0.35)',
                 display:'flex', flexDirection:'column', gap:4,
               }}>
-                <div style={{fontSize:13, color:'#f7c948', fontWeight:700}}>
+                <div style={{fontSize:13, color:'var(--warn)', fontWeight:700}}>
                   ⚠️ Ціна за цей час: <strong>{servicePrice}₴</strong>
                 </div>
-                <div style={{fontSize:11, color:'rgba(247,201,72,0.7)'}}>
+                <div style={{fontSize:11, color:'var(--warn)'}}>
                   {customPriceAmt != null ? 'Індивідуальна' : 'Стандартна'} {baseP}₴ + надбавка +{surcharge}₴{customPriceAmt == null && discountAmt > 0 ? ` − знижка ${discountAmt * baseHours}₴` : ''}
                 </div>
               </div>
             ) : servicePrice > 0 ? (
               <div style={{
                 marginTop:12, padding:'8px 14px', borderRadius:12,
-                background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)',
+                background:'var(--field-bg)', border:'1px solid var(--field-bd)',
                 fontSize:12, color:'var(--dim)', textAlign:'center',
               }}>
                 Вартість запису: <strong style={{color:'var(--text)'}}>{servicePrice}₴</strong>
-                {customPriceAmt == null && discountAmt > 0 && <span style={{marginLeft:6, color:'#4ade80', fontSize:11}}>−{discountAmt * baseHours}₴</span>}
+                {customPriceAmt == null && discountAmt > 0 && <span style={{marginLeft:6, color:'var(--ok)', fontSize:11}}>−{discountAmt * baseHours}₴</span>}
               </div>
             ) : null}
             {pkgAvail && (
               <button type="button" onClick={() => setUsePackage(v => !v)} style={{
                 display:'flex', alignItems:'center', gap:10, width:'100%', marginTop:12, padding:'10px 14px', borderRadius:12, cursor:'pointer', fontFamily:'inherit', textAlign:'left',
-                background: pkgOn ? 'rgba(74,222,128,0.08)' : 'rgba(255,255,255,0.04)',
-                border: pkgOn ? '1px solid rgba(74,222,128,0.35)' : '1px solid rgba(255,255,255,0.08)',
-                fontSize:13, fontWeight:700, color: pkgOn ? '#4ade80' : 'var(--dim)',
+                background: pkgOn ? 'rgba(74,222,128,0.08)' : 'var(--field-bg)',
+                border: pkgOn ? '1px solid rgba(74,222,128,0.35)' : '1px solid var(--field-bd)',
+                fontSize:13, fontWeight:700, color: pkgOn ? 'var(--ok)' : 'var(--dim)',
               }}>
                 <span style={{fontSize:18}}>🎫</span>
                 <span style={{flex:1}}>Списати з пакета «{pkgAvail.name}» <span style={{fontWeight:600, color:'var(--dim)'}}>(лишилось {pkgAvail.left}, {expiresLabel(pkgAvail)})</span></span>
@@ -1200,7 +1200,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             {chosenAddons.length > 0 && (
               <div style={{
                 marginTop:8, padding:'8px 14px', borderRadius:12,
-                background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)',
+                background:'var(--field-bg)', border:'1px solid var(--field-bd)',
                 fontSize:12, color:'var(--dim)', textAlign:'center', lineHeight:1.5,
               }}>
                 ➕ {addonsLabel(chosenAddons)}: <strong style={{color:'var(--text)'}}>+{addonTot.price}₴</strong>{addonTot.minutes > 0 ? ` · +${addonTot.minutes} хв` : ''}
@@ -1215,8 +1215,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               rows={2}
               style={{
                 width:'100%', marginTop:10, padding:'10px 12px',
-                borderRadius:12, border:'1px solid rgba(255,255,255,0.1)',
-                background:'rgba(255,255,255,0.04)', color:'var(--text)',
+                borderRadius:12, border:'1px solid var(--field-bd)',
+                background:'var(--field-bg)', color:'var(--text)',
                 fontSize:13, fontFamily:'inherit', resize:'none',
                 boxSizing:'border-box', outline:'none',
               }}
@@ -1243,10 +1243,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               {intakeForm.fields.map(f => {
                 const val = intakeAnswers[f.id] || ''
                 const set = (v) => setIntakeAnswers(a => ({ ...a, [f.id]: v }))
-                const box = { width:'100%', padding:'10px 12px', borderRadius:12, border:'1px solid rgba(255,255,255,0.1)', background:'rgba(255,255,255,0.04)', color:'var(--text)', fontSize:14, fontFamily:'inherit', boxSizing:'border-box', outline:'none' }
+                const box = { width:'100%', padding:'10px 12px', borderRadius:12, border:'1px solid var(--field-bd)', background:'var(--field-bg)', color:'var(--text)', fontSize:14, fontFamily:'inherit', boxSizing:'border-box', outline:'none' }
                 return (
                   <div key={f.id}>
-                    <div style={{fontSize:12, fontWeight:700, color:'var(--text)', marginBottom:5}}>{f.label}{f.required && <span style={{color:'#f87171'}}> *</span>}</div>
+                    <div style={{fontSize:12, fontWeight:700, color:'var(--text)', marginBottom:5}}>{f.label}{f.required && <span style={{color:'var(--bad)'}}> *</span>}</div>
                     {f.type === 'text' && <input value={val} maxLength={200} onChange={e => set(e.target.value)} style={box} />}
                     {f.type === 'date' && <input type="date" value={val} onChange={e => set(e.target.value)} style={box} />}
                     {f.type === 'yesno' && (
@@ -1256,7 +1256,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                     )}
                     {f.type === 'select' && (
                       <div style={{display:'flex', flexWrap:'wrap', gap:8}}>
-                        {f.options.map(o => <button key={o} type="button" className={`dur-pill${val === o ? ' active' : ''}`} style={{padding:'8px 12px'}} onClick={() => set(val === o ? '' : o)}>{o}</button>)}
+                        {f.options.map(o => <button key={o} type="button" className={`dur-pill${val === o ? ' active' : ''}`} style={{padding:'8px 12px', flex:'1 1 120px'}} onClick={() => set(val === o ? '' : o)}>{o}</button>)}
                       </div>
                     )}
                   </div>
@@ -1343,8 +1343,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   <span className="lbl">Ціна</span>
                   <span className="val" style={{color:'var(--gold)'}}>
                     {successData.price != null ? successData.price : lessonPrice(successData.durationHours, successData.surcharge || 0)} ₴
-                    {successData.surcharge > 0 && !successData.packageName && <span style={{fontSize:10, color:'var(--gold)', opacity:0.7}}> (+{successData.surcharge}₴)</span>}
-                    {customPriceAmt == null && discountAmt > 0 && !successData.packageName && <span style={{fontSize:10, color:'#4ade80', marginLeft:4}}>−{discountAmt * (successData.baseHours ?? successData.durationHours)}₴</span>}
+                    {successData.surcharge > 0 && !successData.packageName && <span style={{fontSize:11, color:'var(--gold)'}}> (+{successData.surcharge}₴)</span>}
+                    {customPriceAmt == null && discountAmt > 0 && !successData.packageName && <span style={{fontSize:11, color:'var(--ok)', marginLeft:4}}>−{discountAmt * (successData.baseHours ?? successData.durationHours)}₴</span>}
                   </span>
                 </div>
               )}
@@ -1412,8 +1412,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   </div>
                   {customPriceAmt == null && discountAmt > 0 && (
                     <div className="dialog-info-row">
-                      <span className="lbl" style={{color:'#4ade80'}}>Знижка</span>
-                      <span className="val" style={{color:'#4ade80'}}>−{discountAmt * (dialogSlot.slotDurHours || baseDurationHours)}₴</span>
+                      <span className="lbl" style={{color:'var(--ok)'}}>Знижка</span>
+                      <span className="val" style={{color:'var(--ok)'}}>−{discountAmt * (dialogSlot.slotDurHours || baseDurationHours)}₴</span>
                     </div>
                   )}
                   <div className="dialog-info-row" style={{borderTop:'1px solid rgba(255,255,255,0.07)', marginTop:4, paddingTop:4}}>

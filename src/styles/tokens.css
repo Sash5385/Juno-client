@@ -15,6 +15,15 @@
   --green: #7ed957;
   --blue: #5b9bff;
   --gold: #f7c948;
+  /* текстові кольори статусів: у світлій темі темніші, щоб читались на світлому тлі */
+  --ok: #86efac;
+  --bad: #f87171;
+  --warn: #fbbf24;
+  --info: #93c5fd;
+  --violet: #c084fc;
+  /* поля й другорядні кнопки: напівпрозорий білий невидимий на світлому тлі */
+  --field-bg: rgba(255,255,255,0.04);
+  --field-bd: rgba(255,255,255,0.1);
   --shadow: 0 6px 30px rgba(0,0,0,0.75), 0 2px 8px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.05);
   --shadow-in: inset 4px 4px 14px rgba(0,0,0,0.7), inset -2px -2px 6px rgba(255,255,255,0.03);
 }
@@ -30,6 +39,17 @@
   --text: #1c1d21;
   --dim: #3c3e45;
   --faint: #6b6d75;
+  --ok: #166534;
+  --bad: #991b1b;
+  --warn: #92400e;
+  --info: #1d4ed8;
+  --violet: #7e22ce;
+  --field-bg: rgba(23,35,58,0.05);
+  --field-bd: rgba(23,35,58,0.2);
+  /* Auth: у темній темі лишаються власні значення (fallback у var()), у світлій — видимі */
+  --auth-bg: rgba(255,255,255,0.55);
+  --auth-bd: rgba(23,35,58,0.2);
+  --auth-hi: #ffffff;
   --shadow: 8px 8px 20px rgba(174,178,189,0.45), -4px -4px 12px rgba(255,255,255,0.9);
   --shadow-in: inset 3px 3px 8px rgba(174,178,189,0.4), inset -2px -2px 6px rgba(255,255,255,0.7);
 }

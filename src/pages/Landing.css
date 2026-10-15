@@ -650,7 +650,7 @@
 .pricing-bubble-lbl { font-size: 12px; font-weight: 800; color: var(--text); margin-bottom: 8px; }
 .pricing-bubble-num { font-size: 28px; font-weight: 900; letter-spacing: -1px; line-height: 1; color: var(--c); }
 .pricing-bubble-num span { font-size: 11px; font-weight: 700; color: var(--dim); }
-.pricing-bubble-sub { font-size: 10.5px; color: var(--dim); margin-top: 8px; }
+.pricing-bubble-sub { font-size: 11px; color: var(--dim); margin-top: 8px; }
 .pricing-bubble-sub b { color: var(--text); font-weight: 700; }
 
 /* NEAREST SLOTS */
@@ -696,8 +696,8 @@
   cursor: pointer;
 }
 .slot-chip.active { border-color: rgba(255,90,60,0.5); box-shadow: 0 6px 20px rgba(255,90,60,0.25); }
-.slot-chip-day { font-size: 10px; font-weight: 700; color: var(--dim); text-transform: uppercase; }
-.slot-chip-date { font-size: 9px; font-weight: 600; color: var(--faint); }
+.slot-chip-day { font-size: 11px; font-weight: 700; color: var(--dim); text-transform: uppercase; }
+.slot-chip-date { font-size: 11px; font-weight: 600; color: var(--faint); }
 .slot-chip-time { font-size: 16px; font-weight: 900; color: #22c55e; }
 .slot-chip.active .slot-chip-time { color: var(--acc-hi); }
 
@@ -752,12 +752,12 @@
   font-size: 12px;
   font-weight: 800;
   color: white;
-  background: linear-gradient(165deg, #9ee07a, #5fb83d);
+  background: linear-gradient(165deg, #22863a, #15803d);
   box-shadow: -2px 2px 6px rgba(0,0,0,0.3), inset 1px 1px 0 rgba(255,255,255,0.2);
 }
 
 .review-name { font-size: 12px; font-weight: 700; }
-.review-date { font-size: 10px; color: var(--faint); }
+.review-date { font-size: 11px; color: var(--faint); }
 
 /* CONTACTS */
 .contacts {
@@ -813,18 +813,18 @@
 .contact-ico.loc { background: linear-gradient(165deg, #fb923c, #ea580c); }
 .contact-ico.tg { background: linear-gradient(165deg, #5b9bff, #2563eb); }
 
-.contact-label { font-size: 10px; color: var(--faint); letter-spacing: 1px; text-transform: uppercase; }
+.contact-label { font-size: 11px; color: var(--faint); letter-spacing: 1px; text-transform: uppercase; }
 .contact-val { font-size: 13px; font-weight: 700; }
 
 .contact-icon-row {
-  display: flex;
-  justify-content: center;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr)); /* 4 кнопки зв'язку — на всю ширину, однакові */
   gap: 14px;
   padding: 8px 0;
 }
 
 .contact-icon-btn {
-  width: 56px;
+  width: 100%;
   height: 56px;
   border-radius: 16px;
   display: flex;
@@ -1131,7 +1131,7 @@
 }
 
 .devby small {
-  font-size: 5px;
+  font-size: 10px;
   font-weight: 700;
   letter-spacing: 1.2px;
   text-transform: uppercase;
@@ -1159,7 +1159,7 @@
 }
 
 .devby span {
-  font-size: 6px;
+  font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2px;
   color: var(--dim);
@@ -1196,4 +1196,21 @@
   cursor: pointer;
   padding: 6px 10px;
   font-family: inherit;
+}
+
+/* Світла тема: картки «ціни / найближче вікно / слоти» були темним склом з світлим текстом на світлому тлі */
+[data-theme="light"] .pricing-bubble {
+  background: linear-gradient(155deg, color-mix(in srgb, var(--c) 28%, #fff) 0%, #fff 100%);
+  box-shadow: 0 6px 18px rgba(60,80,120,0.14);
+}
+[data-theme="light"] .pricing-bubble-num { color: color-mix(in srgb, var(--c) 45%, #000); }
+[data-theme="light"] .next-slot-card {
+  background: linear-gradient(165deg, rgba(34,197,94,0.16), var(--surface));
+  box-shadow: 0 6px 18px rgba(60,80,120,0.14);
+}
+[data-theme="light"] .next-slot-big,
+[data-theme="light"] .slot-chip-time { color: #15803d; }
+[data-theme="light"] .slot-chip {
+  background: var(--surface);
+  box-shadow: 0 4px 14px rgba(60,80,120,0.12);
 }

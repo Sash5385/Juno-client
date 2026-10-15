@@ -36,7 +36,7 @@
 }
 
 .booking-mon {
-  font-size: 10px;
+  font-size: 11px;
   color: var(--dim);
   margin-top: 2px;
   text-transform: uppercase;
@@ -67,7 +67,7 @@
   display: inline-block;
   padding: 3px 8px;
   border-radius: 8px;
-  font-size: 9px;
+  font-size: 11px;
   font-weight: 800;
   text-transform: uppercase;
   letter-spacing: 0.5px;
@@ -76,7 +76,7 @@
 
 .status-confirmed {
   background: rgba(126,217,87,0.15);
-  color: #7ed957;
+  color: var(--ok);
 }
 
 .status-pending {
@@ -86,7 +86,7 @@
 
 .status-cancelled {
   background: rgba(239,68,68,0.15);
-  color: #ef4444;
+  color: var(--bad);
 }
 
 .booking-actions {
@@ -101,11 +101,13 @@
   gap: 5px;
   margin-top: 6px;
 }
+/* пара кнопок календаря: однакові за шириною й висотою, на всю ширину блоку */
+.booking-cal-row .cal-add-btn { flex: 1 1 0; min-width: 0; text-align: center; }
 
 .cal-add-btn {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
-  padding: 3px 8px;
+  padding: 8px 8px;
   border-radius: 7px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);

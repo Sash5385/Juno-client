@@ -120,8 +120,9 @@
   border-radius: 14px;
   background: linear-gradient(180deg, #005bbb 50%, #ffd500 50%);
   display: flex;
-  align-items: center;
+  align-items: flex-start; /* підпис лишається в синій половині — білий на жовтому не читався */
   justify-content: center;
+  padding-top: 5px;
   font-size: 12px;
   font-weight: 900;
   color: white;

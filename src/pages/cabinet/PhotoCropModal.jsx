@@ -99,7 +99,7 @@ export default function PhotoCropModal({ file, round, outSize, title, onCancel, 
         )}
         <div style={{ display:"flex", gap:10 }}>
           <button onClick={onCancel} disabled={saving} style={{ flex:1, padding:"14px", borderRadius:14, border:`1px solid ${BORDER}`, background:"rgba(255,255,255,0.05)", color:TEXT, fontSize:15, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Скасувати</button>
-          <button onClick={save} disabled={!img || saving || err} style={{ flex:2, padding:"14px", borderRadius:14, border:"none", background:GOLD, color:"#1a1a1a", fontSize:15, fontWeight:800, cursor:"pointer", fontFamily:"inherit", opacity:(!img||err)?0.5:1 }}>{saving ? "Зберігаю…" : "Зберегти"}</button>
+          <button onClick={save} disabled={!img || saving || err} style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:GOLD, color:"var(--on-gold, #1a1a1a)", fontSize:15, fontWeight:800, cursor:"pointer", fontFamily:"inherit", opacity:(!img||err)?0.5:1 }}>{saving ? "Зберігаю…" : "Зберегти"}</button>
         </div>
       </div>
     </div>,

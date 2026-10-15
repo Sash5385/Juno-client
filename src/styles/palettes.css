@@ -176,7 +176,7 @@ html:is([data-palette="neon"], [data-palette="ocean"]) body[data-theme] .cab-ico
 
 
 /* ── Туман · dark (скло як в адмінці) ── */
-html[data-palette="fog"] body[data-theme="dark"]{--bg:#10141c;--bg-deep:#0b0f16;--surface:#171d2a;--surf-hi:#1f2738;--surf-lo:#0f141d;--border:rgba(255,255,255,0.1);--text:#e8edf6;--dim:#8c98ae;--faint:#5f6b80;--accent:#60a5fa;--acc-hi:#93c5fd;--green:#4ade80;--blue:#60a5fa;--gold:#fbbf24;--shadow:none;color-scheme:dark;}
+html[data-palette="fog"] body[data-theme="dark"]{--bg:#10141c;--bg-deep:#0b0f16;--surface:#171d2a;--surf-hi:#1f2738;--surf-lo:#0f141d;--border:rgba(255,255,255,0.1);--text:#e8edf6;--on-accent:#06182e;--link:#93c5fd;--dim:#c6cfde;--faint:#aab5c8;--accent:#60a5fa;--acc-hi:#93c5fd;--green:#4ade80;--blue:#60a5fa;--gold:#fbbf24;--shadow:none;color-scheme:dark;}
 html[data-palette="fog"] body[data-theme="dark"] #root::before{background:radial-gradient(circle at 0% 0%,rgba(96,165,250,.35),transparent 48%),radial-gradient(circle at 100% 80%,rgba(129,140,248,.3),transparent 50%)}
 html[data-palette="fog"] body[data-theme="dark"] .cab-topbar{background:transparent;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
 html[data-palette="fog"] body[data-theme="dark"] .cal-card,html[data-palette="fog"] body[data-theme="dark"] .svc-tile,html[data-palette="fog"] body[data-theme="dark"] .user-banner,html[data-palette="fog"] body[data-theme="dark"] .booking-card,html[data-palette="fog"] body[data-theme="dark"] .profile-section,html[data-palette="fog"] body[data-theme="dark"] .profile-banner,html[data-palette="fog"] body[data-theme="dark"] .empty-state{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:18px;box-shadow:none}
@@ -190,7 +190,7 @@ html[data-palette="fog"] body[data-theme="dark"] .slot{border-radius:14px;backgr
 html[data-palette="fog"] body[data-theme="dark"] .slot.taken{background:rgba(248,113,113,.16);border-color:rgba(248,113,113,.38)}
 html[data-palette="fog"] body[data-theme="dark"] .slot.selected{background:linear-gradient(145deg,#93c5fd,#60a5fa);color:#06182e;border-color:transparent}
 html[data-palette="fog"] body[data-theme="dark"] .btn-primary,html[data-palette="fog"] body[data-theme="dark"] .btn-login{background:linear-gradient(145deg,#93c5fd,#60a5fa);color:#06182e;border:none;border-radius:16px;font-weight:700;box-shadow:none}
-html[data-palette="fog"] body[data-theme="dark"] .botnav-inner{background:rgba(255,255,255,.06);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:26px;box-shadow:none}
+html[data-palette="fog"] body[data-theme="dark"] .botnav-inner{background:rgba(14,19,29,.88);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,.1);border-radius:26px;box-shadow:none}
 html[data-palette="fog"] body[data-theme="dark"] .botnav-ico{color:var(--text)}
 html[data-palette="fog"] body[data-theme="dark"] .botnav-lbl{color:var(--faint)}
 html[data-palette="fog"] body[data-theme="dark"] .botnav-btn.active .botnav-ico,html[data-palette="fog"] body[data-theme="dark"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
@@ -201,7 +201,7 @@ html[data-palette="fog"] body[data-theme="dark"] .cab-icon-btn{width:30px;height
 html[data-palette="fog"] body[data-theme="dark"] .cab-icon-btn::before{display:none}
 
 /* ── Туман · light (скло як в адмінці) ── */
-html[data-palette="fog"] body[data-theme="light"]{--bg:#e9eef8;--bg-deep:#dfe7f5;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#eef2fa;--border:rgba(23,35,58,0.1);--text:#17233a;--dim:#5d6c88;--faint:#8f9bb3;--accent:#3b82f6;--acc-hi:#60a5fa;--green:#16a34a;--blue:#3b82f6;--gold:#d97706;--shadow:0 4px 18px rgba(60,80,120,.12);color-scheme:light;}
+html[data-palette="fog"] body[data-theme="light"]{--bg:#e9eef8;--bg-deep:#dfe7f5;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#eef2fa;--border:rgba(23,35,58,0.1);--text:#17233a;--dim:#3f4c66;--faint:#4f5d78;--accent:#1d4ed8;--acc-hi:#2f6fee;--green:#15803d;--blue:#3b82f6;--gold:#a3480a;--on-gold:#fff;--link:#1e40af;--shadow:0 4px 18px rgba(60,80,120,.12);color-scheme:light;}
 html[data-palette="fog"] body[data-theme="light"] #root::before{background:radial-gradient(circle at 0% 0%,rgba(96,165,250,.3),transparent 48%),radial-gradient(circle at 100% 80%,rgba(129,140,248,.22),transparent 50%)}
 html[data-palette="fog"] body[data-theme="light"] .cab-topbar{background:transparent;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--border)}
 html[data-palette="fog"] body[data-theme="light"] .cal-card,html[data-palette="fog"] body[data-theme="light"] .svc-tile,html[data-palette="fog"] body[data-theme="light"] .user-banner,html[data-palette="fog"] body[data-theme="light"] .booking-card,html[data-palette="fog"] body[data-theme="light"] .profile-section,html[data-palette="fog"] body[data-theme="light"] .profile-banner,html[data-palette="fog"] body[data-theme="light"] .empty-state{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(23,35,58,.1);border-radius:18px;box-shadow:0 4px 18px rgba(60,80,120,.12)}
@@ -209,18 +209,42 @@ html[data-palette="fog"] body[data-theme="light"] .cal-day{border-radius:12px;bo
 html[data-palette="fog"] body[data-theme="light"] .cal-day.day-free{background:rgba(22,163,74,.14);border-color:rgba(22,163,74,.4);color:#15803d;box-shadow:none}
 html[data-palette="fog"] body[data-theme="light"] .cal-day.day-partial{background:rgba(217,119,6,.14);border-color:rgba(217,119,6,.4);color:#b45309;box-shadow:none}
 html[data-palette="fog"] body[data-theme="light"] .cal-day.day-full{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.34);color:#b91c1c;box-shadow:none}
-html[data-palette="fog"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff !important;border-color:transparent;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.selected{background:linear-gradient(145deg,#2f6fee,#1d4ed8);color:#fff !important;border-color:transparent;box-shadow:none}
 html[data-palette="fog"] body[data-theme="light"] .cal-day.today:not(.selected)::before{border-radius:12px}
 html[data-palette="fog"] body[data-theme="light"] .slot{border-radius:14px;background:rgba(22,163,74,.14);border:1px solid rgba(22,163,74,.4);color:var(--text)}
 html[data-palette="fog"] body[data-theme="light"] .slot.taken{background:rgba(220,38,38,.1);border-color:rgba(220,38,38,.34)}
-html[data-palette="fog"] body[data-theme="light"] .slot.selected{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff;border-color:transparent}
-html[data-palette="fog"] body[data-theme="light"] .btn-primary,html[data-palette="fog"] body[data-theme="light"] .btn-login{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff;border:none;border-radius:16px;font-weight:700;box-shadow:none}
-html[data-palette="fog"] body[data-theme="light"] .botnav-inner{background:rgba(255,255,255,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(23,35,58,.1);border-radius:26px;box-shadow:0 4px 18px rgba(60,80,120,.12)}
+html[data-palette="fog"] body[data-theme="light"] .slot.selected{background:linear-gradient(145deg,#2f6fee,#1d4ed8);color:#fff;border-color:transparent}
+html[data-palette="fog"] body[data-theme="light"] .btn-primary,html[data-palette="fog"] body[data-theme="light"] .btn-login{background:linear-gradient(145deg,#2f6fee,#1d4ed8);color:#fff;border:none;border-radius:16px;font-weight:700;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .botnav-inner{background:rgba(255,255,255,.92);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border:1px solid rgba(23,35,58,.1);border-radius:26px;box-shadow:0 4px 18px rgba(60,80,120,.12)}
 html[data-palette="fog"] body[data-theme="light"] .botnav-ico{color:var(--text)}
 html[data-palette="fog"] body[data-theme="light"] .botnav-lbl{color:var(--faint)}
 html[data-palette="fog"] body[data-theme="light"] .botnav-btn.active .botnav-ico,html[data-palette="fog"] body[data-theme="light"] .botnav-btn.active .botnav-lbl{color:var(--accent)}
-html[data-palette="fog"] body[data-theme="light"] .botnav-fab{background:linear-gradient(145deg,#60a5fa,#3b82f6);color:#fff;border-color:var(--bg);box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] .botnav-fab{background:linear-gradient(145deg,#2f6fee,#1d4ed8);color:#fff;border-color:var(--bg);box-shadow:none}
 html[data-palette="fog"] body[data-theme="light"] .botnav-fab-glow{background:radial-gradient(circle,rgba(96,165,250,.3),transparent 70%)}
 html[data-palette="fog"] body[data-theme="light"] .botnav-badge,html[data-palette="fog"] body[data-theme="light"] .cab-icon-btn .badge{background:var(--accent);color:#fff}
 html[data-palette="fog"] body[data-theme="light"] .cab-icon-btn{width:30px;height:30px;overflow:visible;border-radius:50%;background:rgba(255,255,255,.72);border:1px solid rgba(23,35,58,.1);color:#17233a;box-shadow:none;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px)}
 html[data-palette="fog"] body[data-theme="light"] .cab-icon-btn::before{display:none}
+
+/* ── Туман: читабельність і контраст (аудит клієнта 320–768px) ── */
+/* темний режим: світлі акцентні заливки отримують темний текст, як вже зроблено для .btn-primary */
+html[data-palette="fog"] body[data-theme="dark"] :is(.edit-tile.selected,.edit-save,.theme-btn.active,.chat-tab-btn.active,.dialog-btn.primary,.hero-cta,.footer-cta,.next-slot-cta,.map-route-btn){color:#06182e;box-shadow:none}
+html[data-palette="fog"] body[data-theme="light"] :is(.edit-save,.chat-tab-btn.active,.dialog-btn.primary){box-shadow:0 4px 12px rgba(37,99,235,.25)}
+html[data-palette="fog"] body[data-theme] .dialog-btn.primary::before{display:none}
+/* календар: недоступні дні й «зайняті» читаються (раніше ~1.6:1 і прозорість .75) */
+html[data-palette="fog"] body[data-theme] .cal-day.disabled{color:var(--faint);font-weight:500}
+html[data-palette="fog"] body[data-theme] .cal-day.day-full{opacity:1}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.day-free{color:#166534}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.day-partial{color:#92400e}
+html[data-palette="fog"] body[data-theme="light"] .cal-day.today:not(.selected){color:#92400e !important}
+/* слоти у світлому режимі: підписи темні, не білі/світло-зелені на світлому тлі */
+html[data-palette="fog"] body[data-theme="light"] :is(.slot.my-queue,.slot.my-booked){color:var(--text)}
+html[data-palette="fog"] body[data-theme="light"] .slot:not(.selected) :is(.slot-dur,.slot-mine){color:#166534}
+html[data-palette="fog"] body[data-theme="light"] .slot:not(.selected) .slot-sur{color:#92400e}
+html[data-palette="fog"] body[data-theme="light"] :is(.nl-title,.nl-pill){color:#1e40af}
+/* неактивна головна кнопка: читабельний підпис замість білого на ледь помітному градієнті */
+html[data-palette="fog"] body[data-theme] :is(.btn-primary,.btn-login):disabled{background:var(--surf-lo);color:var(--faint);opacity:1;border:1px solid var(--border);box-shadow:none}
+/* вузькі екрани: кнопки шапки 28px, щоб назва вкладки поміщалась */
+@media (max-width:380px){html[data-palette="fog"] body[data-theme] .cab-icon-btn{width:28px;height:28px}}
+/* світла тема: білий «блік» поверх підписів головних кнопок знижував контраст */
+html[data-palette="fog"] body[data-theme="light"] :is(.hero-cta,.footer-cta,.next-slot-cta,.map-route-btn,.btn-login)::after{display:none}
+html[data-palette="fog"] body[data-theme="dark"] .booking-time{color:var(--acc-hi)}

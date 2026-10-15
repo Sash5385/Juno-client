@@ -86,7 +86,7 @@ export default function QueueTab({ user, profile }) {
 
   return (
     <div style={{ paddingTop:12, display:'flex', flexDirection:'column', gap:10 }}>
-      <div style={{ fontSize:13, fontWeight:800, color:'#fff', textAlign:'center', textTransform:'uppercase', letterSpacing:0.4, marginBottom:2 }}>
+      <div style={{ fontSize:13, fontWeight:800, color:'var(--text)', textAlign:'center', textTransform:'uppercase', letterSpacing:0.4, marginBottom:2 }}>
         Ви стоїте у черзі на {active.length} {active.length === 1 ? 'слот' : active.length < 5 ? 'слоти' : 'слотів'}
       </div>
 
@@ -114,7 +114,7 @@ export default function QueueTab({ user, profile }) {
               </div>
               {isOffered ? (
                 <div style={{
-                  background:'rgba(126,217,87,0.15)', color:'#7ed957',
+                  background:'rgba(126,217,87,0.15)', color:'var(--ok)',
                   borderRadius:8, padding:'4px 10px',
                   fontSize:11, fontWeight:700,
                 }}>🎉 Запрошено</div>
@@ -135,7 +135,7 @@ export default function QueueTab({ user, profile }) {
                   style={{
                     flex:1, padding:'10px',
                     borderRadius:10, border:'none', cursor:'pointer',
-                    background:'rgba(126,217,87,0.15)', color:'#7ed957',
+                    background:'rgba(126,217,87,0.15)', color:'var(--ok)',
                     fontSize:13, fontWeight:700,
                     opacity: busy ? 0.5 : 1,
                     transition:'opacity .15s',
@@ -149,7 +149,7 @@ export default function QueueTab({ user, profile }) {
                   style={{
                     flex:1, padding:'10px',
                     borderRadius:10, border:'none', cursor:'pointer',
-                    background:'rgba(239,68,68,0.1)', color:'#f87171',
+                    background:'rgba(239,68,68,0.1)', color:'var(--bad)',
                     fontSize:13, fontWeight:700,
                     opacity: busy ? 0.5 : 1,
                     transition:'opacity .15s',
@@ -165,7 +165,7 @@ export default function QueueTab({ user, profile }) {
                 style={{
                   width:'100%', padding:'10px',
                   borderRadius:10, border:'none', cursor:'pointer',
-                  background:'rgba(239,68,68,0.1)', color:'#f87171',
+                  background:'rgba(239,68,68,0.1)', color:'var(--bad)',
                   fontSize:13, fontWeight:700,
                   opacity: isLeaving ? 0.5 : 1,
                   transition:'opacity .15s',

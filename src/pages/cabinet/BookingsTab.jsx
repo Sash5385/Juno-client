@@ -349,7 +349,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
       : b.status === 'cancelled' ? 'Скасовано' : 'Очікує'
 
     return (
-      <div key={b.id} className="booking-card" style={isPast ? {opacity:0.6} : {}}>
+      <div key={b.id} className="booking-card" style={isPast ? {opacity:0.92} : {}}>
         <div className="booking-date">
           <div className="booking-day">{d.getDate()}</div>
           <div className="booking-mon">{getMonthShort(d.getMonth())}</div>
@@ -377,29 +377,29 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {(b.status === 'confirmed' || b.status === 'cancelled') && (
               <div className={`booking-status ${statusClass}`}>{statusText}</div>
             )}
-            {b.isPaid && <div style={{fontSize:10,fontWeight:700,color:"#63d37b",padding:"2px 7px",borderRadius:6,background:"rgba(99,211,120,0.12)"}}>✓ Оплачено</div>}
+            {b.isPaid && <div style={{fontSize:11,fontWeight:700,color:"var(--ok)",padding:"2px 7px",borderRadius:6,background:"rgba(99,211,120,0.12)"}}>✓ Оплачено</div>}
             {!isPast && b.status === 'confirmed' && lessonCountdown(b) && (
-              <div style={{fontSize:10,fontWeight:700,color:'#fb923c',padding:'2px 7px',borderRadius:6,background:'rgba(251,146,60,0.1)'}}>⏱ {lessonCountdown(b)}</div>
+              <div style={{fontSize:11,fontWeight:700,color:'var(--warn)',padding:'2px 7px',borderRadius:6,background:'rgba(251,146,60,0.1)'}}>⏱ {lessonCountdown(b)}</div>
             )}
           </div>
           {isPast && b.status === 'confirmed' && b.instructorNote && (
             <div style={{marginTop:6,padding:'7px 10px',borderRadius:9,
               background:'rgba(59,130,246,0.08)',border:'1px solid rgba(59,130,246,0.2)',
               fontSize:11,color:'var(--text)',lineHeight:1.5}}>
-              <span style={{fontSize:9,fontWeight:700,color:'rgba(96,165,250,0.8)',display:'block',marginBottom:2}}>📝 Нотатка майстра</span>
+              <span style={{fontSize:11,fontWeight:700,color:'var(--info)',display:'block',marginBottom:2}}>📝 Нотатка майстра</span>
               {b.instructorNote}
             </div>
           )}
           {isPast && b.status === 'confirmed' && (
             <div style={{marginTop:6,display:'flex',alignItems:'center',gap:4}}>
-              <span style={{fontSize:10,color:'var(--dim)',marginRight:2}}>Оцінка:</span>
+              <span style={{fontSize:11,color:'var(--dim)',marginRight:2}}>Оцінка:</span>
               {[1,2,3,4,5].map(star => (
                 <span
                   key={star}
                   onClick={() => rateBooking(user.uid, b.id, star).catch(()=>{})}
                   style={{
-                    fontSize:18, cursor:'pointer', lineHeight:1,
-                    color: (b.rating || 0) >= star ? '#fbbf24' : 'rgba(255,255,255,0.15)',
+                    fontSize:22, cursor:'pointer', lineHeight:1, padding:'4px 2px',
+                    color: (b.rating || 0) >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)',
                     transition:'color 0.15s',
                   }}
                 >★</span>
@@ -407,7 +407,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             </div>
           )}
           {!isPast && b.status !== 'cancelled' && b.studentConfirmed && (
-            <div className="booking-meta" style={{ color: '#4caf50', marginTop: 4 }}>
+            <div className="booking-meta" style={{ color: 'var(--ok)', marginTop: 4 }}>
               ✓ Ви підтвердили присутність
             </div>
           )}
@@ -440,7 +440,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                   />
                   <div style={{display:'flex',gap:6}}>
                     <button onClick={()=>{saveStudentNote(user.uid,b.id,noteDraft.trim()).catch(()=>{});setNoteOpenId(null);}} style={{flex:1,padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'rgba(99,211,120,0.15)',color:'#63d37b',fontSize:12,fontWeight:700,fontFamily:'inherit'}}>Зберегти</button>
-                    <button onClick={()=>setNoteOpenId(null)} style={{padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'rgba(255,255,255,0.06)',color:'var(--dim)',fontSize:12,fontFamily:'inherit'}}>✕</button>
+                    <button onClick={()=>setNoteOpenId(null)} style={{padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'var(--field-bg)',color:'var(--dim)',fontSize:12,fontFamily:'inherit'}}>✕</button>
                   </div>
                 </div>
               ) : (
@@ -456,7 +456,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" onClick={() => setRescheduleBooking(b)}>📅</button>}
             {cancelConfirmId === b.id ? (
               <>
-                <button className="action-btn" style={{ color: '#e53935', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
+                <button className="action-btn" style={{ color: 'var(--bad)', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
                 <button className="action-btn" style={{ fontSize: 11, padding: '2px 6px' }} onClick={() => setCancelConfirmId(null)}>Ні</button>
               </>
             ) : (
@@ -492,7 +492,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             <div style={{borderRadius:14,background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)',padding:'12px 14px',marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
               <div style={{fontSize:22,flexShrink:0}}>💳</div>
               <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:800,color:'#fca5a5'}}>Заборгованість: {totalDebt} ₴</div>
+                <div style={{fontSize:13,fontWeight:800,color:'var(--bad)'}}>Заборгованість: {totalDebt} ₴</div>
                 <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>Зверніться до майстра для оплати</div>
               </div>
             </div>
@@ -522,21 +522,21 @@ export default function BookingsTab({ user, profile, bookingsData }) {
           })()}
           {upcoming.length > 0 && (
             <>
-              <div className="section-title" style={{ fontSize: 14, fontWeight: 800, color: '#fff', textAlign: 'center' }}>Найближчі</div>
+              <div className="section-title" style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)', textAlign: 'center' }}>Найближчі</div>
               {upcoming.map(b => renderCard(b))}
             </>
           )}
           {completed.length > 0 && (
             <>
-              <div className="section-title" style={{ fontSize: 14, fontWeight: 800, color: '#fff', textAlign: 'center' }}>Завершені ({completed.length})</div>
+              <div className="section-title" style={{ fontSize: 14, fontWeight: 800, color: 'var(--text)', textAlign: 'center' }}>Завершені ({completed.length})</div>
               {(showAllCompleted ? completed : completed.slice(0, 10)).map(b => renderCard(b, true))}
               {completed.length > 10 && (
                 <button
                   onClick={() => setShowAllCompleted(v => !v)}
                   style={{
                     display:'block', width:'100%', marginTop:8, padding:'10px 16px',
-                    borderRadius:12, border:'1px solid rgba(255,255,255,0.1)',
-                    background:'rgba(255,255,255,0.04)', color:'var(--dim)',
+                    borderRadius:12, border:'1px solid var(--field-bd)',
+                    background:'var(--field-bg)', color:'var(--dim)',
                     fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit',
                   }}
                 >
@@ -560,7 +560,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
 
       {toast && (
         <div style={{
-          position:'fixed', bottom:90, left:'50%', transform:'translateX(-50%)',
+          position:'fixed', bottom:'calc(100px + env(safe-area-inset-bottom, 0px))', left:'50%', transform:'translateX(-50%)',
           background:'var(--surface)', color: toast.type === 'error' ? 'var(--accent)' : 'var(--green)',
           padding:'11px 18px', borderRadius:12, fontSize:13, fontWeight:600,
           boxShadow:'var(--shadow)', zIndex:9999, maxWidth:340, width:'calc(100% - 32px)',

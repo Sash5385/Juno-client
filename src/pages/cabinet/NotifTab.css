@@ -15,7 +15,7 @@
 }
 .notif-empty-icon  { font-size: 40px; margin-bottom: 12px; opacity: 0.35; }
 .notif-empty-title { font-size: 16px; font-weight: 700; color: var(--dim); margin-bottom: 6px; }
-.notif-empty-sub   { font-size: 13px; color: var(--faint, var(--dim)); text-align: center; opacity: 0.7; }
+.notif-empty-sub   { font-size: 13px; color: var(--dim); text-align: center; }
 
 /* ─── LIST ─────────────────────────────────────────────────────── */
 .notif-list { display: flex; flex-direction: column; gap: 8px; }
@@ -70,9 +70,8 @@
   font-size: 13px;
   font-weight: 800;
   color: var(--text);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  min-width: 0;
+  overflow-wrap: anywhere; /* заголовок переноситься, а не обрізається «…» */
 }
 
 /* ─── TEXT / TIME ──────────────────────────────────────────────── */
@@ -85,12 +84,12 @@
 }
 
 .notif-time {
-  font-size: 10px;
+  font-size: 11px;
   color: rgba(255,255,255,0.65);
 }
 
 [data-theme="light"] .notif-text { color: var(--dim); }
-[data-theme="light"] .notif-time { color: var(--dim); opacity: 0.7; }
+[data-theme="light"] .notif-time { color: var(--dim); }
 
 /* ─── TOOLBAR ──────────────────────────────────────────────────── */
 .notif-toolbar {
@@ -104,11 +103,11 @@
   border: none;
   font-size: 12px;
   font-weight: 600;
-  color: #fff;
+  color: var(--text);
   cursor: pointer;
-  padding: 4px 8px;
+  padding: 8px 12px;
   border-radius: 8px;
-  opacity: 0.7;
+  opacity: 0.85;
   transition: opacity 0.15s;
 }
 .notif-clear-all:hover { opacity: 1; }
@@ -119,15 +118,15 @@
   align-self: flex-start;
   background: none;
   border: none;
-  font-size: 11px;
+  font-size: 14px;
   color: var(--dim);
   cursor: pointer;
-  padding: 2px 4px;
-  border-radius: 6px;
-  opacity: 0.4;
+  padding: 8px;
+  margin: -8px -8px 0 0; /* область дотику ~30px, візуально значок на місці */
+  border-radius: 8px;
+  opacity: 0.75;
   transition: opacity 0.15s;
   line-height: 1;
-  margin-top: 2px;
 }
 .notif-dismiss:hover { opacity: 0.9; }
 

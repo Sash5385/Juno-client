@@ -65,7 +65,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               <span style={{fontSize:28,lineHeight:1}}>📅</span>
               <div style={{flex:1}}>
-                <div style={{fontSize:11,color:'#6b9bff',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Наступний запис</div>
+                <div style={{fontSize:11,color:'var(--info)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Наступний запис</div>
                 <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>{dayLabel}{next.time ? ` · ${next.time}` : ''}</div>
                 {next.serviceName && <div style={{fontSize:12,color:'var(--dim)',marginTop:2}}>{next.serviceName}</div>}
               </div>
@@ -82,7 +82,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           <div style={{display:'flex',alignItems:'center',gap:10}}>
             <span style={{fontSize:28,lineHeight:1}}>🎓</span>
             <div style={{flex:1}}>
-              <div style={{fontSize:11,color:'#4ade80',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Залишок записів</div>
+              <div style={{fontSize:11,color:'var(--ok)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Залишок записів</div>
               <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>
                 {profile.lessonBalance} {profile.lessonBalance === 1 ? 'запис' : profile.lessonBalance < 5 ? 'записи' : 'записів'}
               </div>
@@ -103,13 +103,13 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             <div style={{display:'flex',alignItems:'center',gap:10}}>
               <span style={{fontSize:28,lineHeight:1}}>🏁</span>
               <div style={{flex:1,minWidth:0}}>
-                <div style={{fontSize:11,color:'rgba(192,132,252,0.9)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Останній запис</div>
+                <div style={{fontSize:11,color:'var(--violet)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Останній запис</div>
                 <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>{parseInt(dd)}.{parseInt(mm)}{last.time ? ` · ${last.time}` : ''}</div>
                 {last.serviceName && <div style={{fontSize:12,color:'var(--dim)',marginTop:2,overflow:'hidden',textOverflow:'ellipsis',whiteSpace:'nowrap'}}>{last.serviceName}</div>}
               </div>
               {last.rating > 0 && (
                 <div style={{flexShrink:0}}>
-                  <span style={{fontSize:14,color:'#fbbf24'}}>{'★'.repeat(last.rating)}</span>
+                  <span style={{fontSize:14,color:'var(--warn)'}}>{'★'.repeat(last.rating)}</span>
                 </div>
               )}
             </div>
@@ -133,7 +133,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           </div>
           {attendanceRate !== null && (
             <div className="stat-btn">
-              <div className="num" style={{color: attendanceRate >= 90 ? '#63d37b' : attendanceRate >= 70 ? '#f6b21b' : '#f87171'}}>{attendanceRate}%</div>
+              <div className="num" style={{color: attendanceRate >= 90 ? 'var(--ok)' : attendanceRate >= 70 ? 'var(--warn)' : 'var(--bad)'}}>{attendanceRate}%</div>
               <div className="lbl">явка</div>
             </div>
           )}
@@ -146,13 +146,13 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           <div className="stat-row">
             {totalSpent > 0 && (
               <div className="stat-btn">
-                <div className="num" style={{ color:'#63d37b', fontSize:14 }}>{totalSpent.toLocaleString()} ₴</div>
+                <div className="num" style={{ color:'var(--ok)', fontSize:14 }}>{totalSpent.toLocaleString()} ₴</div>
                 <div className="lbl">оплачено</div>
               </div>
             )}
             {totalDebt > 0 && (
               <div className="stat-btn">
-                <div className="num" style={{ color:'#f87171', fontSize:14 }}>{totalDebt.toLocaleString()} ₴</div>
+                <div className="num" style={{ color:'var(--bad)', fontSize:14 }}>{totalDebt.toLocaleString()} ₴</div>
                 <div className="lbl">борг</div>
               </div>
             )}

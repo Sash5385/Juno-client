@@ -102,9 +102,9 @@ function InstallPrompt({ active }) {
 
   return (
     <div style={{
-      position:'fixed', left:12, right:12, bottom:'calc(env(safe-area-inset-bottom,0px) + 76px)', zIndex:210,
+      position:'fixed', left:12, right:12, bottom:'calc(env(safe-area-inset-bottom,0px) + 100px)', zIndex:210,
       background:'var(--surface)', border:'1px solid var(--border)', borderRadius:18, padding:'14px 16px',
-      boxShadow:'0 12px 36px rgba(0,0,0,0.5)',
+      boxShadow:'0 12px 36px rgba(0,0,0,0.5)', maxHeight:'calc(100dvh - 170px)', overflowY:'auto',
     }}>
       <div style={{display:'flex', alignItems:'center', gap:10}}>
         <img src="/icon-192.png" alt="" style={{width:40, height:40, borderRadius:10, flexShrink:0}} />
@@ -124,7 +124,7 @@ function InstallPrompt({ active }) {
         {deferredPrompt && (
           <button onClick={install} style={{
             flex:1, padding:'10px 14px', borderRadius:12, border:'none', cursor:'pointer',
-            fontSize:13, fontWeight:800, color:'#fff',
+            fontSize:13, fontWeight:800, color:'var(--on-accent, #fff)',
             background:'linear-gradient(145deg,var(--acc-hi),var(--accent))',
           }}>Встановити</button>
         )}
@@ -176,7 +176,7 @@ function InstallBanner() {
         }}>Встановити</button>
       )}
       <button onClick={()=>setDismissed(true)} aria-label="Закрити" style={{
-        width:26, height:26, borderRadius:8, border:'none', cursor:'pointer', flexShrink:0,
+        width:32, height:32, borderRadius:8, border:'none', cursor:'pointer', flexShrink:0,
         background:'rgba(255,255,255,0.06)', color:'var(--dim)', fontSize:14,
       }}>✕</button>
     </div>
@@ -199,6 +199,11 @@ export default function App() {
   const license = useLicense(tenantIid)
   const pendingBookingRef = useRef(null)
   const { needRefresh, updateServiceWorker, isUpdating } = useAppUpdate()
+  // Банер оновлення висить над навігацією: поки він є, прокрутка отримує додатковий нижній відступ (див. global.css)
+  useEffect(() => {
+    document.body.classList.toggle('has-update-banner', !!needRefresh)
+    return () => document.body.classList.remove('has-update-banner')
+  }, [needRefresh])
 
   // Визначаємо, до якого майстра підключений цей студент — застосунок
   // мультитенантний, спільний для студентів РІЗНИХ майстрів. Джерело:
