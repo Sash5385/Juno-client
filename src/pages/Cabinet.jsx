@@ -56,7 +56,8 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
     const p = new URLSearchParams(loc.search)
     const date = p.get('date')
     const time = p.get('time')
-    return date ? { date, time } : null
+    const master = p.get('master')
+    return date ? { date, time, master } : null
   }, [loc.search])
 
   const [userQueue, setUserQueue] = useState([])

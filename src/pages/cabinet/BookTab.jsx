@@ -132,8 +132,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   }
   useEffect(() => {
     if (!salonMode || pickedMaster) return
-    let saved = null
-    try { saved = localStorage.getItem(`dp_master_${ownerId}`) } catch {}
+    let saved = notifParams?.master || null // пуш про звільнений слот веде у календар того майстра
+    if (!saved || !masters.some(m => m.id === saved)) { try { saved = localStorage.getItem(`dp_master_${ownerId}`) } catch {} }
     if (saved && masters.some(m => m.id === saved)) pickMaster(saved)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [salonMode, masters])

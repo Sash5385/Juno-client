@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
-import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster } from '../../firebase/db'
+import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster, subscribeMasters } from '../../firebase/db'
 import { formatDurHours } from '../../utils/format'
 import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
@@ -294,6 +294,8 @@ export default function BookingsTab({ user, profile, bookingsData }) {
   const { readOnly: licenseReadOnly } = useContext(LicenseContext)
   const { upcoming, completed, loading } = bookingsData
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
+  const [masters, setMasters] = useState([]) // салон: імена майстрів для підпису запису
+  useEffect(() => subscribeMasters(setMasters), [])
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
   const [noteOpenId, setNoteOpenId] = useState(null)
   const [noteDraft, setNoteDraft] = useState('')
@@ -358,6 +360,9 @@ export default function BookingsTab({ user, profile, bookingsData }) {
           </div>
           <div className="booking-type">
             {b.serviceType === 'school' ? '🎓' : '🚙'} {b.serviceName} · {formatDurHours(b.durationHours || 1)}
+            {b.masterId && masters.find(m => m.id === b.masterId) && (
+              <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masters.find(m => m.id === b.masterId).name}</span>
+            )}
             {(b.price > 0) && (
               <span style={{marginLeft:6, color:'var(--gold)', fontWeight:700}}>
                 {b.price} ₴{b.surcharge > 0 ? ` (+${b.surcharge}₴)` : ''}
