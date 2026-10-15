@@ -71,6 +71,25 @@ export async function resolveSlug(slug) {
   return snap.exists() ? snap.val()?.iid || null : null
 }
 
+// ─── САЛОН: календар майстра ─────────────────────────────
+// Простір-салон має кількох майстрів. Слоти власника — instructors/{iid}/timeslots (як завжди), слоти іншого майстра —
+// timeslots_m/{masterId}. Клієнт обирає майстра на сторінці запису (setClientMaster), запис отримує masterId (для власника — без поля).
+let _master = null
+export const setClientMaster = (id) => { _master = id && id !== _iid ? id : null }
+export const getClientMaster = () => _master
+export const slotsRoot = (m = _master) => (m && m !== _iid ? `timeslots_m/${m}` : 'timeslots')
+
+// Публічний список майстрів салону: [{ id, name, color, owner }] (власник першим). Порожній — акаунт «Один майстер».
+export function subscribeMasters(callback) {
+  const r = iRef('masters')
+  const handler = onValue(r, snap => {
+    const v = snap.val() || {}
+    callback(Object.entries(v).filter(([, m]) => m && m.name).map(([id, m]) => ({ id, name: String(m.name), color: m.color || '#60a5fa', owner: !!m.owner }))
+      .sort((a, b) => Number(b.owner) - Number(a.owner) || a.name.localeCompare(b.name)))
+  }, () => callback([]))
+  return () => off(r, 'value', handler)
+}
+
 export const iRef = (path) => ref(db, _iid ? `instructors/${_iid}${path ? '/' + path : ''}` : '/__no_tenant__')
 
 // ─── ACCESS CONTROL ─────────────────────────────────────
@@ -122,7 +141,7 @@ export async function updateUserProfile(uid, patch) {
 // в”Ђв”Ђв”Ђ TIMESLOTS в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
 export async function getSlotsForDate(date) {
   // date Сѓ С„РѕСЂРјР°С‚С– YYYY-MM-DD
-  const snap = await get(iRef(`timeslots/${date}`))
+  const snap = await get(iRef(`${slotsRoot()}/${date}`))
   return maskSlotsIfBlocked(snap.exists() ? snap.val() : {})
 }
 
@@ -171,7 +190,7 @@ function classifyDay(slotsObj) {
 
 export function subscribeMonthAvailability(year, month, callback) {
   const prefix = `${year}-${String(month + 1).padStart(2, '0')}-`
-  const r = iRef('timeslots')
+  const r = iRef(slotsRoot())
   const handler = onValue(r, snap => {
     const all = snap.val() || {}
     const result = {}
@@ -184,7 +203,7 @@ export function subscribeMonthAvailability(year, month, callback) {
 }
 
 export function subscribeSlotsForDate(date, callback) {
-  const r = iRef(`timeslots/${date}`)
+  const r = iRef(`${slotsRoot()}/${date}`)
   const handler = onValue(r, snap => {
     callback(maskSlotsIfBlocked(snap.exists() ? snap.val() : {}))
   })
@@ -256,11 +275,12 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
     const [h, m] = booking.time.split(':').map(Number)
     const startMin = h * 60 + m
     const durMin = Math.round((booking.durationHours || 1) * 60) + Math.max(0, Math.min(120, Number(booking.bufferMin) || 0))
-    const daySnap = await get(iRef(`timeslots/${booking.date}`))
+    const root = slotsRoot(booking.masterId || null)
+    const daySnap = await get(iRef(`${root}/${booking.date}`))
     // Лише слоти, які зайняв цей клієнт (bookedBy): чужі правила БД не дозволять змінити, а один відхилений шлях
     // скасував би весь пакетний update. Решту (перерва, слоти без bookedBy) звільняє сервер (onBookingChanged).
     const day = Object.fromEntries(Object.entries(daySnap.val() || {}).filter(([, n]) => n && n.bookedBy === uid))
-    const updates = restoreRangeUpdates(day, `timeslots/${booking.date}/`, startMin, durMin, { extra: { bookedBy: null } })
+    const updates = restoreRangeUpdates(day, `${root}/${booking.date}/`, startMin, durMin, { extra: { bookedBy: null } })
     // Слоти звільняє і сервер (onBookingChanged); якщо правила не пускають (слот зайнятий без bookedBy
     // зі старої версії) — скасування запису вже збережено, тож це не помилка для клієнта.
     if (Object.keys(updates).length) await update(iRef(""), updates).catch(() => {})
@@ -370,11 +390,12 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
   const mainEnd = startMin + durationHours * 60
   const endMin = mainEnd + (bufferMin > 0 ? bufferMin : 0)
   const claimedIds = []
+  const root = slotsRoot() // фіксуємо корінь на час спроби: майстра можуть переключити посеред claim
   for (let min = startMin; min < endMin; min += intervalMin) {
     const slotH = String(Math.floor(min / 60)).padStart(2, '0')
     const slotM = String(min % 60).padStart(2, '0')
     const slotId = `slot${slotH}${slotM}`
-    const slotRef = iRef(`timeslots/${date}/${slotId}`)
+    const slotRef = iRef(`${root}/${date}/${slotId}`)
     const soft = min >= mainEnd // позиція перерви
     let skipSoft = false
     let result
@@ -404,7 +425,7 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
     if (soft && skipSoft) continue
     if (!result.committed) {
       await Promise.all(claimedIds.map(id =>
-        runTransaction(iRef(`timeslots/${date}/${id}`), current =>
+        runTransaction(iRef(`${root}/${date}/${id}`), current =>
           current ? (current.phantom ? null : { ...current, available: true, bookedBy: null }) : current
         ).catch(() => {})
       ))
@@ -422,22 +443,22 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
 export async function markSlotsUnavailable(date, startTime, durationHours, intervalMin = 30) {
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
-  const daySnap = await get(iRef(`timeslots/${date}`))
-  const updates = blockRangeUpdates(daySnap.val() || {}, `timeslots/${date}/`, startMin, durationHours * 60, { step: intervalMin, extra: { bookedBy: auth.currentUser?.uid || null } })
+  const daySnap = await get(iRef(`${slotsRoot()}/${date}`))
+  const updates = blockRangeUpdates(daySnap.val() || {}, `${slotsRoot()}/${date}/`, startMin, durationHours * 60, { step: intervalMin, extra: { bookedBy: auth.currentUser?.uid || null } })
   await update(iRef(""), updates)
 }
 
 // ─── VIEWING (live presence on slot) ─────────────────────────────
 export async function setViewingSlot(date, time, uid) {
   const slotId = `slot${time.replace(':', '')}`
-  const r = iRef(`timeslots/${date}/${slotId}/viewing/${uid}`)
+  const r = iRef(`${slotsRoot()}/${date}/${slotId}/viewing/${uid}`)
   await set(r, Date.now())
   onDisconnect(r).remove()
 }
 
 export async function clearViewingSlot(date, time, uid) {
   const slotId = `slot${time.replace(':', '')}`
-  await remove(iRef(`timeslots/${date}/${slotId}/viewing/${uid}`))
+  await remove(iRef(`${slotsRoot()}/${date}/${slotId}/viewing/${uid}`))
 }
 
 // ─── QUEUE OFFERS ────────────────────────────────────────────────

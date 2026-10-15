@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
 import { createPortal } from 'react-dom'
-import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, subscribeGroupSeats, joinGroupSeat, newBookingId, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
+import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, subscribeGroupSeats, joinGroupSeat, newBookingId, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability, subscribeMasters, setClientMaster, getCurrentIid } from '../../firebase/db'
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, parseYMD } from '../../utils/date'
 import { getInitials, pluralize } from '../../utils/format'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
@@ -116,6 +116,28 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     getMyIntake(user.uid).then(v => setIntakeSaved(v || null)).catch(() => setIntakeSaved(null))
   }, [user?.uid])
   useEffect(() => { setAddonIds([]) }, [selectedService?.id])
+
+  // Салон: майстри простору (публічний список). Їх >1 → клієнт спершу обирає майстра; слоти, запис і скасування йдуть у календар цього майстра.
+  const [masters, setMasters] = useState([])
+  const [pickedMaster, setPickedMaster] = useState(null)
+  useEffect(() => subscribeMasters(setMasters), [])
+  const salonMode = masters.length > 1
+  const ownerId = getCurrentIid()
+  const masterBooking = pickedMaster && pickedMaster !== ownerId ? pickedMaster : undefined // для власника поле не пишемо
+  const pickMaster = (id) => {
+    setClientMaster(id)           // спершу корінь слотів — потім стан, щоб підписки одразу читали календар цього майстра
+    try { localStorage.setItem(`dp_master_${ownerId}`, id) } catch {}
+    setSelectedTime(null); setSelectedTime2(null); setSlots({}); setMonthAvail({})
+    setPickedMaster(id)
+  }
+  useEffect(() => {
+    if (!salonMode || pickedMaster) return
+    let saved = null
+    try { saved = localStorage.getItem(`dp_master_${ownerId}`) } catch {}
+    if (saved && masters.some(m => m.id === saved)) pickMaster(saved)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [salonMode, masters])
+  const needMaster = salonMode && !pickedMaster
 
   useEffect(() => {
     getAdminSettings().then(s => setAdminSettings(s)).catch(() => {})
@@ -279,7 +301,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       setLoading(false)
     })
     return unsub
-  }, [selectedDate])
+  }, [selectedDate, pickedMaster])
 
   // Місця в групах обраного дня (для групових послуг)
   useEffect(() => {
@@ -325,7 +347,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       avail => setMonthAvail(avail)
     )
     return unsub
-  }, [viewMonth])
+  }, [viewMonth, pickedMaster])
 
   const days = useMemo(() => getMonthGrid(viewMonth.getFullYear(), viewMonth.getMonth()), [viewMonth])
 
@@ -344,6 +366,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     if (slot.available === false) {
       // Зайнятий або зарезервований для іншого
       // якщо слот запропонований комусь — і не мені — дозволяємо стати в чергу
+      if (masterBooking) { showToast('Цей час зайнятий. Оберіть інший'); return } // черга очікування поки лише для календаря власника
       const q = queueMap[slot.time]
       if (q?.mine) return
       setDialogSlot({ ...slot, queueCount: q?.count || 0 })
@@ -497,6 +520,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         serviceType: selectedService.type,
         serviceId: selectedService.id,
         serviceName: selectedService.name,
+        masterId: masterBooking,
         price: totalPrice || undefined,
         surcharge: (pkgOn || fixedPrice != null) ? undefined : (surcharge || undefined),
         discountAmt: (pkgOn || fixedPrice != null || customPriceAmt != null) ? undefined : (discountAmt || undefined),
@@ -847,7 +871,27 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         </div>
       )}
 
-      <div className="book-cols">
+      {salonMode && (
+        <div style={{ marginBottom: 14 }}>
+          <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>{needMaster ? 'Оберіть майстра' : 'Майстер'}</div>
+          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
+            {masters.map(m => {
+              const on = m.id === pickedMaster
+              return (
+                <button key={m.id} onClick={() => pickMaster(m.id)} style={{
+                  display: 'flex', alignItems: 'center', gap: 8, padding: needMaster ? '14px 18px' : '8px 14px', borderRadius: 99, cursor: 'pointer', fontFamily: 'inherit',
+                  fontSize: needMaster ? 15 : 13, fontWeight: 700, color: 'var(--text)',
+                  border: `1.5px solid ${on ? m.color : 'var(--border, rgba(255,255,255,0.14))'}`,
+                  background: on ? `color-mix(in srgb, ${m.color} 28%, transparent)` : 'rgba(255,255,255,0.05)',
+                }}>
+                  <span style={{ width: 12, height: 12, borderRadius: '50%', background: m.color, flexShrink: 0 }} />{m.name}
+                </button>
+              )
+            })}
+          </div>
+        </div>
+      )}
+      <div className="book-cols" style={needMaster ? { display: 'none' } : undefined}>
       <div className="book-col">
       {/* 1. ДАТА */}
       <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>1. Дата</div>

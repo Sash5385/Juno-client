@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
-import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
+import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster } from '../../firebase/db'
 import { formatDurHours } from '../../utils/format'
 import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
@@ -48,6 +48,9 @@ function lessonCountdown(b) {
 
 // ─── RESCHEDULE MODAL ────────────────────────────────────────────
 function RescheduleModal({ booking, user, profile, onClose, onDone }) {
+  // Салон: перенос лишається в календарі ТОГО Ж майстра, у якого запис. Корінь слотів перемикаємо до підписок і повертаємо при закритті.
+  const [prevMaster] = useState(() => { const p = getClientMaster(); setClientMaster(booking.masterId || null); return p })
+  useEffect(() => () => setClientMaster(prevMaster), [prevMaster])
   useBackClose(true, onClose)
   const { showToast: showModalToast, ToastEl: ModalToastEl } = useToast()
   const isVipStudent = profile?.isVip === true
@@ -184,6 +187,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         packageUseId: booking.packageId && !booking.packageError ? (booking.packageUseId || booking.id) : undefined,
         studentName: booking.studentName,
         phone: booking.phone,
+        masterId: booking.masterId || undefined,
         rescheduledFrom: `${booking.date} ${booking.time}`,
       })
       onDone()
