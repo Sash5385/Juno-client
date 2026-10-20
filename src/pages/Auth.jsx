@@ -1,3 +1,4 @@
+import LangSwitch from "../i18n/LangSwitch";
 import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { sendSmsCode, verifySmsCode, resetRecaptcha, getSmsErrorMessage, renderRecaptcha, isIOSDevice, isInAppBrowser } from '../firebase/auth'
@@ -428,6 +429,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       {/* ── PHONE / EMAIL ── */}
       {step === 'phone' && (
         <div className="fade-up" style={{display:'flex',flexDirection:'column'}}>
+          <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}><LangSwitch/></div>
           <div className="auth-logo-block">
             <div className="auth-logo-icon"><img src="/icon-192.png" alt="Juno"/></div>
             <div className="auth-logo-name">Juno</div>

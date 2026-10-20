@@ -248,3 +248,8 @@ html[data-palette="fog"] body[data-theme] :is(.btn-primary,.btn-login):disabled{
 /* світла тема: білий «блік» поверх підписів головних кнопок знижував контраст */
 html[data-palette="fog"] body[data-theme="light"] :is(.hero-cta,.footer-cta,.next-slot-cta,.map-route-btn,.btn-login)::after{display:none}
 html[data-palette="fog"] body[data-theme="dark"] .booking-time{color:var(--acc-hi)}
+
+/* Локалізація: довгі підписи нижньої навігації (de/fr/pl) не вилазять за кнопку */
+.botnav-btn{min-width:0}
+.botnav-lbl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+html:not([lang="uk"]) .botnav-lbl{font-size:10px}

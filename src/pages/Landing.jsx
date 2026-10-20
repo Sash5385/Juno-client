@@ -1,3 +1,4 @@
+import LangSwitch from '../i18n/LangSwitch'
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
@@ -175,6 +176,7 @@ export default function Landing({ user, profile }) {
             <div className="logo-icon"><img src="/icon-192.png" alt="Juno"/></div>
             Juno
           </div>
+          <LangSwitch style={{ minHeight: 36, padding: "6px 8px", fontSize: 13, maxWidth: 110 }} />
           <button className="btn-login landing-topbar-login" onClick={goRegister}>
             {user ? 'Кабінет' : 'Увійти'}
           </button>

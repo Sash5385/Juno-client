@@ -1,3 +1,4 @@
+import LangSwitch from "../../i18n/LangSwitch";
 import { useState, useEffect } from "react";
 import { updateUserProfile, getAdminSettings, getCurrentSlug } from "../../firebase/db";
 import { useTheme, PALETTES } from "../../hooks/useTheme";
@@ -233,6 +234,11 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           )}
         </div>
       )}
+
+      <div className="profile-section">
+        <div className="section-title">🌐 Мова</div>
+        <LangSwitch style={{ width: "100%" }} />
+      </div>
 
       <div className="profile-section">
         <div className="section-title">🎨 Оформлення</div>
