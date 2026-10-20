@@ -28,18 +28,19 @@ export function setLang(l) {
 }
 
 let exact = new Map()
+let lower = new Map()
 let patterns = []
 const esc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
 
 function build(dict, l) {
-  exact = new Map(); patterns = []
+  exact = new Map(); lower = new Map(); patterns = []
   for (const [k, v] of Object.entries(dict)) {
     const t = v && v[l]
     if (!t) continue
     if (/\{\d+\}/.test(k)) {
       const re = new RegExp('^' + esc(k).replace(/\\\{\d+\\\}/g, '(.+?)') + '$')
       patterns.push({ re, t, n: k.length })
-    } else exact.set(k, t)
+    } else { exact.set(k, t); const lk = k.toLowerCase(); if (!lower.has(lk)) lower.set(lk, t) }
   }
   patterns.sort((a, b) => b.n - a.n)
 }
@@ -53,6 +54,12 @@ export function tr(text) {
   for (const p of patterns) {
     const m = core.match(p.re)
     if (m) return lead + p.t.replace(/\{(\d+)\}/g, (_, i) => tr(m[+i + 1] ?? '')) + tail
+  }
+  // регістр: «ОЧІКУЮТЬ» (верхній, через CSS/toUpperCase) і «очікують» (нижній) беруть переклад «Очікують»
+  const lc = lower.get(core.toLowerCase())
+  if (lc !== undefined) {
+    const up = core === core.toUpperCase() && core !== core.toLowerCase()
+    return lead + (up ? lc.toUpperCase() : lc) + tail
   }
   // «5 записів» → число + перекладене слово
   const nm = core.match(/^([+\-−]?\d+(?:[.,]\d+)?)\s+(.+)$/)
