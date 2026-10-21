@@ -854,7 +854,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         }}>
           <span style={{fontSize:20}}>🎫</span>
           <div style={{minWidth:0}}>
-            <div style={{fontWeight:700, fontSize:13, color:'var(--text)'}}>{p.name}: лишилось {p.left} з {p.total}</div>
+            <div style={{fontWeight:700, fontSize:13, color:'var(--text)'}}>{`${p.name}: лишилось ${p.left} з ${p.total}`}</div>
             <div style={{fontSize:11, color:'var(--dim)'}}>{expiresLabel(p)}</div>
           </div>
         </div>
