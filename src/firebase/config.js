@@ -18,7 +18,7 @@ function defaultAuthDomain() {
     const ua = navigator.userAgent
     const ios = /iphone|ipad|ipod/i.test(ua) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1)
     const host = window.location.host
-    if (ios && /\.(web\.app|firebaseapp\.com)$/.test(host)) return host
+    if (ios && /\.(web\.app|firebaseapp\.com)$|(^|\.)aldemi\.com\.ua$/.test(host)) return host
   } catch {}
   return fallback
 }
