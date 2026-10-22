@@ -32,7 +32,7 @@ export default function About() {
       textAlign: 'center',
       fontFamily: 'inherit',
     }}>
-      <img src="/icon-192.png" alt="Juno" style={{ width: 72, height: 72, borderRadius: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }} />
+      <img src={import.meta.env.BASE_URL + 'icon-192.png'} alt="Juno" style={{ width: 72, height: 72, borderRadius: 20, boxShadow: '0 8px 24px rgba(0,0,0,0.35)' }} />
       <h1 style={{ fontSize: 26, fontWeight: 900, margin: '18px 0 6px', letterSpacing: -0.5 }}>Juno</h1>
       <div style={{ fontSize: 14, color: 'var(--accent)', fontWeight: 700, marginBottom: 28 }}>
         Онлайн-запис до майстра
@@ -89,7 +89,7 @@ export default function About() {
             />
             <button
               disabled={!slug}
-              onClick={() => { window.location.href = '/i/' + encodeURIComponent(slug) }}
+              onClick={() => { window.location.href = import.meta.env.BASE_URL + 'i/' + encodeURIComponent(slug) }}
               style={{ flex: '1 1 100px', padding: '10px 14px', borderRadius: 10, border: 'none', background: 'linear-gradient(145deg,var(--acc-hi),var(--accent))', color: 'var(--on-accent, #fff)', fontWeight: 800, fontSize: 14, opacity: slug ? 1 : 0.5 }}
             >Відкрити</button>
           </div>

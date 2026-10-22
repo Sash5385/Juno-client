@@ -92,7 +92,7 @@ export default function SalonPage({ slug }) {
               )}
               <button
                 className="btn-primary" style={{ marginTop: 12 }} disabled={!m.slug}
-                onClick={() => window.location.assign(`/i/${encodeURIComponent(m.slug)}`)}
+                onClick={() => window.location.assign(`${import.meta.env.BASE_URL}i/${encodeURIComponent(m.slug)}`)}
               >{m.slug ? 'Записатись' : 'Скоро'}</button>
             </div>
           ))}

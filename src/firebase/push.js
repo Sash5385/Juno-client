@@ -33,7 +33,7 @@ export async function getFirebaseSwReg() {
   // Without a unique scope, Firebase SW stays in "waiting" and push events go to VitePWA SW
   const existing = regs.find(r => r.scope?.includes('firebase-push'))
   if (existing) return existing
-  return navigator.serviceWorker.register('/firebase-messaging-sw.js', { scope: '/firebase-push/' })
+  return navigator.serviceWorker.register(import.meta.env.BASE_URL + 'firebase-messaging-sw.js', { scope: import.meta.env.BASE_URL + 'firebase-push/' })
 }
 
 export function initMessaging() {

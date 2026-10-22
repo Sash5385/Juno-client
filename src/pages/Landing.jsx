@@ -173,7 +173,7 @@ export default function Landing({ user, profile }) {
             </button>
           </div>
           <div className="logo">
-            <div className="logo-icon"><img src="/icon-192.png" alt="Juno"/></div>
+            <div className="logo-icon"><img src={import.meta.env.BASE_URL + 'icon-192.png'} alt="Juno"/></div>
             Juno
           </div>
           <LangSwitch style={{ minHeight: 36, padding: "6px 8px", fontSize: 13, maxWidth: 110 }} />

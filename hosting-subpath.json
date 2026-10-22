@@ -1,0 +1,6 @@
+[
+  { "source": "/junoclient/i/*/manifest.webmanifest", "destination": "/junoclient/manifest-tenant.webmanifest" },
+  { "source": "/junoclient/api/delete-account", "function": "deleteAccount", "region": "europe-west1" },
+  { "source": "/junoclient/api/report-error", "function": "reportError", "region": "europe-west1" },
+  { "source": "/junoclient/**", "destination": "/junoclient/index.html" }
+]

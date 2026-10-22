@@ -31,7 +31,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
     setDeleting(true);
     try {
       const token = await auth.currentUser.getIdToken(true);
-      const resp = await fetch("/api/delete-account", {
+      const resp = await fetch(import.meta.env.BASE_URL + "api/delete-account", {
         method: "POST",
         headers: { "Authorization": `Bearer ${token}`, "Content-Type": "application/json" },
         body: JSON.stringify({ type: "student", iid: getCurrentIid(), uid: user.uid }),
@@ -39,7 +39,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       if (!resp.ok) throw new Error("server");
       try { localStorage.clear(); } catch { /* ignore */ }
       await signOut().catch(() => {});
-      window.location.href = "/";
+      window.location.href = import.meta.env.BASE_URL;
     } catch {
       setDeleting(false);
       showToast("Не вдалося видалити акаунт. Спробуйте пізніше");
@@ -267,7 +267,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
             onClick={() => {
               const slug = getCurrentSlug();
               const origin = window.location.origin;
-              const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
+              const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
               navigator.clipboard.writeText(link)
                 .then(() => showToast("Посилання скопійовано!"))
                 .catch(() => showToast("Скопіюйте: " + link));
@@ -282,7 +282,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               onClick={() => {
                 const slug = getCurrentSlug();
                 const origin = window.location.origin;
-                const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
+                const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
                 navigator.share({ title: 'Juno', text: 'Запишись онлайн!', url: link }).catch(() => {});
               }}
               className="edit-save"

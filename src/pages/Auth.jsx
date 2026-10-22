@@ -431,7 +431,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
         <div className="fade-up" style={{display:'flex',flexDirection:'column'}}>
           <div style={{display:"flex",justifyContent:"flex-end",marginBottom:8}}><LangSwitch/></div>
           <div className="auth-logo-block">
-            <div className="auth-logo-icon"><img src="/icon-192.png" alt="Juno"/></div>
+            <div className="auth-logo-icon"><img src={import.meta.env.BASE_URL + 'icon-192.png'} alt="Juno"/></div>
             <div className="auth-logo-name">Juno</div>
           </div>
 

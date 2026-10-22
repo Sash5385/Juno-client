@@ -4,6 +4,9 @@
 importScripts('https://www.gstatic.com/firebasejs/12.13.0/firebase-app-compat.js')
 importScripts('https://www.gstatic.com/firebasejs/12.13.0/firebase-messaging-compat.js')
 
+// База застосунку виводиться з розташування SW (працює і на '/', і під '/junoclient/').
+const BASE = new URL('./', self.location).pathname
+
 self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', () => self.clients.claim())
 
@@ -30,11 +33,11 @@ messaging.onBackgroundMessage((payload) => {
   // тут завжди undefined, тому title/body й досі бралися з нього ніколи не
   // існуючого поля, і фонове сповіщення завжди показувалось порожнім.
   const title = payload.data?.title || 'Juno'
-  const url = payload.data?.url || self.location.origin + '/cabinet'
+  const url = payload.data?.url || self.location.origin + BASE + 'cabinet'
   const options = {
     body: payload.data?.body || '',
-    icon: '/icon-192.png',
-    badge: '/badge-dp.png', // монохромний «DP» для шторки сповіщень
+    icon: BASE + 'icon-192.png',
+    badge: BASE + 'badge-dp.png', // монохромний «DP» для шторки сповіщень
     // Унікальний tag — з тим самим сталим tag кожне наступне повідомлення
     // (напр. друге в чаті поспіль) тихо замінює попереднє сповіщення без
     // нового звуку/вібрації на деяких Android/Chrome.
@@ -49,12 +52,12 @@ messaging.onBackgroundMessage((payload) => {
 self.addEventListener('notificationclick', (e) => {
   e.notification.close()
   const data = e.notification.data || {}
-  const target = data.url || self.location.origin + '/cabinet'
-  const fullUrl = target.startsWith('http') ? target : (self.location.origin + target)
+  const target = data.url || self.location.origin + BASE + 'cabinet'
+  const fullUrl = target.startsWith('http') ? target : (self.location.origin + BASE + target.replace(/^\//, ''))
   e.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then((list) => {
       for (const c of list) {
-        if (c.url.startsWith(self.location.origin) && 'focus' in c) {
+        if (c.url.startsWith(self.location.origin + BASE) && 'focus' in c) {
           c.focus()
           return c.navigate(fullUrl)
         }

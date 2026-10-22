@@ -33,7 +33,8 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:852885730629:web:9a8f34b87d2538541cba2c"
 }
 
-export const app = initializeApp(firebaseConfig)
+// Під підшляхом (спільний origin з адмінкою) — іменований app, щоб Auth-сховище не збігалося.
+export const app = import.meta.env.BASE_URL === '/' ? initializeApp(firebaseConfig) : initializeApp(firebaseConfig, 'juno-client')
 // Демо (?demo=1): фейковий вхід клієнта без звернень до Firebase Auth/бази.
 const demoAuth = {
   currentUser: { ...DEMO_USER, getIdToken: async () => 'demo' },

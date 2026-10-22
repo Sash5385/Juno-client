@@ -33,8 +33,8 @@ function versionGuard() {
     },
     transformIndexHtml(html) {
       const guard =
-        '<script>(function(){var B=' + JSON.stringify(version) + ';' +
-        'function check(){try{fetch("/version.json?_="+Date.now(),{cache:"no-store"})' +
+        '<script>window.__BASE=' + JSON.stringify(BASE) + ';(function(){var B=' + JSON.stringify(version) + ';' +
+        'function check(){try{fetch(window.__BASE+"version.json?_="+Date.now(),{cache:"no-store"})' +
         '.then(function(r){return r.json()}).then(function(d){' +
         'if(d&&d.version&&d.version!==B){' +
         'var k="vreset_"+d.version;if(sessionStorage.getItem(k))return;' +
@@ -81,7 +81,10 @@ function versionGuard() {
   }
 }
 
+const BASE = process.env.VITE_BASE || '/'
+
 export default defineConfig({
+  base: BASE,
   resolve: {
     // Демо-режим (?demo=1) — див. src/firebaseDbDemo.js
     alias: [{ find: /^firebase\/database$/, replacement: resolve(__dirname, 'src/firebaseDbDemo.js') }],
@@ -101,20 +104,21 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         lang: 'uk',
-        start_url: '/',
+        start_url: BASE,
+        scope: BASE,
         icons: [
           {
-            src: '/icon-192.png',
+            src: BASE + 'icon-192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png',
+            src: BASE + 'icon-512.png',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png',
+            src: BASE + 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
@@ -123,6 +127,7 @@ export default defineConfig({
       },
       workbox: {
         cleanupOutdatedCaches: true,
+        navigateFallback: BASE + 'index.html',
         // Без цього новий SW чекає, поки ВСІ вкладки/сесії PWA закриються, перш
         // ніж активуватись — а PWA на телефоні може роками не закриватись
         // повністю (лише згортатись). skipWaiting+clientsClaim: новий SW бере
@@ -132,7 +137,7 @@ export default defineConfig({
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
         runtimeCaching: [
           {
-            urlPattern: /^\/manifest\.json/,
+            urlPattern: ({ url }) => url.pathname === BASE + 'manifest.json',
             handler: 'NetworkFirst',
             options: {
               cacheName: 'manifest-cache',
