@@ -396,7 +396,7 @@ export default function Landing({ user, profile }) {
           <div className="devby">
             <small>Розробка та дизайн</small>
             <span>Founder &amp; Head of Product by</span>
-            <b>AlDemi</b>
+            <a href="https://aldemi.com.ua" target="_blank" rel="noopener noreferrer"><b>AlDemi</b></a>
           </div>
         </div>
 

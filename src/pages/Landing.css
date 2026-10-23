@@ -1214,3 +1214,5 @@
   background: var(--surface);
   box-shadow: 0 4px 14px rgba(60,80,120,0.12);
 }
+
+.devby a { text-decoration: none; color: inherit; }
