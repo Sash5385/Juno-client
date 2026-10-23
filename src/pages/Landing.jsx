@@ -395,8 +395,8 @@ export default function Landing({ user, profile }) {
           <div>© 2026 Juno.</div>
           <div className="devby">
             <small>Розробка та дизайн</small>
-            <b>AlDemi Studio</b>
-            <span>Founder &amp; Head of Product</span>
+            <span>Founder &amp; Head of Product by</span>
+            <b>AlDemi</b>
           </div>
         </div>
 
