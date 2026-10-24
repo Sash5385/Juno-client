@@ -21,6 +21,7 @@ import TestTab from './cabinet/TestTab'
 import { formatDateLabel } from '../utils/date'
 import { useMosaicSwitch, MosaicOverlay } from '../mosaic'
 import './Cabinet.css'
+import { saveRedirectAfterLogin } from '../utils/redirectAfterLogin'
 
 const TAB_COMPONENT_KEYS = ['book', 'bookings', 'progress', 'queue', 'chat', 'notifications', 'profile', 'test']
 
@@ -201,6 +202,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
 
   const handleLogout = async () => {
     if (!window.confirm('Вийти з акаунту?')) return
+    saveRedirectAfterLogin(loc.pathname, loc.search)
     await signOut()
     nav('/', { replace: true })
   }

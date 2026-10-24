@@ -22,6 +22,7 @@ import Cabinet from './pages/Cabinet'
 import Landing from './pages/Landing'
 import PublicSchedule from './pages/PublicSchedule'
 import About from './pages/About'
+import { saveRedirectAfterLogin } from './utils/redirectAfterLogin'
 
 // ─── PWA INSTALL PROMPT (пропонуємо зберегти застосунок лише при
 // першому вході — раз показали (banner з'явився), більше не пропонуємо,
@@ -179,6 +180,13 @@ function InstallBanner() {
       }}>✕</button>
     </div>
   )
+}
+
+// Неавторизований відкрив глибоке посилання (/cabinet?date=...) — запам'ятовуємо його перед переходом на лендінг
+function SaveRedirect({ to }) {
+  const location = useLocation()
+  saveRedirectAfterLogin(location.pathname, location.search)
+  return <Navigate to={to} replace />
 }
 
 export default function App() {
@@ -454,7 +462,7 @@ export default function App() {
       <Route path="/cabinet/*" element={
         user && profile
           ? <Cabinet user={user} profile={profile} onProfileUpdate={reloadProfile} />
-          : <Navigate to="/" replace />
+          : <SaveRedirect to="/" />
       } />
 
       <Route path="*" element={<Navigate to="/" replace />} />

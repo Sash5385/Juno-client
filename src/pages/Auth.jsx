@@ -6,6 +6,7 @@ import { saveUserProfile, getUserProfile, sendWelcomeIfEnabled } from '../fireba
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
 import { normalizePhone, formatPhone } from '../utils/format'
+import { consumeRedirectAfterLogin } from '../utils/redirectAfterLogin'
 import './Auth.css'
 
 const iosDevice = isIOSDevice()
@@ -188,7 +189,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       const existing = await getUserProfile(u.uid)
       if (existing) {
         if (onProfileSaved) await onProfileSaved()
-        nav('/cabinet')
+        nav(consumeRedirectAfterLogin())
       } else {
         setStep('survey')
       }
@@ -246,7 +247,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       await saveUserProfile(uid, data)
       sendWelcomeIfEnabled(uid).catch(() => {})
       if (onProfileSaved) await onProfileSaved()
-      nav('/cabinet')
+      nav(consumeRedirectAfterLogin())
     } catch (e) {
       console.error(e)
       showToast('Не вдалось зберегти профіль')
@@ -260,7 +261,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
     const existing = await getUserProfile(u.uid)
     if (existing) {
       if (onProfileSaved) await onProfileSaved()
-      nav('/cabinet')
+      nav(consumeRedirectAfterLogin())
     } else {
       setStep('survey')
     }
@@ -321,7 +322,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       const existing = await getUserProfile(u.uid)
       if (existing) {
         if (onProfileSaved) await onProfileSaved()
-        nav('/cabinet')
+        nav(consumeRedirectAfterLogin())
       } else {
         setStep('survey')
       }
