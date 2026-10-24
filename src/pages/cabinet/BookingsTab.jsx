@@ -47,7 +47,7 @@ function lessonCountdown(b) {
 }
 
 // ─── RESCHEDULE MODAL ────────────────────────────────────────────
-function RescheduleModal({ booking, user, profile, allBookings = [], onClose, onDone }) {
+function RescheduleModal({ booking, user, profile, allBookings = [], canPrivate = false, onClose, onDone }) {
   useBackClose(true, onClose)
   const { showToast: showModalToast, ToastEl: ModalToastEl } = useToast()
   const isVipStudent = profile?.isVip === true
@@ -214,8 +214,8 @@ function RescheduleModal({ booking, user, profile, allBookings = [], onClose, on
           <div className="cal-days">
             {days.map((d, i) => {
               if (!d) return <div key={i} className="cal-day empty" />
-              // Горизонт календаря — як у вкладці «Записатись» (calendarOpenDays)
-              const disabled = isPast(d) || d > maxBookDate(today, true, adminSettings)
+              // Горизонт календаря — як у вкладці «Записатись» (приватні / автошкола)
+              const disabled = isPast(d) || d > maxBookDate(today, canPrivate, adminSettings)
               const isToday = isSameDay(d, today)
               const selected = selectedDate && isSameDay(d, selectedDate)
               const isCurrent = d && formatDateYMD(d) === booking.date
@@ -603,6 +603,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
           user={user}
           profile={profile}
           allBookings={[...upcoming, ...completed]}
+          canPrivate={profile?.studentType === 'private' || !!bookingsData.canBookPrivate}
           onClose={() => setRescheduleBooking(null)}
           onDone={() => { setRescheduleBooking(null); showToast('Урок перенесено') }}
         />

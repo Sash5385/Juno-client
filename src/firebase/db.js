@@ -350,7 +350,7 @@ export function getCompletedHours(bookings) {
 // захоплені в цій же спробі й повертає false.
 export async function claimSlot(date, startTime, durationHours = 1, intervalMin = 30) {
   if (_blocked) return false
-  intervalMin = Math.max(30, Number(intervalMin) || 30) // дрібний крок сітки адміна не множить службові слоти
+  intervalMin = Math.max(1, Number(intervalMin) || 30) // крок сітки до 1 хв (потрібно салонам); лише захист від 0/NaN
   const uid = auth.currentUser?.uid || null
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
@@ -386,7 +386,7 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
 // Повертає слоти, які щойно захопив claimSlot, якщо запис після цього не вдалось створити
 // (мережа, правила, ліцензія): інакше час лишається зайнятим без запису. Чужі слоти не чіпає.
 export async function releaseClaimedSlots(date, startTime, durationHours = 1, intervalMin = 30) {
-  intervalMin = Math.max(30, Number(intervalMin) || 30)
+  intervalMin = Math.max(1, Number(intervalMin) || 30)
   const uid = auth.currentUser?.uid || null
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
@@ -405,7 +405,7 @@ export async function releaseClaimedSlots(date, startTime, durationHours = 1, in
 // заброньований одержувачем через чергу (offeredTo/reservedFor
 // блокує інших від початку), тож гонки за нього немає.
 export async function markSlotsUnavailable(date, startTime, durationHours, intervalMin = 30) {
-  intervalMin = Math.max(30, Number(intervalMin) || 30)
+  intervalMin = Math.max(1, Number(intervalMin) || 30)
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
   const daySnap = await get(iRef(`timeslots/${date}`))

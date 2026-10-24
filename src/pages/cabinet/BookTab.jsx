@@ -700,7 +700,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         >
           {days.map((d, i) => {
             if (!d) return <div key={i} className="cal-day empty"></div>
-            const maxDays = adminSettings.calendarOpenDays ?? 30
+            // Приватні й автошкільні учні мають окремі горизонти видимості календаря
+            // (Налаштування → Обмеження). Учень автошколи до 40 год — «автошкола».
+            const maxDays = canPrivate
+              ? (adminSettings.calendarOpenDays ?? 30)
+              : (adminSettings.schoolCalendarOpenDays ?? 14)
             const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + maxDays)
             const disabled = isPast(d) || d > maxDate
             // «Мінімальний інтервал між записами» — день видно, але тап пояснює, чому не можна
