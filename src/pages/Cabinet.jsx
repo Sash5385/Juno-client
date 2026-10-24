@@ -22,6 +22,7 @@ import { formatDateLabel } from '../utils/date'
 import { useMosaicSwitch, MosaicOverlay } from '../mosaic'
 import './Cabinet.css'
 import { saveRedirectAfterLogin } from '../utils/redirectAfterLogin'
+import ReportProblem from '../components/ReportProblem'
 
 const TAB_COMPONENT_KEYS = ['book', 'bookings', 'progress', 'queue', 'chat', 'notifications', 'profile', 'test']
 
@@ -453,6 +454,8 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
           </div>
         )
       })()}
+
+      <ReportProblem />
 
       {ToastEl}
     </div>

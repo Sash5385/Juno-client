@@ -2,10 +2,12 @@ import { useState, useEffect, useMemo, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
-import { cancelBooking, rateBooking, saveStudentNote, saveGoals, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
+import { cancelBooking, rateBooking, saveStudentNote, saveGoals, createBooking, claimSlot, releaseClaimedSlots, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } from '../../firebase/db'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { LicenseContext } from '../../hooks/useLicense'
+import { useReviewPrompt, ReviewCard } from './ReviewPrompt'
+import { minIntervalConflict, minIntervalMessage, maxBookDate, withinCutoff, rescheduleState } from '../../utils/bookingRules'
 import './BookingsTab.css'
 import './BookTab.css'
 
@@ -45,7 +47,7 @@ function lessonCountdown(b) {
 }
 
 // ─── RESCHEDULE MODAL ────────────────────────────────────────────
-function RescheduleModal({ booking, user, profile, onClose, onDone }) {
+function RescheduleModal({ booking, user, profile, allBookings = [], onClose, onDone }) {
   useBackClose(true, onClose)
   const { showToast: showModalToast, ToastEl: ModalToastEl } = useToast()
   const isVipStudent = profile?.isVip === true
@@ -118,6 +120,12 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
 
   const handleConfirm = async () => {
     if (!selectedDate || !selectedTime) return
+    // Перенос не обходить правила звичайного запису: мінімальний інтервал і заборона запису за N год
+    const conflict = minIntervalConflict(formatDateYMD(selectedDate), allBookings, adminSettings.minBookingIntervalDays, booking.id)
+    if (conflict) { showModalToast(minIntervalMessage(adminSettings.minBookingIntervalDays, conflict)); return }
+    if (withinCutoff(selectedDate, selectedTime, adminSettings.bookCutoffHours)) {
+      showModalToast(`Записатись можна не пізніше ніж за ${adminSettings.bookCutoffHours} год до уроку`); return
+    }
     setSaving(true)
     try {
       const newDate = formatDateYMD(selectedDate)
@@ -156,6 +164,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
       // 2. Скасовуємо старий запис (відновлює старі слоти)
       await cancelBooking(user.uid, booking.id, { isReschedule: true })
       // 3. Створюємо новий
+      try {
       await createBooking(user.uid, {
         date: newDate,
         time: selectedTime,
@@ -170,6 +179,10 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         phone: booking.phone,
         rescheduledFrom: `${booking.date} ${booking.time}`,
       })
+      } catch (err) {
+        await releaseClaimedSlots(newDate, selectedTime, durationHours, adminSettings.interval || 30)
+        throw err
+      }
       onDone()
     } catch (e) {
       showModalToast('Помилка: ' + e.message)
@@ -201,18 +214,24 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
           <div className="cal-days">
             {days.map((d, i) => {
               if (!d) return <div key={i} className="cal-day empty" />
-              const disabled = isPast(d)
+              // Горизонт календаря — як у вкладці «Записатись» (calendarOpenDays)
+              const disabled = isPast(d) || d > maxBookDate(today, true, adminSettings)
               const isToday = isSameDay(d, today)
               const selected = selectedDate && isSameDay(d, selectedDate)
               const isCurrent = d && formatDateYMD(d) === booking.date
               const dateStr = formatDateYMD(d)
               const avail = monthAvail[dateStr]
-              const availClass = (!disabled && !isCurrent) ? (avail ? `day-${avail}` : '') : ''
+              const intervalConflict = !disabled && !isCurrent && minIntervalConflict(dateStr, allBookings, adminSettings.minBookingIntervalDays, booking.id)
+              const availClass = (!disabled && !isCurrent && !intervalConflict) ? (avail ? `day-${avail}` : '') : ''
               return (
                 <button
                   key={i}
-                  className={`cal-day ${disabled || isCurrent ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${availClass}`}
-                  onClick={() => !disabled && !isCurrent && setSelectedDate(d)}
+                  className={`cal-day ${disabled || isCurrent || intervalConflict ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${availClass}`}
+                  onClick={() => {
+                    if (disabled || isCurrent) return
+                    if (intervalConflict) { showModalToast(minIntervalMessage(adminSettings.minBookingIntervalDays, intervalConflict)); return }
+                    setSelectedDate(d)
+                  }}
                   disabled={disabled || isCurrent}
                 >
                   {d.getDate()}
@@ -235,7 +254,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
             ) : (
               <div className="slots-grid" style={{ marginBottom: 16 }}>
                 {slotsList.map(slot => {
-                  const unavail = slot.available === false || slot.overlapBlocked
+                  const unavail = slot.available === false || slot.overlapBlocked || withinCutoff(selectedDate, slot.time, adminSettings.bookCutoffHours)
                   const isSelected = selectedTime === slot.time
                   return (
                     <button
@@ -273,6 +292,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
 export default function BookingsTab({ user, profile, bookingsData }) {
   const { readOnly: licenseReadOnly } = useContext(LicenseContext)
   const { upcoming, completed, loading } = bookingsData
+  const reviewPrompt = useReviewPrompt(user, profile, bookingsData)
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
   const [goalsOpenId, setGoalsOpenId] = useState(null)
@@ -282,7 +302,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
   const [toast, setToast] = useState(null)
   const [adminCfg, setAdminCfg] = useState({ bookCutoffHours: 24, studentCanCancel: true })
   useEffect(() => { getAdminSettings().then(s => setAdminCfg(s)).catch(() => {}) }, [])
-  const cancelCutoff = adminCfg.bookCutoffHours ?? 24
+  const cancelCutoff = adminCfg.cancelCutoffHours ?? adminCfg.bookCutoffHours ?? 24
   const cancelAllowed = adminCfg.studentCanCancel !== false
   const totalDebt = useMemo(
     () => completed.filter(b => b.status === 'confirmed' && !b.isPaid && b.price > 0).reduce((s, b) => s + (b.price || 0), 0),
@@ -323,6 +343,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         })()
       : null
     const cancelLocked = !cancelAllowed || hoursUntilLesson(b) < cancelCutoff
+    const resch = rescheduleState(hoursUntilLesson(b), adminCfg, cancelCutoff)
     const statusClass = b.status === 'confirmed' ? 'status-confirmed'
       : b.status === 'cancelled' ? 'status-cancelled' : 'status-pending'
     const statusText = b.status === 'confirmed' ? (isPast ? 'Завершено' : 'Підтверджено')
@@ -469,7 +490,18 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            {!licenseReadOnly && <button className="action-btn" title="Перенести" onClick={() => setRescheduleBooking(b)}>📅</button>}
+            {!licenseReadOnly && resch.show && (
+              <button
+                className="action-btn"
+                title={resch.locked ? `Перенести можна не пізніше ніж за ${cancelCutoff} год` : 'Перенести'}
+                onClick={() => {
+                  if (resch.locked) { showToast(`Перенести урок можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до інструктора.`, 'error'); return }
+                  setRescheduleBooking(b)
+                }}
+                disabled={resch.locked}
+                style={resch.locked ? { opacity: 0.4 } : {}}
+              >📅</button>
+            )}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: '#e53935', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
@@ -496,6 +528,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
 
   return (
     <div className="fade-up">
+      <ReviewCard prompt={reviewPrompt} />
       {upcoming.length === 0 && completed.length === 0 ? (
         <div className="empty-state">
           <div className="empty-state-emoji">📅</div>
@@ -569,6 +602,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
           booking={rescheduleBooking}
           user={user}
           profile={profile}
+          allBookings={[...upcoming, ...completed]}
           onClose={() => setRescheduleBooking(null)}
           onDone={() => { setRescheduleBooking(null); showToast('Урок перенесено') }}
         />

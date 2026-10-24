@@ -1,8 +1,9 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
-import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, claimReservedSlot, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
+import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, claimSlot, releaseClaimedSlots, claimReservedSlot, setViewingSlot, clearViewingSlot, subscribeMonthAvailability } from '../../firebase/db'
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, parseYMD } from '../../utils/date'
 import { getInitials, pluralize } from '../../utils/format'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
+import { minIntervalConflict, minIntervalMessage } from '../../utils/bookingRules'
 import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
 
@@ -286,6 +287,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       return
     }
     const dateStr = formatDateYMD(selectedDate)
+    // «Мінімальний інтервал між записами» з налаштувань інструктора
+    const intervalConflict = minIntervalConflict(dateStr, [...bookingsData.upcoming, ...(bookingsData.completed || [])], adminSettings.minBookingIntervalDays)
+    if (intervalConflict) {
+      showToast(minIntervalMessage(adminSettings.minBookingIntervalDays, intervalConflict))
+      return
+    }
     if (overlapsMyBooking(dateStr, startTime, durationHours)) {
       showToast('Ви вже записані на цей час')
       return
@@ -314,6 +321,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         : lessonPrice(durationHours, surcharge)
       const currentSlot = slots[`slot${startTime.replace(':', '')}`]
       const isOfferedToMe = !!currentSlot?.offeredTo?.[user?.uid]
+      let claimedFrom = startTime, claimedHours = durationHours // що саме захопили (для звільнення, якщо запис не створився)
       // Атомарно займаємо весь діапазон (перша година вже зарезервована
       // саме для мене через чергу — атомарно займаємо лише решту, якщо
       // бронювання довше 1 год)
@@ -333,7 +341,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           setSubmitting(false)
           return
         }
+        claimedFrom = nextTime; claimedHours = durationHours - 1
+      } else {
+        claimedHours = 0 // перша година зарезервована чергою — власних захоплень нема
       }
+      try {
       await createBooking(user.uid, {
         date: dateStr,
         time: startTime,
@@ -348,6 +360,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         phone: profile.phone || user.phoneNumber,
         studentNote: studentNote.trim() || undefined,
       })
+      } catch (err) {
+        // запис не створився — не лишаємо слоти зайнятими
+        if (claimedHours > 0) await releaseClaimedSlots(dateStr, claimedFrom, claimedHours, adminSettings.interval || 30)
+        throw err
+      }
       setStudentNote("")
       if (isOfferedToMe) {
         await claimReservedSlot(dateStr, startTime, user.uid)
@@ -686,18 +703,24 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             const maxDays = adminSettings.calendarOpenDays ?? 30
             const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + maxDays)
             const disabled = isPast(d) || d > maxDate
+            // «Мінімальний інтервал між записами» — день видно, але тап пояснює, чому не можна
+            const intervalConflict = !disabled && minIntervalConflict(formatDateYMD(d), [...bookingsData.upcoming, ...(bookingsData.completed || [])], adminSettings.minBookingIntervalDays)
             const isToday = isSameDay(d, today)
             const selected = selectedDate && isSameDay(d, selectedDate)
             const dateStr = formatDateYMD(d)
             const avail = monthAvail[dateStr]      // undefined=loading, null=empty, 'free'/'partial'/'full'
-            const dayClass = disabled ? '' :
+            const dayClass = (disabled || intervalConflict) ? '' :
               avail === undefined ? 'has-slots' :  // loading - show neutral
               avail ? `day-${avail}` : ''          // loaded: colored or plain
             return (
               <button
                 key={i}
-                className={`cal-day ${disabled ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${dayClass}`}
-                onClick={() => { if (!disabled) { setLoading(true); setSelectedDate(d) } }}
+                className={`cal-day ${disabled || intervalConflict ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${dayClass}`}
+                onClick={() => {
+                  if (disabled) return
+                  if (intervalConflict) { showToast(minIntervalMessage(adminSettings.minBookingIntervalDays, intervalConflict)); return }
+                  setLoading(true); setSelectedDate(d)
+                }}
                 disabled={disabled}
               >
                 {d.getDate()}

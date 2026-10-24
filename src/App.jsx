@@ -5,7 +5,7 @@ import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
 import { auth } from './firebase/config'
 import {
-  getUserProfile, updateUserProfile, createBooking, claimSlot,
+  getUserProfile, subscribeUserAdminFields, updateUserProfile, createBooking, claimSlot, releaseClaimedSlots,
   setCurrentTenant, loadStoredTenant, resolveSlug, getCurrentSlug,
 } from './firebase/db'
 import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
@@ -284,6 +284,12 @@ export default function App() {
     navigate({ pathname: location.pathname, search: '?' + p.toString(), hash: location.hash }, { replace: true, state: location.state })
   }, [tenantIid, location.pathname, location.search])
 
+  // Знижка/ціна/VIP, які інструктор змінив, поки учень у застосунку, підтягуються наживо (без перезаходу)
+  useEffect(() => {
+    if (!user?.uid || !profile) return
+    return subscribeUserAdminFields(user.uid, fields => setProfile(p => (p ? { ...p, ...fields } : p)))
+  }, [user?.uid, !!profile])
+
   useEffect(() => {
     if (tenantIid === undefined) return // ще визначаємо інструктора
     if (!tenantIid) { setLoading(false); return } // посилання-інструктора нема
@@ -367,6 +373,7 @@ export default function App() {
         if (!claimed) {
           showToast('На жаль, цей слот вже зайняли поки ви авторизувались. Оберіть інший час.')
         } else {
+          try {
           await createBooking(auth.currentUser.uid, {
             date: pb.date,
             time: pb.time,
@@ -376,6 +383,10 @@ export default function App() {
             studentName: p.name,
             phone: p.phone || auth.currentUser.phoneNumber,
           })
+          } catch (err) {
+            await releaseClaimedSlots(pb.date, pb.time, pb.duration, 30)
+            throw err
+          }
         }
       } catch (e) {
         console.error('Auto-book failed:', e)

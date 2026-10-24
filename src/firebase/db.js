@@ -1,5 +1,5 @@
 ﻿import {
-  ref, get, set, update, push, onValue, off, remove, increment, onDisconnect, runTransaction
+  ref, get, set, update, push, onValue, off, remove, increment, onDisconnect, runTransaction, serverTimestamp
 } from 'firebase/database'
 import { db, auth } from './config'
 import { DEMO } from '../demo/demoMode'
@@ -105,7 +105,22 @@ export async function getUserProfile(uid) {
   if (!snap.exists()) { _blocked = false; return null }
   const data = snap.val()
   _blocked = !!data.blocked
+  // Вузол users/{uid} може існувати без анкети (токен push тощо) — тоді профілю ще нема: вхід веде на анкету
+  if (!data.profile || !String(data.profile.name || '').trim()) return null
   return { ...(data.profile || {}), isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 }
+}
+
+// Поля, які змінює інструктор (знижка, індивідуальна ціна, VIP, блок…): getUserProfile читає їх лише при вході,
+// тож учень з уже відкритим застосунком не бачив нової знижки. Ця підписка оновлює їх наживо.
+export function subscribeUserAdminFields(uid, callback) {
+  const r = iRef(`users/${uid}`)
+  const handler = onValue(r, snap => {
+    const data = snap.val()
+    if (!data) return
+    _blocked = !!data.blocked
+    callback({ isVip: data.isVip || false, discount: data.discount || 0, customPrice: data.customPrice ?? null, hoursOffset: data.hoursOffset || 0, lessonBalance: data.lessonBalance || 0 })
+  }, () => {})
+  return () => off(r, 'value', handler)
 }
 
 export async function saveUserProfile(uid, profile) {
@@ -335,6 +350,7 @@ export function getCompletedHours(bookings) {
 // захоплені в цій же спробі й повертає false.
 export async function claimSlot(date, startTime, durationHours = 1, intervalMin = 30) {
   if (_blocked) return false
+  intervalMin = Math.max(30, Number(intervalMin) || 30) // дрібний крок сітки адміна не множить службові слоти
   const uid = auth.currentUser?.uid || null
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
@@ -367,11 +383,29 @@ export async function claimSlot(date, startTime, durationHours = 1, intervalMin 
   return true
 }
 
+// Повертає слоти, які щойно захопив claimSlot, якщо запис після цього не вдалось створити
+// (мережа, правила, ліцензія): інакше час лишається зайнятим без запису. Чужі слоти не чіпає.
+export async function releaseClaimedSlots(date, startTime, durationHours = 1, intervalMin = 30) {
+  intervalMin = Math.max(30, Number(intervalMin) || 30)
+  const uid = auth.currentUser?.uid || null
+  const [h, m] = startTime.split(':').map(Number)
+  const startMin = h * 60 + m
+  const endMin = startMin + durationHours * 60
+  for (let min = startMin; min < endMin; min += intervalMin) {
+    const slotId = `slot${String(Math.floor(min / 60)).padStart(2, '0')}${String(min % 60).padStart(2, '0')}`
+    await runTransaction(iRef(`timeslots/${date}/${slotId}`), current => {
+      if (!current || current.bookedBy !== uid) return current
+      return current.phantom ? null : { ...current, available: true, bookedBy: null }
+    }).catch(() => {})
+  }
+}
+
 // Позначає недоступними слоти діапазону БЕЗ атомарного захоплення —
 // лише для випадку, коли перший слот діапазону вже гарантовано
 // заброньований одержувачем через чергу (offeredTo/reservedFor
 // блокує інших від початку), тож гонки за нього немає.
 export async function markSlotsUnavailable(date, startTime, durationHours, intervalMin = 30) {
+  intervalMin = Math.max(30, Number(intervalMin) || 30)
   const [h, m] = startTime.split(':').map(Number)
   const startMin = h * 60 + m
   const daySnap = await get(iRef(`timeslots/${date}`))
@@ -408,15 +442,26 @@ export async function claimQueueOffer(uid, slotKey, offer, profile) {
   const entry = entrySnap.val()
   if (!entry) throw new Error('Queue entry not found')
   const durationHours = entry.durationHours || 1
-  await createBooking(uid, {
-    date: offer.date,
-    time: offer.time,
-    serviceType: entry.studentType,
-    durationHours,
-    studentName: entry.name || profile?.name || '',
-    phone: entry.phone || profile?.phone || '',
-  })
-  await markSlotsUnavailable(offer.date, offer.time, durationHours, 30)
+  // Атомарно займаємо весь діапазон: якщо місце встиг зайняти хтось інший — запис не створюємо
+  const claimed = await claimSlot(offer.date, offer.time, durationHours, 30)
+  if (!claimed) {
+    await clearQueueOffer(uid, slotKey).catch(() => {})
+    throw new Error('Це місце вже зайняв інший учень')
+  }
+  try {
+    await createBooking(uid, {
+      date: offer.date,
+      time: offer.time,
+      serviceType: entry.studentType,
+      durationHours,
+      studentName: entry.name || profile?.name || '',
+      phone: entry.phone || profile?.phone || '',
+    })
+  } catch (err) {
+    // запис не створився — не лишаємо слоти зайнятими
+    await releaseClaimedSlots(offer.date, offer.time, durationHours, 30)
+    throw err
+  }
   await claimReservedSlot(offer.date, offer.time, uid)
   await clearQueueOffer(uid, slotKey)
 }
@@ -481,6 +526,17 @@ export async function getApprovedReviews(max = 12) {
   })
   list.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0))
   return list.slice(0, max)
+}
+
+// Власні відгуки учня (reviews/{uid}/…): за ними рахуємо, чи час просити новий відгук (кожні 10 уроків)
+export async function getMyReviews(uid) {
+  const snap = await get(iRef(`reviews/${uid}`))
+  return snap.exists() ? Object.values(snap.val()).filter(Boolean) : []
+}
+
+// Новий відгук: правила бази дозволяють учню лише створити свій (оцінка 1–5, текст до 500, createdAt — серверний)
+export async function createReview(uid, { rating, text, studentName, atLessons }) {
+  await push(iRef(`reviews/${uid}`), { rating, text, studentName, atLessons, createdAt: serverTimestamp() })
 }
 
 // ─── CHAT ────────────────────────────────────────────────────────

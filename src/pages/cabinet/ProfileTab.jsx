@@ -4,14 +4,18 @@ import { useTheme, PALETTES } from "../../hooks/useTheme";
 import { useToast } from "../../hooks/useToast";
 import { getInitials, formatPhone } from "../../utils/format";
 import { APP_VERSION } from "../../version.js";
+import { openReportProblem } from "../../components/ReportProblem";
 import { auth } from "../../firebase/config";
 import { getCurrentIid } from "../../firebase/db";
 import { signOut } from "../../firebase/auth";
+import PhotoCropModal from "./PhotoCropModal";
+import { useReviewPrompt, ReviewProfileButton } from "./ReviewPrompt";
 import "./ProfileTab.css";
 
-export default function ProfileTab({ user, profile, onProfileUpdate }) {
+export default function ProfileTab({ user, profile, bookingsData, onProfileUpdate }) {
   const { palette, setPalette } = useTheme();
   const { showToast, ToastEl } = useToast();
+  const reviewPrompt = useReviewPrompt(user, profile, bookingsData);
 
   const [instructorProfile, setInstructorProfile] = useState(null);
   useEffect(() => {
@@ -20,6 +24,27 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const iPhone = instructorProfile?.phone || '';
   const iAddress = instructorProfile?.address || '';
   const iPhoneDigits = iPhone.replace(/\D/g, '');
+
+  // Фото профілю: кадрування (рух + масштаб) → 160×160 JPEG (≈6 КБ) прямо в users/{uid}/profile/photo
+  const [photoBusy, setPhotoBusy] = useState(false);
+  const savePhoto = async (photo) => {
+    setPhotoBusy(true);
+    try {
+      await updateUserProfile(user.uid, { photo });
+      await onProfileUpdate?.();
+    } catch (e) {
+      showToast("Не вдалося зберегти фото");
+    } finally {
+      setPhotoBusy(false);
+    }
+  };
+  const [cropFile, setCropFile] = useState(null);
+  const onPhotoPick = (e) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (file) setCropFile(file);
+  };
+  const removePhoto = () => savePhoto(null);
 
   // Видалення власного акаунта (дані записів, чатів, сповіщень + обліковий запис). Незворотно.
   const [delOpen, setDelOpen] = useState(false);
@@ -110,7 +135,12 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
   return (
     <div className="profile-tab">
       <div className="profile-banner">
-        <div className="profile-avatar">{getInitials(profile.name)}</div>
+        <label className={`profile-avatar profile-avatar--edit${profile.photo ? ' has-photo' : ''}`} title="Змінити фото">
+          {profile.photo ? <img src={profile.photo} alt="" /> : getInitials(profile.name)}
+          <span className="profile-avatar-cam" aria-hidden="true">📷</span>
+          <input type="file" accept="image/*" hidden disabled={photoBusy} onChange={onPhotoPick} />
+        </label>
+        {profile.photo && <button type="button" className="profile-photo-del" onClick={removePhoto} disabled={photoBusy}>Видалити фото</button>}
         <div className="profile-name">{profile.name}</div>
         <div className="profile-phone">{formatPhone(profile.phone || user?.phoneNumber)}</div>
       </div>
@@ -172,6 +202,8 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       </div>
 
 
+      <ReviewProfileButton prompt={reviewPrompt} />
+
       {iPhone && (
         <div className="profile-section">
           <div className="section-title">Контакти інструктора</div>
@@ -207,6 +239,13 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           )}
         </div>
       )}
+
+      <div className="profile-section">
+        <button type="button" onClick={openReportProblem} className="edit-tile" style={{width:"100%",marginTop:0,padding:"12px 14px",textAlign:"left",display:"flex",alignItems:"center",gap:10}}>
+          <span style={{fontSize:22}}>🛠</span>
+          <span style={{flex:1}}><b style={{display:"block"}}>Щось не працює?</b><span style={{fontSize:12,color:"var(--faint)"}}>Опишіть проблему — ми отримаємо її одразу</span></span>
+        </button>
+      </div>
 
       <div className="profile-section">
         <div className="section-title">🎨 Оформлення</div>
@@ -301,6 +340,14 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       <div onClick={forceUpdate} style={{textAlign:"center",padding:"12px 0 4px",color:"#5a5c62",fontSize:13,fontWeight:600,letterSpacing:0.5,cursor:"pointer"}}>
         {APP_VERSION}
       </div>
+
+      {cropFile && (
+        <PhotoCropModal
+          file={cropFile} round outSize={160} title="Фото профілю"
+          onCancel={() => setCropFile(null)}
+          onDone={(dataUrl) => { setCropFile(null); savePhoto(dataUrl); }}
+        />
+      )}
 
       {ToastEl}
     </div>
