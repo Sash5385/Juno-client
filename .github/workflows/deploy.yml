@@ -3,7 +3,7 @@ name: Deploy to Firebase
 on:
   push:
     branches:
-      - claude/optimistic-bardeen-o4gf7w
+      - main
 
 jobs:
   tests:
@@ -32,7 +32,7 @@ jobs:
           repoToken: ${{ secrets.GITHUB_TOKEN }}
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
           channelId: live
-          projectId: ${{ secrets.FIREBASE_PROJECT_ID }}
+          projectId: juno-booking
 
   build-android:
     runs-on: ubuntu-latest
