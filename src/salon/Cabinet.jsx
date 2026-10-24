@@ -48,7 +48,7 @@ export default function Cabinet() {
         <div style={{ flex: 1, minWidth: 0 }}><div style={{ fontSize: 16, fontWeight: 900, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{profile.name}</div><div style={{ fontSize: 11.5, color: 'var(--dim)' }}>Мій кабінет</div></div>
         {signedIn && <button onClick={() => setFlow(true)} style={{ border: 'none', borderRadius: 11, padding: '9px 13px', background: 'linear-gradient(145deg,var(--acc-hi),var(--accent))', color: '#fff', fontWeight: 800, fontSize: 13, cursor: 'pointer', fontFamily: 'inherit' }}>＋ Записатись</button>}
       </div>
-      <div style={{ flex: 1, overflowY: 'auto', padding: '6px 14px calc(88px + env(safe-area-inset-bottom,0px))', maxWidth: 640, width: '100%', margin: '0 auto' }}>
+      <div style={{ flex: 1, overflowY: 'auto', padding: '6px 14px calc(88px + env(safe-area-inset-bottom,0px))', maxWidth: 640, width: '100%', margin: '0 auto', zoom: 'var(--ui-zoom, 1)' }}>
         {!signedIn ? <Card style={{ padding: '16px 16px' }}><ClientAuth /></Card> : (
           tab === 'bookings' ? <MyBookings bookings={bookings} loading={q.loading} openChat={(id) => { setChatMaster(id); nav('/cabinet/chat') }} />
             : tab === 'chat' ? <ChatTab bookings={bookings} initialMaster={chatMaster} unread={unread} />

@@ -6,7 +6,7 @@ import { useSalon } from './ctx'
 import { sref } from './data'
 import { registerClientPush, pushPermission } from './push'
 import { signOut } from '../firebase/auth-email'
-import { useTheme } from '../hooks/useTheme'
+import { useTheme, UI_SCALES } from '../hooks/useTheme'
 import { APP_VERSION } from '../version.js'
 import { normalizePhone, formatPhone } from '../utils/format'
 import { Btn, Card, Chip, Field } from './kit'
@@ -14,7 +14,7 @@ import { Btn, Card, Chip, Field } from './kit'
 export default function ProfileTab() {
   const { salonId, user, uProfile, profile, slug, toast } = useSalon()
   const nav = useNavigate()
-  const { theme, toggle } = useTheme()
+  const { theme, toggle, uiScale, setUiScale } = useTheme()
   const [name, setName] = useState(uProfile?.name || '')
   const [phone, setPhone] = useState(formatPhone(uProfile?.phone || ''))
   const [busy, setBusy] = useState(false)
@@ -44,6 +44,10 @@ export default function ProfileTab() {
       <Card style={{ padding: '14px 16px', marginBottom: 12 }}>
         <div style={{ fontWeight: 800, marginBottom: 8 }}>Вигляд</div>
         <div style={{ display: 'flex', gap: 8 }}><Chip active={theme === 'dark'} onClick={() => theme !== 'dark' && toggle()}>Темна</Chip><Chip active={theme === 'light'} onClick={() => theme !== 'light' && toggle()}>Світла</Chip></div>
+        <div style={{ fontWeight: 800, margin: '14px 0 8px' }}>Розмір інтерфейсу</div>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3, minmax(0, 1fr))', gap: 8 }}>
+          {UI_SCALES.map(sc => <Chip key={sc.id} active={uiScale === sc.id} onClick={() => setUiScale(sc.id)}>{sc.name}</Chip>)}
+        </div>
       </Card>
       <Btn variant="ghost" onClick={() => nav(`/s/${slug}`)} style={{ marginBottom: 8 }}>Сторінка салону «{profile.name}»</Btn>
       <Btn variant="ghost" danger onClick={async () => { await signOut(); nav(`/s/${slug}`) }}>Вийти</Btn>
