@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "site": "juno-client",
+    "site": "juno-booking-client",
     "public": "dist",
     "ignore": [
       "firebase.json",

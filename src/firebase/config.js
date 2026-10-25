@@ -6,11 +6,11 @@ import { DEMO, DEMO_USER } from '../demo/demoMode'
 // Беремо з .env (Vite автоматично підставляє import.meta.env.VITE_*)
 // Якщо .env немає — fallback на дефолти (треба підставити вручну)
 // iPhone (Safari/ярлик) блокує сховище між різними доменами: вхід через Google робить
-// редірект на juno-booking.firebaseapp.com і назад на juno-client.web.app, а результат
+// редірект на juno-booking.firebaseapp.com і назад на juno-booking-client.web.app, а результат
 // входу лишається в "чужому" сховищі — користувач повертається невійшовшим. Firebase Hosting
 // віддає /__/auth/handler на КОЖНОМУ домені сайту, тож на iOS робимо authDomain тим самим,
 // що й у сайту (same-origin). Потрібно один раз додати
-// https://juno-client.web.app/__/auth/handler в Authorized redirect URIs OAuth-клієнта
+// https://juno-booking-client.web.app/__/auth/handler в Authorized redirect URIs OAuth-клієнта
 // (Google Cloud Console → Credentials). На інших платформах — як раніше.
 function defaultAuthDomain() {
   const fallback = 'juno-booking.firebaseapp.com'
