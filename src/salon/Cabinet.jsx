@@ -55,13 +55,27 @@ export default function Cabinet() {
               : tab === 'notifs' ? <NotifTab /> : <ProfileTab />
         )}
       </div>
-      <nav style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 100, display: 'flex', background: 'linear-gradient(180deg,var(--surf-hi),var(--surface))', borderTop: '1px solid var(--border)', padding: '6px 4px calc(8px + env(safe-area-inset-bottom,0px))' }}>
-        {TABS.map(([id, icon, label]) => (
-          <button key={id} onClick={() => go(id)} style={{ flex: 1, border: 'none', background: 'transparent', cursor: 'pointer', fontFamily: 'inherit', position: 'relative', color: tab === id ? 'var(--accent)' : 'var(--dim)', fontWeight: tab === id ? 800 : 600, padding: '4px 0' }}>
-            <div style={{ fontSize: 20 }}>{icon}</div><div style={{ fontSize: 10.5, marginTop: 2 }}>{label}</div>
-            {id === 'chat' && unreadTotal > 0 && <span style={{ position: 'absolute', top: 0, right: '22%', minWidth: 16, height: 16, borderRadius: 8, background: 'var(--accent)', color: '#fff', fontSize: 10, fontWeight: 800, display: 'flex', alignItems: 'center', justifyContent: 'center', padding: '0 4px' }}>{unreadTotal}</span>}
-          </button>
-        ))}
+      <nav style={{ position: 'fixed', left: 0, right: 0, bottom: 0, zIndex: 100, padding: '0 3px max(10px, calc(env(safe-area-inset-bottom) - 20px))', pointerEvents: 'none' }}>
+        <div style={{ display: 'flex', overflow: 'visible', pointerEvents: 'auto', background: 'rgba(0,0,0,0.52)', backdropFilter: 'blur(20px)', WebkitBackdropFilter: 'blur(20px)', borderRadius: 26, border: '1px solid rgba(255,255,255,0.12)', boxShadow: '0 12px 40px rgba(0,0,0,0.65), 0 4px 16px rgba(0,0,0,0.4)' }}>
+          {[...TABS.slice(0, 2), null, ...TABS.slice(2)].map((t) => {
+            if (!t) return (
+              <div key="fab" style={{ flex: '1 1 0', minWidth: 0, display: 'flex', justifyContent: 'center', position: 'relative' }}>
+                {signedIn && <button onClick={() => setFlow(true)} aria-label="Записатись" style={{ position: 'absolute', top: -36, width: 78, height: 78, borderRadius: '50%', background: 'linear-gradient(155deg,var(--acc-hi),var(--accent))', border: '5px solid var(--bg)', display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'pointer', boxShadow: '0 10px 28px rgba(255,90,60,0.5)', zIndex: 2 }}>
+                  <svg width="33" height="33" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.2" strokeLinecap="round"><rect x="3" y="5" width="18" height="16" rx="2" /><path d="M8 3v4M16 3v4M3 10h18" /></svg>
+                </button>}
+              </div>
+            )
+            const [id, icon, label] = t
+            const on = tab === id
+            return (
+              <button key={id} onClick={() => go(id)} style={{ flex: '1 1 0', minWidth: 0, background: 'transparent', border: 'none', cursor: 'pointer', fontFamily: 'inherit', display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 3, padding: '10px 2px 9px', position: 'relative' }}>
+                <div style={{ fontSize: 18, lineHeight: 1.2, opacity: on ? 1 : 0.55, transform: on ? 'scale(1.1)' : 'none', transition: 'transform .15s, opacity .15s' }}>{icon}</div>
+                <div style={{ fontSize: 10, fontWeight: 700, whiteSpace: 'nowrap', color: on ? 'var(--accent)' : 'rgba(255,255,255,0.45)' }}>{label}</div>
+                {id === 'chat' && unreadTotal > 0 && <span style={{ position: 'absolute', top: 0, right: '30%', background: 'var(--accent)', color: '#fff', borderRadius: 10, padding: '1px 5px', fontSize: 9, fontWeight: 800 }}>{unreadTotal}</span>}
+              </button>
+            )
+          })}
+        </div>
       </nav>
       {flow && <BookFlow onClose={() => setFlow(false)} />}
     </div>
