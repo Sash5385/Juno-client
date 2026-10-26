@@ -8,13 +8,13 @@ self.addEventListener('install', () => self.skipWaiting())
 self.addEventListener('activate', () => self.clients.claim())
 
 firebase.initializeApp({
-  apiKey: "TODO_JUNO_API_KEY",
+  apiKey: "AIzaSyDu4tWzXFZWWlaJGuhlibDKz1U96Uk3Q74",
   authDomain: "juno-booking.firebaseapp.com",
   databaseURL: "https://juno-booking-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: "juno-booking",
   storageBucket: "juno-booking.firebasestorage.app",
-  messagingSenderId: "TODO_JUNO_SENDER_ID",
-  appId: "TODO_JUNO_APP_ID"
+  messagingSenderId: "852885730629",
+  appId: "1:852885730629:web:9a8f34b87d2538541cba2c"
 })
 
 const messaging = firebase.messaging()

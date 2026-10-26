@@ -24,13 +24,13 @@ function defaultAuthDomain() {
 }
 
 const firebaseConfig = {
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "TODO_JUNO_API_KEY",
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "AIzaSyDu4tWzXFZWWlaJGuhlibDKz1U96Uk3Q74",
   authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || defaultAuthDomain(),
   databaseURL: import.meta.env.VITE_FIREBASE_DATABASE_URL || "https://juno-booking-default-rtdb.europe-west1.firebasedatabase.app",
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "juno-booking",
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "juno-booking.firebasestorage.app",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "TODO_JUNO_SENDER_ID",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "TODO_JUNO_APP_ID"
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "852885730629",
+  appId: import.meta.env.VITE_FIREBASE_APP_ID || "1:852885730629:web:9a8f34b87d2538541cba2c"
 }
 
 export const app = initializeApp(firebaseConfig)
