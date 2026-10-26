@@ -4,8 +4,8 @@ import { app } from './config'
 import { iRef } from './db'
 import { DEMO } from '../demo/demoMode'
 
-// VAPID-ключ навмисно НЕ задаємо: раніше тут стояв ключ проєкту ID4, а DrivePad працює на
-// іншому проєкті (drivepad-86fe1) — Firebase відхиляв getToken, токени учнів не
+// VAPID-ключ навмисно НЕ задаємо: раніше тут стояв ключ проєкту ID4, а Juno працює на
+// іншому проєкті (juno-booking) — Firebase відхиляв getToken, токени учнів не
 // зберігались. Без vapidKey SDK бере ключ за замовчуванням, який працює для будь-якого проєкту.
 
 let messaging = null

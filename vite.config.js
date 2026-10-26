@@ -25,7 +25,7 @@ function versionGuard() {
   let version = ''
   let overlayJs = ''
   return {
-    name: 'drivepad-client-version-guard',
+    name: 'juno-client-version-guard',
     buildStart() {
       version = readVersion()
       // Анімація оновлення — окремий читабельний файл, вставляється в HTML інлайном.
