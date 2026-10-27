@@ -249,10 +249,10 @@ export default function ProfileTab({ user, profile, bookingsData, onProfileUpdat
 
       <div className="profile-section">
         <div className="section-title">🎨 Оформлення</div>
-        <div className="edit-tiles">
+        <div className="edit-tiles" style={{display:"grid",gridTemplateColumns:`repeat(${PALETTES.length}, minmax(0, 1fr))`,gap:6}}>
           {PALETTES.map(p => (
-            <button key={p.id} type="button" className={`edit-tile${palette === p.id ? " selected" : ""}`} onClick={() => setPalette(p.id)}>
-              <span style={{display:"flex",justifyContent:"center",gap:4,marginBottom:6}}>
+            <button key={p.id} type="button" className={`edit-tile${palette === p.id ? " selected" : ""}`} style={{padding:"10px 2px",fontSize:12,minWidth:0}} onClick={() => setPalette(p.id)}>
+              <span style={{display:"flex",justifyContent:"center",gap:3,marginBottom:6}}>
                 {p.colors.map(c => <i key={c} style={{width:14,height:14,borderRadius:"50%",background:c,display:"block",boxShadow:"0 0 0 1.5px rgba(255,255,255,0.35)"}}/>)}
               </span>
               {p.name}
