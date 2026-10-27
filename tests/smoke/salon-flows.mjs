@@ -27,6 +27,7 @@ check("services grouped by category", await fhas("Стрижка") && await fhas
 await flow().getByText("Жіноча стрижка").first().click();
 check("master step: any + both masters with their own prices", await fhas("Будь-який майстер") && await fhas("Борис Литвин") && await fhas("550"));
 await flow().getByText("Борис Литвин").first().click();
+await flow().locator("button", { hasText: /^\d\d:\d\d$/ }).first().waitFor({ timeout: 2500 }).catch(() => {}); // слоти підвантажуються асинхронно
 check("time step: date strip and free times", await fhas("Дата і час") && (await flow().locator("button", { hasText: /^\d\d:\d\d$/ }).count()) > 0);
 await flow().locator("button", { hasText: /^\d\d:\d\d$/ }).last().click();
 check("confirm: summary with master price and payment options", await fhas("Підтвердження") && await fhas("550 ₴") && await fhas("Передоплата") && await fhas("Оплатити в салоні"));
@@ -41,7 +42,8 @@ console.log("── мої записи: політика скасування, 
 check("payment status shown (deposit paid / waiting)", await has("Передоплата внесена") && await has("Чекає оплати"));
 check("unpaid online booking shows hold deadline", await has("Оплатіть до"));
 check("other client's booking is not shown", !(await has("Чужий запис", 800)));
-await page.locator("button", { hasText: "Скасувати" }).first().click();
+// кнопка саме платного запису: новий запис із сьогоднішнім слотом може стояти першим у списку
+await page.locator("div").filter({ hasText: "Доплатити" }).last().locator("button", { hasText: "Скасувати" }).click();
 check("cancel dialog explains the policy for the paid booking", await has("Скасувати запис?") && (await has("безкоштовне") || await has("не повертається")) && await has("210"));
 await page.locator("button", { hasText: "Залишити" }).click();
 check("dialog closes without cancelling", !(await has("Скасувати запис?", 600)));
