@@ -50,7 +50,7 @@ check("dialog closes without cancelling", !(await has("Скасувати зап
 await page.locator("div").filter({ hasText: "Доплатити" }).last().locator("button", { hasText: "Перенести" }).click();
 await flow().locator("button", { hasText: /^\d\d:\d\d$/ }).first().waitFor();
 check("reschedule opens at the time step (same master, date strip)", await fhas("Перенести запис") && (await flow().locator("button", { hasText: /^\d\d:\d\d$/ }).count()) > 0);
-await flow().locator("button", { hasText: /^\d\d:\d\d$/ }).nth(2).click();
+await flow().locator("button", { hasText: /^\d\d:\d\d$/ }).last().click();
 check("paid booking: deposit moves, no payment choice offered", await fhas("Передоплата 210") && !(await fhas("Оплатити в салоні", 500)));
 await flow().locator("button", { hasText: /^Перенести$/ }).click();
 check("reschedule done", await fhas("Запис перенесено"));
