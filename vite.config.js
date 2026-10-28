@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { VitePWA } from 'vite-plugin-pwa'
 import { readFileSync } from 'node:fs'
@@ -21,7 +21,7 @@ function readVersion() {
 // tear down the SW + caches, and reload onto fresh code. Checks the version
 // immediately, then periodically (every 45s) and on tab-visible, so an
 // already-open session also picks up a new deploy without a manual reload.
-function versionGuard() {
+function versionGuard(base = '/') {
   let version = ''
   let overlayJs = ''
   return {
@@ -29,12 +29,12 @@ function versionGuard() {
     buildStart() {
       version = readVersion()
       // Анімація оновлення — окремий читабельний файл, вставляється в HTML інлайном.
-      try { overlayJs = readFileSync(resolve(__dirname, 'src/updateOverlay.inline.js'), 'utf8') } catch { overlayJs = '' }
+      try { overlayJs = readFileSync(resolve(__dirname, 'src/updateOverlay.inline.js'), 'utf8').replace("'/version.json?_='", JSON.stringify(base + 'version.json?_=').replace(/"/g, "'")) } catch { overlayJs = '' }
     },
     transformIndexHtml(html) {
       const guard =
         '<script>(function(){var B=' + JSON.stringify(version) + ';' +
-        'function check(){try{fetch("/version.json?_="+Date.now(),{cache:"no-store"})' +
+        'function check(){try{fetch(' + JSON.stringify(base + 'version.json?_=') + '+Date.now(),{cache:"no-store"})' +
         '.then(function(r){return r.json()}).then(function(d){' +
         'if(d&&d.version&&d.version!==B){' +
         'var k="vreset_"+d.version;if(sessionStorage.getItem(k))return;' +
@@ -81,14 +81,18 @@ function versionGuard() {
   }
 }
 
-export default defineConfig({
+// VITE_BASE — підшлях розміщення (напр. /junoclient/ на aldemi.com.ua); за замовчуванням корінь, збірка не змінюється.
+export default defineConfig(({ mode }) => {
+const base = loadEnv(mode, process.cwd(), '').VITE_BASE || '/'
+return {
+  base,
   resolve: {
     // Демо-режим (?demo=1) — див. src/firebaseDbDemo.js
     alias: [{ find: /^firebase\/database$/, replacement: resolve(__dirname, 'src/firebaseDbDemo.js') }],
   },
   plugins: [
     react(),
-    versionGuard(),
+    versionGuard(base),
     VitePWA({
       registerType: 'prompt',
       includeAssets: ['favicon.svg'],
@@ -101,20 +105,21 @@ export default defineConfig({
         display: 'standalone',
         orientation: 'portrait',
         lang: 'uk',
-        start_url: '/',
+        start_url: base,
+        scope: base,
         icons: [
           {
-            src: '/icon-192.png',
+            src: base + 'icon-192.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png',
+            src: base + 'icon-512.png',
             sizes: '512x512',
             type: 'image/png'
           },
           {
-            src: '/icon-512.png',
+            src: base + 'icon-512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any maskable'
@@ -163,4 +168,5 @@ export default defineConfig({
     port: 5173,
     host: true
   }
+}
 })

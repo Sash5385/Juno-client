@@ -62,7 +62,7 @@ export default function ProfileTab({ user, profile, bookingsData, onProfileUpdat
       if (!resp.ok) throw new Error("server");
       try { localStorage.clear(); } catch { /* ignore */ }
       await signOut().catch(() => {});
-      window.location.href = "/";
+      window.location.href = import.meta.env.BASE_URL;
     } catch {
       setDeleting(false);
       showToast("Не вдалося видалити акаунт. Спробуйте пізніше");
@@ -283,7 +283,7 @@ export default function ProfileTab({ user, profile, bookingsData, onProfileUpdat
             onClick={() => {
               const slug = getCurrentSlug();
               const origin = window.location.origin;
-              const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
+              const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
               navigator.clipboard.writeText(link)
                 .then(() => showToast("Посилання скопійовано!"))
                 .catch(() => showToast("Скопіюйте: " + link));
@@ -298,7 +298,7 @@ export default function ProfileTab({ user, profile, bookingsData, onProfileUpdat
               onClick={() => {
                 const slug = getCurrentSlug();
                 const origin = window.location.origin;
-                const link = slug ? `${origin}/i/${slug}/?ref=${user.uid}` : `${origin}/?ref=${user.uid}`;
+                const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
                 navigator.share({ title: 'DrivePad', text: 'Запишись на уроки водіння!', url: link }).catch(() => {});
               }}
               className="edit-save"

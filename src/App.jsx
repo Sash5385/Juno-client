@@ -106,7 +106,7 @@ function InstallPrompt({ active }) {
       boxShadow:'0 12px 36px rgba(0,0,0,0.5)',
     }}>
       <div style={{display:'flex', alignItems:'center', gap:10}}>
-        <img src="/icon-192.png" alt="" style={{width:40, height:40, borderRadius:10, flexShrink:0}} />
+        <img src={import.meta.env.BASE_URL + "icon-192.png"} alt="" style={{width:40, height:40, borderRadius:10, flexShrink:0}} />
         <div style={{flex:1, minWidth:0}}>
           <div style={{fontSize:14, fontWeight:800, color:'var(--text)'}}>Додайте DrivePad на головний екран</div>
           <div style={{fontSize:12, color:'var(--dim)', marginTop:2}}>Запис на уроки в один дотик і сповіщення про урок</div>
@@ -262,7 +262,7 @@ export default function App() {
     const slug = getCurrentSlug()
     if (!slug) return
     const link = document.querySelector('link[rel="manifest"]')
-    const href = `/i/${encodeURIComponent(slug)}/manifest.webmanifest`
+    const href = `${import.meta.env.BASE_URL}i/${encodeURIComponent(slug)}/manifest.webmanifest`
     if (link) link.setAttribute('href', href)
     else {
       const l = document.createElement('link')
@@ -328,7 +328,7 @@ export default function App() {
           if (!reg) return
           reg.showNotification(title, {
             body,
-            icon: '/icon-192.png',
+            icon: import.meta.env.BASE_URL + 'icon-192.png',
             badge: '/badge-dp.png',
             // Унікальний tag — інакше друге повідомлення поспіль тихо замінює перше.
             tag: payload.data?.tag || ('drivepad-notif-' + Date.now()),
@@ -336,10 +336,10 @@ export default function App() {
             data: { url },
           })
         }).catch(() => {
-          new Notification(title, { body, icon: '/icon-192.png' })
+          new Notification(title, { body, icon: import.meta.env.BASE_URL + 'icon-192.png' })
         })
       } else {
-        new Notification(title, { body, icon: '/icon-192.png' })
+        new Notification(title, { body, icon: import.meta.env.BASE_URL + 'icon-192.png' })
       }
     })
   }, [user])

@@ -30,7 +30,7 @@ const SalonApp = SALON_MODE ? lazy(() => import('./salon/index.jsx')) : null
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
-    <BrowserRouter>
+    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
       {SalonApp ? <Suspense fallback={null}><SalonApp /></Suspense> : <App />}
     </BrowserRouter>
   </React.StrictMode>,

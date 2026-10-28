@@ -169,7 +169,7 @@ export default function Landing({ user, profile }) {
             </button>
           </div>
           <div className="logo">
-            <div className="logo-icon"><img src="/icon-192.png" alt="DrivePad"/></div>
+            <div className="logo-icon"><img src={import.meta.env.BASE_URL + "icon-192.png"} alt="DrivePad"/></div>
             DrivePad
           </div>
           <button className="btn-login landing-topbar-login" onClick={goRegister}>

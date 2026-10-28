@@ -33,8 +33,8 @@ messaging.onBackgroundMessage((payload) => {
   const url = payload.data?.url || 'https://juno-client.web.app/cabinet'
   const options = {
     body: payload.data?.body || '',
-    icon: '/icon-192.png',
-    badge: '/badge-dp.png', // монохромний «DP» для шторки сповіщень
+    icon: new URL('icon-192.png', self.location).href,
+    badge: new URL('badge-dp.png', self.location).href, // монохромний «DP» для шторки сповіщень
     // Унікальний tag — з тим самим сталим tag кожне наступне повідомлення
     // (напр. друге в чаті поспіль) тихо замінює попереднє сповіщення без
     // нового звуку/вібрації на деяких Android/Chrome.
