@@ -11,6 +11,24 @@ export const PALETTES = [
 const DEFAULT_PALETTE = 'fog'
 const PALETTE_EVENT = 'dp-palette'
 
+// Масштаб інтерфейсу: Мін / Середній / Макс (CSS zoom вмісту кабінету, зберігається в браузері)
+export const UI_SCALES = [
+  { id: 's', name: 'Мін',     zoom: 0.9 },
+  { id: 'm', name: 'Середній', zoom: 1 },
+  { id: 'l', name: 'Макс',    zoom: 1.15 },
+]
+const SCALE_EVENT = 'dp-scale'
+export function readScale() {
+  try {
+    const v = localStorage.getItem('uiScale')
+    return UI_SCALES.some(x => x.id === v) ? v : 'm'
+  } catch { return 'm' }
+}
+export function applyUiScale(id) {
+  const z = UI_SCALES.find(x => x.id === id)?.zoom || 1
+  document.documentElement.style.setProperty('--ui-zoom', String(z)) // застосовується до вмісту кабінету (.cab-content); шапка й нижня панель не змінюються
+}
+
 function readPalette() {
   try {
     // Одноразовий перехід на «Туман» (v2): раніше збережена палітра була лише автозбереженням типового значення
@@ -27,6 +45,17 @@ export function useTheme() {
     return 'dark'
   })
   const [palette, setPaletteState] = useState(readPalette)
+  const [uiScale, setUiScaleState] = useState(readScale)
+
+  useEffect(() => {
+    const onScale = (e) => setUiScaleState(e.detail)
+    window.addEventListener(SCALE_EVENT, onScale)
+    return () => window.removeEventListener(SCALE_EVENT, onScale)
+  }, [])
+  useEffect(() => {
+    applyUiScale(uiScale)
+    try { localStorage.setItem('uiScale', uiScale) } catch { /* сховище недоступне */ }
+  }, [uiScale])
 
   // Кілька компонентів викликають useTheme — тримаємо палітру в синхроні подією
   useEffect(() => {
@@ -51,5 +80,11 @@ export function useTheme() {
     window.dispatchEvent(new CustomEvent(PALETTE_EVENT, { detail: id }))
   }
 
-  return { theme, toggle, setTheme, palette, setPalette }
+  const setUiScale = (id) => {
+    if (!UI_SCALES.some(x => x.id === id)) return
+    setUiScaleState(id)
+    window.dispatchEvent(new CustomEvent(SCALE_EVENT, { detail: id }))
+  }
+
+  return { theme, toggle, setTheme, palette, setPalette, uiScale, setUiScale }
 }

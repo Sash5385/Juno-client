@@ -1,7 +1,7 @@
 import LangSwitch from "../../i18n/LangSwitch";
 import { useState, useEffect } from "react";
 import { updateUserProfile, getAdminSettings, getCurrentSlug } from "../../firebase/db";
-import { useTheme, PALETTES } from "../../hooks/useTheme";
+import { useTheme, PALETTES, UI_SCALES } from "../../hooks/useTheme";
 import { useToast } from "../../hooks/useToast";
 import { getInitials, formatPhone } from "../../utils/format";
 import { APP_VERSION } from "../../version.js";
@@ -12,7 +12,7 @@ import PhotoCropModal from "./PhotoCropModal";
 import "./ProfileTab.css";
 
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
-  const { palette, setPalette } = useTheme();
+  const { palette, setPalette, uiScale, setUiScale } = useTheme();
   const { showToast, ToastEl } = useToast();
 
   const [instructorProfile, setInstructorProfile] = useState(null);
@@ -254,6 +254,15 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         </div>
         <div style={{fontSize:12,color:"var(--faint)",marginTop:8,lineHeight:1.5}}>
           Темний або світлий режим перемикає кнопка в шапці.
+        </div>
+        <div className="section-title" style={{marginTop:16}}>🔎 Розмір інтерфейсу</div>
+        <div className="edit-tiles">
+          {UI_SCALES.map(sc => (
+            <button key={sc.id} type="button" className={`edit-tile${uiScale === sc.id ? " selected" : ""}`} onClick={() => setUiScale(sc.id)}>
+              <span style={{display:"block",fontWeight:800,fontSize:sc.id === "s" ? 13 : sc.id === "l" ? 20 : 16,marginBottom:2}}>Аа</span>
+              {sc.name}
+            </button>
+          ))}
         </div>
       </div>
 

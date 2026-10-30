@@ -17,6 +17,7 @@
   padding: 0 16px;
   /* Нижня навігація ≈60px + кругла кнопка «Записатись» виступає ще на 24px: з запасом, щоб останній елемент не ховався під нею */
   padding-bottom: calc(100px + 2 * env(safe-area-inset-bottom));
+  zoom: var(--ui-zoom, 1);
 }
 
 .cab-content--chat {

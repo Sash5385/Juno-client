@@ -5,6 +5,7 @@ import App from './App.jsx'
 import { initErrorReporter } from './errorReporter.js'
 import { initI18n } from './i18n/index.js'
 import { startLangSync } from './i18n/syncLang.js'
+import { applyUiScale, readScale } from './hooks/useTheme'
 import './styles/tokens.css'
 import './styles/global.css'
 import './styles/palettes.css'
@@ -12,6 +13,7 @@ import './styles/palettes.css'
 initErrorReporter()
 initI18n()
 startLangSync()
+applyUiScale(readScale()) // масштаб інтерфейсу (Профіль → Розмір інтерфейсу) — до першого рендеру
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
