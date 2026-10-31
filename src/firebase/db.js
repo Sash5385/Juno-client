@@ -669,3 +669,12 @@ export async function sendWelcomeIfEnabled(uid) {
     ])
   } catch (_) {}
 }
+
+// ─── РЕДАГУВАННЯ ПОВІДОМЛЕНЬ (до 24 год; відмітка editedAt) ───────
+export async function editStudentMessage(uid, id, text) {
+  await update(iRef(`chats/${uid}/${id}`), { text, editedAt: Date.now() })
+}
+
+export async function editGeneralMessage(id, text) {
+  await update(iRef(`chats/general/${id}`), { text, editedAt: Date.now() })
+}

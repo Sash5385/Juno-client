@@ -253,3 +253,13 @@ html[data-palette="fog"] body[data-theme="dark"] .booking-time{color:var(--acc-h
 .botnav-btn{min-width:0}
 .botnav-lbl{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 html:not([lang="uk"]) .botnav-lbl{font-size:10px}
+
+/* Туман: чат — «таблетки» на всю ширину, симетрично (вх./вих. однакової ширини) */
+html[data-palette="fog"] body[data-theme="dark"] .chat-msg-row .chat-bubble,
+html[data-palette="fog"] body[data-theme="dark"] .chat-msg-row .chat-bubble-wrap{flex:1;max-width:none;min-width:0}
+html[data-palette="fog"] body[data-theme="dark"] .chat-bubble-wrap .chat-bubble{width:100%}
+html[data-palette="fog"] body[data-theme="dark"] .chat-bubble{border-radius:99px;padding:10px 20px;text-align:center}
+html[data-palette="fog"] body[data-theme="dark"] .bubble-in{border-radius:99px}
+html[data-palette="fog"] body[data-theme="dark"] .bubble-out{background:linear-gradient(135deg,rgba(96,165,250,.28),rgba(129,140,248,.18));border:1px solid rgba(147,197,253,.4)}
+html[data-palette="fog"] body[data-theme="dark"] .chat-bubble .bubble-time{text-align:center}
+html[data-palette="fog"] body[data-theme="dark"] .chat-sender-name{text-align:center;width:100%;padding-left:0}
