@@ -9,6 +9,7 @@ import { auth } from "../../firebase/config";
 import { getCurrentIid } from "../../firebase/db";
 import { signOut } from "../../firebase/auth";
 import PhotoCropModal from "./PhotoCropModal";
+import ConfirmDialog from "./ConfirmDialog";
 import "./ProfileTab.css";
 
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
@@ -118,8 +119,9 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
     }
   };
 
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const handleLogout = async () => {
-    if (!window.confirm("Вийти з акаунту?")) return;
+    setLogoutOpen(false);
     try { await signOut(); } catch { /* ігноруємо */ }
     window.location.href = import.meta.env.BASE_URL || "/";
   };
@@ -188,8 +190,10 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       </div>
 
 
-      {instructorProfile?.name && (
+      {(instructorProfile?.name || iPhone) && (
         <div className="profile-section">
+        {instructorProfile?.name && (
+          <>
           <div className="section-title">🚗 Мій майстер</div>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             {(instructorProfile.photoUrl || instructorProfile.photo)
@@ -202,12 +206,11 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               )}
             </div>
           </div>
-        </div>
-      )}
-
-      {iPhone && (
-        <div className="profile-section">
-          <div className="section-title">Контакти майстра</div>
+          </>
+        )}
+        {iPhone && (
+          <>
+          <div className="section-title" style={instructorProfile?.name ? {marginTop:16} : undefined}>Контакти майстра</div>
           <div className="contact-phone-block">
             <div className="contact-btns">
               <a href={`tel:${iPhone}`} className="contact-btn contact-btn--call" aria-label="Зателефонувати">
@@ -238,6 +241,8 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               </div>
             </a>
           )}
+          </>
+        )}
         </div>
       )}
 
@@ -320,7 +325,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       </div>
 
       <div className="pf-account">
-        <button className="pf-btn" onClick={handleLogout}>Вийти з акаунта</button>
+        <button className="pf-btn" onClick={() => setLogoutOpen(true)}>Вийти з акаунта</button>
         {!delOpen ? (
           <button className="pf-btn pf-btn--danger" onClick={() => setDelOpen(true)}>Видалити акаунт</button>
         ) : (
@@ -352,6 +357,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           onDone={(dataUrl) => { setCropFile(null); savePhoto(dataUrl); }}
         />
       )}
+      <ConfirmDialog open={logoutOpen} title="Вийти з акаунту?" confirmLabel="Вийти" danger onConfirm={handleLogout} onCancel={() => setLogoutOpen(false)} />
       {ToastEl}
     </div>
   );

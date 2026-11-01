@@ -7,6 +7,7 @@ import { useBackClose } from '../hooks/useBackButton'
 import { signOut } from '../firebase/auth'
 import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue } from '../firebase/db'
 
+import ConfirmDialog from './cabinet/ConfirmDialog'
 import BookTab from './cabinet/BookTab'
 import BookingPaused from './cabinet/BookingPaused'
 import { LicenseContext } from '../hooks/useLicense'
@@ -198,8 +199,9 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
     else if (dx > 0 && idx > 0) switchTab(SWIPE_TABS[idx - 1])
   }
 
+  const [logoutOpen, setLogoutOpen] = useState(false)
   const handleLogout = async () => {
-    if (!window.confirm('Вийти з акаунту?')) return
+    setLogoutOpen(false)
     await signOut()
     nav('/', { replace: true })
   }
@@ -255,7 +257,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
               <div className="badge">{bellCount}</div>
             )}
           </button>
-          <button className="cab-icon-btn" onClick={handleLogout} aria-label="Вийти з акаунту">
+          <button className="cab-icon-btn" onClick={() => setLogoutOpen(true)} aria-label="Вийти з акаунту">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/>
               <polyline points="16 17 21 12 16 7"/>
@@ -451,6 +453,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
         )
       })()}
 
+      <ConfirmDialog open={logoutOpen} title="Вийти з акаунту?" confirmLabel="Вийти" danger onConfirm={handleLogout} onCancel={() => setLogoutOpen(false)} />
       {ToastEl}
     </div>
   )
