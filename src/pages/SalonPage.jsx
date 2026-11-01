@@ -47,7 +47,7 @@ export default function SalonPage({ slug }) {
   }, [slug])
 
   const wrap = {
-    minHeight: '100vh', background: 'var(--bg)', color: 'var(--text)', display: 'flex', flexDirection: 'column', alignItems: 'center',
+    minHeight: '100dvh', background: 'var(--bg)', color: 'var(--text)', display: 'flex', flexDirection: 'column', alignItems: 'center',
     padding: '20px', paddingTop: 'calc(32px + env(safe-area-inset-top, 0px))', paddingBottom: 'calc(32px + env(safe-area-inset-bottom, 0px))', boxSizing: 'border-box',
   }
 

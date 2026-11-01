@@ -5,7 +5,7 @@
 /* ── Неон-ніч · dark ── */
 html[data-palette="neon"] body[data-theme="dark"]{
   --bg:#0a0614;--bg-deep:#0e0a1f;--surface:#1b1334;--surf-hi:#2b2442;--surf-lo:#160f2a;
-  --border:rgba(255,255,255,0.08);--text:#f3eeff;--dim:#918d9c;--faint:#635e6d;
+  --border:rgba(255,255,255,0.08);--text:#f3eeff;--dim:#918d9c;--faint:#918e98;
   --accent:#ff3d9a;--acc-hi:#ff6eb3;--green:#2ee6a6;--blue:#5b9bff;--gold:#f7c948;
   --shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05);
   color-scheme:dark;
@@ -47,7 +47,7 @@ html[data-palette="neon"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nth
 /* ── Неон-ніч · light ── */
 html[data-palette="neon"] body[data-theme="light"]{
   --bg:#f6f0ff;--bg-deep:#ece3ff;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#f0f0f0;
-  --border:rgba(0,0,0,0.07);--text:#1d1038;--dim:#695e7e;--faint:#948ba5;
+  --border:rgba(0,0,0,0.07);--text:#1d1038;--dim:#695e7e;--faint:#6a6476;
   --accent:#d61f7e;--acc-hi:#e0579e;--green:#10b981;--blue:#5b9bff;--gold:#f7c948;
   --shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9);
   color-scheme:light;
@@ -89,7 +89,7 @@ html[data-palette="neon"] body[data-theme="light"] .cab-actions .cab-icon-btn:nt
 /* ── Океан · dark ── */
 html[data-palette="ocean"] body[data-theme="dark"]{
   --bg:#04121c;--bg-deep:#061a28;--surface:#0f2b3d;--surf-hi:#203a4b;--surf-lo:#0c2231;
-  --border:rgba(255,255,255,0.08);--text:#e6f6ff;--dim:#8796a0;--faint:#5a6972;
+  --border:rgba(255,255,255,0.08);--text:#e6f6ff;--dim:#8796a0;--faint:#98a2a7;
   --accent:#14b8a6;--acc-hi:#4fcabc;--green:#2dd4bf;--blue:#5b9bff;--gold:#f7c948;
   --shadow:0 6px 30px rgba(0,0,0,0.65), 0 1px 0 rgba(255,255,255,0.05);
   color-scheme:dark;
@@ -131,7 +131,7 @@ html[data-palette="ocean"] body[data-theme="dark"] .cab-actions .cab-icon-btn:nt
 /* ── Океан · light ── */
 html[data-palette="ocean"] body[data-theme="light"]{
   --bg:#eaf6fb;--bg-deep:#d9edf6;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#f0f0f0;
-  --border:rgba(0,0,0,0.07);--text:#0b2a3a;--dim:#59717e;--faint:#869aa4;
+  --border:rgba(0,0,0,0.07);--text:#0b2a3a;--dim:#59717e;--faint:#5d6b72;
   --accent:#0e9488;--acc-hi:#4aafa6;--green:#14b8a6;--blue:#5b9bff;--gold:#f7c948;
   --shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9);
   color-scheme:light;

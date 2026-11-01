@@ -285,7 +285,7 @@
 }
 
 .tile-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
-.tile-desc { font-size: 11px; color: var(--dim); line-height: 1.4; }
+.tile-desc { font-size: 12px; color: var(--dim); line-height: 1.4; }
 
 .warning-card {
   background: linear-gradient(135deg, rgba(247,201,72,0.15), rgba(247,201,72,0.05));
@@ -305,7 +305,7 @@
 .field { margin-bottom: 16px; }
 
 .field-label {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--faint);
   letter-spacing: 1.5px;
   text-transform: uppercase;
@@ -388,7 +388,7 @@
 
 .select-info { flex: 1; min-width: 0; }
 .select-title { font-size: 14px; font-weight: 700; }
-.select-sub { font-size: 11px; color: var(--dim); margin-top: 2px; }
+.select-sub { font-size: 12px; color: var(--dim); margin-top: 2px; }
 
 .toggle-row {
   background: rgba(0,0,0,0.52);
@@ -419,7 +419,7 @@
 
 .toggle-info { flex: 1; }
 .toggle-title { font-size: 13px; font-weight: 800; }
-.toggle-desc { font-size: 11px; color: var(--dim); margin-top: 2px; line-height: 1.4; }
+.toggle-desc { font-size: 12px; color: var(--dim); margin-top: 2px; line-height: 1.4; }
 
 .switch {
   width: 46px;
@@ -499,7 +499,7 @@
 }
 
 .terms-survey-text .lbl {
-  font-size: 10px;
+  font-size: 11px;
   color: #f87171;
   text-transform: uppercase;
   letter-spacing: 1px;

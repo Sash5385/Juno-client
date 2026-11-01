@@ -118,6 +118,12 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
     }
   };
 
+  const handleLogout = async () => {
+    if (!window.confirm("Вийти з акаунту?")) return;
+    try { await signOut(); } catch { /* ігноруємо */ }
+    window.location.href = import.meta.env.BASE_URL || "/";
+  };
+
   if (!profile) {
     return (
       <div style={{ padding: 40, textAlign: "center", color: "var(--dim)" }}>
@@ -236,6 +242,53 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       )}
 
       <div className="profile-section">
+        <div className="section-title">🎁 Запросити друга</div>
+        <div style={{fontSize:13,color:"var(--dim)",marginBottom:10,lineHeight:1.5}}>
+          Поділіться посиланням — коли друг запишеться на перший запис, ви отримаєте бонусний запис!
+        </div>
+        <div style={{display:"flex",gap:8,marginBottom:8}}>
+          <button
+            onClick={() => {
+              const slug = getCurrentSlug();
+              const origin = window.location.origin;
+              const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
+              navigator.clipboard.writeText(link)
+                .then(() => showToast("Посилання скопійовано!"))
+                .catch(() => showToast("Скопіюйте: " + link));
+            }}
+            className="edit-save"
+            style={{flex:1}}
+          >
+            📋 Копіювати
+          </button>
+          {typeof navigator !== 'undefined' && navigator.share && (
+            <button
+              onClick={() => {
+                const slug = getCurrentSlug();
+                const origin = window.location.origin;
+                const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
+                navigator.share({ title: 'Juno', text: 'Запишись онлайн!', url: link }).catch(() => {});
+              }}
+              className="edit-save"
+              style={{flex:1,background:'color-mix(in srgb, var(--info) 18%, transparent)',color:'var(--info)',boxShadow:'none'}}
+            >
+              📤 Поділитись
+            </button>
+          )}
+        </div>
+        {(profile.referralBonusLessons || 0) > 0 && (
+          <div style={{textAlign:"center",fontSize:13,color:"var(--warn)",fontWeight:700,padding:"6px 0"}}>
+            🎁 Ваш бонус: {profile.referralBonusLessons} бонусний запис{profile.referralBonusLessons > 1 ? "и" : ""}
+          </div>
+        )}
+        {(profile.lessonBalance || 0) > 0 && (
+          <div style={{textAlign:"center",fontSize:13,color:"var(--ok)",fontWeight:700,padding:"6px 0"}}>
+            🎓 Залишок записів: {profile.lessonBalance}
+          </div>
+        )}
+      </div>
+
+      <div className="profile-section">
         <div className="section-title">🌐 Мова</div>
         <LangSwitch style={{ width: "100%" }} />
       </div>
@@ -266,82 +319,31 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         </div>
       </div>
 
-      <div className="profile-section">
-        <div className="section-title">🎁 Запросити друга</div>
-        <div style={{fontSize:13,color:"var(--dim)",marginBottom:10,lineHeight:1.5}}>
-          Поділіться посиланням — коли друг запишеться на перший запис, ви отримаєте бонусний запис!
-        </div>
-        <div style={{display:"flex",gap:8,marginBottom:8}}>
-          <button
-            onClick={() => {
-              const slug = getCurrentSlug();
-              const origin = window.location.origin;
-              const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
-              navigator.clipboard.writeText(link)
-                .then(() => showToast("Посилання скопійовано!"))
-                .catch(() => showToast("Скопіюйте: " + link));
-            }}
-            className="edit-save"
-            style={{flex:1}}
-          >
-            📋 Копіювати
-          </button>
-          {typeof navigator !== 'undefined' && navigator.share && (
-            <button
-              onClick={() => {
-                const slug = getCurrentSlug();
-                const origin = window.location.origin;
-                const link = slug ? `${origin}${import.meta.env.BASE_URL}i/${slug}/?ref=${user.uid}` : `${origin}${import.meta.env.BASE_URL}?ref=${user.uid}`;
-                navigator.share({ title: 'Juno', text: 'Запишись онлайн!', url: link }).catch(() => {});
-              }}
-              className="edit-save"
-              style={{flex:1,background:'rgba(99,155,255,0.18)',color:'var(--info)'}}
-            >
-              📤 Поділитись
-            </button>
-          )}
-        </div>
-        {(profile.referralBonusLessons || 0) > 0 && (
-          <div style={{textAlign:"center",fontSize:13,color:"var(--warn)",fontWeight:700,padding:"6px 0"}}>
-            🎁 Ваш бонус: {profile.referralBonusLessons} бонусний запис{profile.referralBonusLessons > 1 ? "и" : ""}
-          </div>
-        )}
-        {(profile.lessonBalance || 0) > 0 && (
-          <div style={{textAlign:"center",fontSize:13,color:"var(--ok)",fontWeight:700,padding:"6px 0"}}>
-            🎓 Залишок записів: {profile.lessonBalance}
-          </div>
-        )}
-      </div>
-
-      <div style={{margin:"18px 4px 0",textAlign:"center"}}>
+      <div className="pf-account">
+        <button className="pf-btn" onClick={handleLogout}>Вийти з акаунта</button>
         {!delOpen ? (
-          <button onClick={() => setDelOpen(true)} style={{background:"none",border:"none",color:"var(--bad)",fontSize:13,fontWeight:700,cursor:"pointer",textDecoration:"underline",fontFamily:"inherit"}}>
-            Видалити акаунт
-          </button>
+          <button className="pf-btn pf-btn--danger" onClick={() => setDelOpen(true)}>Видалити акаунт</button>
         ) : (
-          <div style={{padding:"14px",borderRadius:14,border:"1px solid rgba(239,68,68,0.4)",background:"rgba(239,68,68,0.08)",textAlign:"left"}}>
-            <div style={{fontSize:13,fontWeight:800,color:"var(--bad)",marginBottom:6}}>Видалити акаунт назавжди?</div>
-            <div style={{fontSize:12,color:"var(--dim)",lineHeight:1.5,marginBottom:10}}>
+          <div style={{padding:"14px",borderRadius:14,border:"1px solid color-mix(in srgb, var(--bad) 40%, transparent)",background:"color-mix(in srgb, var(--bad) 8%, transparent)",textAlign:"left"}}>
+            <div style={{fontSize:14,fontWeight:800,color:"var(--bad)",marginBottom:6}}>Видалити акаунт назавжди?</div>
+            <div style={{fontSize:13,color:"var(--dim)",lineHeight:1.5,marginBottom:10}}>
               Будуть видалені ваш профіль, записи, чат і сповіщення, а майбутні записи скасовані. Це неможливо скасувати.
               Щоб підтвердити, введіть слово <b style={{color:"var(--text)"}}>ВИДАЛИТИ</b>.
             </div>
-            <input value={delText} onChange={e => setDelText(e.target.value)} placeholder="ВИДАЛИТИ"
-              style={{width:"100%",boxSizing:"border-box",padding:"10px 12px",borderRadius:10,border:"1px solid rgba(255,255,255,0.18)",background:"rgba(0,0,0,0.3)",color:"var(--text)",fontSize:14,outline:"none",marginBottom:10,fontFamily:"inherit"}}/>
+            <input value={delText} onChange={e => setDelText(e.target.value)} placeholder="ВИДАЛИТИ" className="edit-input" style={{marginBottom:10}}/>
             <div style={{display:"flex",gap:8}}>
-              <button onClick={handleDeleteAccount} disabled={deleting || delText.trim().toUpperCase() !== "ВИДАЛИТИ"}
-                style={{flex:1,padding:"10px",borderRadius:10,border:"none",cursor:(deleting||delText.trim().toUpperCase()!=="ВИДАЛИТИ")?"default":"pointer",background:(deleting||delText.trim().toUpperCase()!=="ВИДАЛИТИ")?"rgba(239,68,68,0.25)":"#ef4444",color:"#fff",fontWeight:800,fontSize:13,fontFamily:"inherit"}}>
+              <button className="pf-btn pf-btn--danger-solid" onClick={handleDeleteAccount} disabled={deleting || delText.trim().toUpperCase() !== "ВИДАЛИТИ"}>
                 {deleting ? "Видалення…" : "Видалити"}
               </button>
-              <button onClick={() => { setDelOpen(false); setDelText(""); }} disabled={deleting}
-                style={{flex:1,padding:"10px",borderRadius:10,border:"1px solid var(--field-bd)",background:"transparent",color:"var(--text)",fontWeight:700,fontSize:13,cursor:"pointer",fontFamily:"inherit"}}>Скасувати</button>
+              <button className="pf-btn" onClick={() => { setDelOpen(false); setDelText(""); }} disabled={deleting}>Скасувати</button>
             </div>
           </div>
         )}
       </div>
 
-      <div onClick={forceUpdate} style={{textAlign:"center",padding:"12px 0 4px",color:"var(--faint)",fontSize:13,fontWeight:600,letterSpacing:0.5,cursor:"pointer"}}>
-        {APP_VERSION}
-      </div>
+      <button type="button" className="pf-version" onClick={forceUpdate} title="Натисніть, щоб перевірити оновлення">
+        <span>{APP_VERSION}</span> · <span>перевірити оновлення</span>
+      </button>
 
       {cropFile && (
         <PhotoCropModal

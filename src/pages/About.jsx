@@ -20,7 +20,7 @@ export default function About() {
   const slug = parseSlug(code)
   return (
     <div style={{
-      minHeight: '100vh',
+      minHeight: '100dvh',
       background: 'var(--bg)',
       color: 'var(--text)',
       display: 'flex',

@@ -117,7 +117,7 @@
 }
 
 .chat-instructor-status {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--dim);
   margin-top: 2px;
 }
@@ -191,12 +191,12 @@
 .chat-msg-avatar.me {
   background: linear-gradient(145deg, #3b82f6, #1d4ed8);
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 .chat-msg-avatar.general-user {
   color: #fff;
-  font-size: 11px;
+  font-size: 12px;
 }
 
 /* general chat bubble wrapper (for sender name above) */
@@ -210,7 +210,7 @@
 .chat-bubble-wrap.wrap-in  { align-items: flex-start; }
 
 .chat-sender-name {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: var(--dim);
   margin-bottom: 2px;
@@ -245,7 +245,7 @@
 }
 
 .bubble-broadcast-label {
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
   color: rgba(168,85,247,0.9);
   margin-bottom: 4px;
@@ -263,7 +263,7 @@
 .bubble-broadcast .bubble-text { color: var(--text); }
 
 .bubble-time {
-  font-size: 11px;
+  font-size: 12px;
   margin-top: 4px;
   text-align: right;
   color: var(--faint);
@@ -309,8 +309,8 @@
 .chat-textarea::placeholder { color: var(--faint); }
 
 .chat-send-btn {
-  width: 38px;
-  height: 38px;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
   border: none;
   cursor: pointer;
@@ -382,7 +382,7 @@
 }
 
 .history-msg-time {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--faint);
   margin-top: 4px;
 }

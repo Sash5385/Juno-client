@@ -173,7 +173,7 @@
 
 [data-theme="light"] .botnav-btn.active .botnav-ico { color: var(--accent); }
 
-.botnav-lbl { font-size: 10px; font-weight: 700; color: rgba(255,255,255,0.45); white-space: nowrap; }
+.botnav-lbl { font-size: 11px; font-weight: 700; color: var(--dim, rgba(255,255,255,0.6)); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
 @media (min-width: 360px) { .botnav-lbl { font-size: 11px; } }
 [data-theme="light"] .botnav-lbl { color: var(--faint); }
 .botnav-btn.active .botnav-lbl { color: var(--accent); }

@@ -103,7 +103,7 @@
 
 .unlock-info { flex: 1; }
 .unlock-title { font-size: 14px; font-weight: 800; color: #7ed957; }
-.unlock-desc { font-size: 11px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
+.unlock-desc { font-size: 12px; color: var(--dim); margin-top: 3px; line-height: 1.4; }
 
 .stat-row {
   display: grid;
@@ -129,7 +129,7 @@
 }
 
 .stat-btn .lbl {
-  font-size: 11px;
+  font-size: 12px;
   color: var(--faint);
   letter-spacing: 0.5px;
   text-transform: uppercase;
