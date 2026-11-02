@@ -365,6 +365,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const days = useMemo(() => getMonthGrid(viewMonth.getFullYear(), viewMonth.getMonth()), [viewMonth])
 
   const handleSlotClick = (slot) => {
+    // Особиста подія майстра: у чергу на неї ставати не можна
+    if (slot.personal) return
     if (slot.lunchBlocked || slot.overlapBlocked || (slot.cutoffBlocked && slot.available !== false)) return
     if (slot.offeredTo?.[user?.uid]) {
       // Слот зарезервований для мене → одразу до бронювання
@@ -1051,7 +1053,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         className={`slot ${isMyReserved || isMyQueue ? 'my-queue' : isPartOfMyBooking ? 'my-booked' : isUnavailable ? 'taken' : ''} ${isSelected ? 'selected' : ''}`}
                         style={{width:'100%'}}
                         onClick={() => !isMyQueue && !isMyBooked && handleSlotClick(slot)}
-                        disabled={isLunch || isOverlap || isMyBooked}
+                        disabled={isLunch || isOverlap || isMyBooked || !!slot.personal}
                         title={isExactlyMine ? 'Ваш запис' : isPartOfMyBooking ? 'Ваш запис (продовження)' : isMyBooked ? 'Перетин з вашим записом' : isLunch ? 'Обідня перерва' : isOverlap ? 'Перетин з іншим записом' : isVipLocked ? 'VIP слот' : isMyReserved ? 'Зарезервовано для вас!' : isTaken ? 'Зайнято — стати в чергу?' : undefined}
                       >
                         <div className="slot-time">{slot.time}</div>
