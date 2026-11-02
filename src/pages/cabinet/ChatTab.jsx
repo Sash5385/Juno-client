@@ -118,6 +118,8 @@ function DirectChat({ user, profile }) {
               {!isMe && <div className="chat-msg-avatar instructor">{salonOn ? "👤" : "🚗"}</div>}
               <div className={`chat-bubble ${isMe ? 'bubble-out' : isBroadcast ? 'bubble-broadcast' : 'bubble-in'}`}>
                 {isBroadcast && <div className="bubble-broadcast-label">📢 Оголошення</div>}
+                {/* ім'я майстра салону, якщо написав він, а не власник */}
+                {!isMe && !isBroadcast && m.senderName && <div className="bubble-broadcast-label">{m.senderName}</div>}
                 <div className="bubble-text">{m.text}</div>
                 <div className="bubble-time">
                     {m.editedAt ? `ред. ${fmtTime(m.editedAt)} · ` : ''}{m.time}
