@@ -3,6 +3,7 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
 import { useBookings } from '../hooks/useBookings'
+import { useChatThreads } from '../hooks/useChatThreads'
 import { useBackClose } from '../hooks/useBackButton'
 import { signOut } from '../firebase/auth'
 import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue } from '../firebase/db'
@@ -72,7 +73,10 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
   }, [queueOffers])
   useBackClose(!!selectedOffer, () => setSelectedOffer(null))
   const [offerSubmitting, setOfferSubmitting] = useState(false)
-  const [unreadChat, setUnreadChat] = useState(0)
+  const [unreadSalon, setUnreadSalon] = useState(0)
+  // Треди з майстрами салону: непрочитані по тредах; у дзвіночку й на вкладці — сума з тредом «Салон»
+  const chatThreads = useChatThreads(user?.uid, bookingsData.bookings, bookingsData.loading)
+  const unreadChat = unreadSalon + chatThreads.total
 
   const lsKey = user?.uid ? `lastSeenBookingsTs_${user.uid}` : null
   const [lastSeenTs, setLastSeenTs] = useState(() =>
@@ -113,7 +117,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
 
   useEffect(() => {
     if (!user?.uid) return
-    return subscribeDirectUnread(user.uid, setUnreadChat)
+    return subscribeDirectUnread(user.uid, setUnreadSalon)
   }, [user?.uid])
 
   useEffect(() => {
@@ -308,7 +312,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
           {displayedTab === 'bookings' && <BookingsTab user={user} profile={profile} bookingsData={bookingsData} />}
           {displayedTab === 'progress' && <ProgressTab user={user} profile={profile} bookingsData={bookingsData} />}
           {displayedTab === 'queue' && <QueueTab user={user} profile={profile} />}
-          {displayedTab === 'chat' && <ChatTab user={user} profile={profile} />}
+          {displayedTab === 'chat' && <ChatTab user={user} profile={profile} threads={chatThreads} unreadSalon={unreadSalon} />}
           {displayedTab === 'notifications' && <NotifTab user={user} onSeen={markNotifsSeen} />}
           {displayedTab === 'profile' && <ProfileTab user={user} profile={profile} bookingsData={bookingsData} onProfileUpdate={onProfileUpdate} />}
         </div>

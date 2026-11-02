@@ -597,8 +597,12 @@ export async function getApprovedReviews(max = 12) {
 }
 
 // ─── CHAT ────────────────────────────────────────────────────────
-export function subscribeStudentChat(uid, callback) {
-  const r = iRef(`chats/${uid}`)
+// Тред «Салон» (власник) — chats/{uid}; окремий тред із майстром салону — chats_m/{mid}/{uid} (mid не заданий → «Салон»).
+const chatPath = (uid, mid) => mid ? `chats_m/${mid}/${uid}` : `chats/${uid}`
+const metaPath = (uid, mid) => mid ? `chatMeta_m/${mid}/${uid}` : `chatMeta/${uid}`
+
+export function subscribeStudentChat(uid, callback, mid) {
+  const r = iRef(chatPath(uid, mid))
   const handler = onValue(r, snap => {
     const data = snap.val() || {}
     const msgs = Object.entries(data)
@@ -609,34 +613,34 @@ export function subscribeStudentChat(uid, callback) {
   return () => off(r, 'value', handler)
 }
 
-export async function sendStudentMessage(uid, text) {
+export async function sendStudentMessage(uid, text, mid) {
   const time = new Date().toLocaleTimeString('uk', { hour: '2-digit', minute: '2-digit' })
-  await push(iRef(`chats/${uid}`), {
+  await push(iRef(chatPath(uid, mid)), {
     from: 'student',
     text,
     time,
     ts: Date.now(),
   })
-  await update(iRef(`chatMeta/${uid}`), {
+  await update(iRef(metaPath(uid, mid)), {
     unreadForAdmin: increment(1),
     lastMsg: text,
     lastTs: Date.now(),
   })
 }
 
-export async function markDirectChatRead(uid) {
-  await set(iRef(`chatMeta/${uid}/unreadForStudent`), 0)
+export async function markDirectChatRead(uid, mid) {
+  await set(iRef(`${metaPath(uid, mid)}/unreadForStudent`), 0)
 }
 
-export async function clearStudentChat(uid) {
-  await remove(iRef(`chats/${uid}`))
-  await set(iRef(`chatMeta/${uid}/unreadForStudent`), 0)
-  await set(iRef(`chatMeta/${uid}/unreadForAdmin`), 0)
+export async function clearStudentChat(uid, mid) {
+  await remove(iRef(chatPath(uid, mid)))
+  await set(iRef(`${metaPath(uid, mid)}/unreadForStudent`), 0)
+  await set(iRef(`${metaPath(uid, mid)}/unreadForAdmin`), 0)
 }
 
-export function subscribeDirectUnread(uid, callback) {
-  const r = iRef(`chatMeta/${uid}/unreadForStudent`)
-  const handler = onValue(r, snap => callback(snap.val() || 0))
+export function subscribeDirectUnread(uid, callback, mid) {
+  const r = iRef(`${metaPath(uid, mid)}/unreadForStudent`)
+  const handler = onValue(r, snap => callback(snap.val() || 0), () => callback(0))
   return () => off(r, 'value', handler)
 }
 
@@ -680,8 +684,8 @@ export async function sendWelcomeIfEnabled(uid) {
 }
 
 // ─── РЕДАГУВАННЯ ПОВІДОМЛЕНЬ (до 24 год; відмітка editedAt) ───────
-export async function editStudentMessage(uid, id, text) {
-  await update(iRef(`chats/${uid}/${id}`), { text, editedAt: Date.now() })
+export async function editStudentMessage(uid, id, text, mid) {
+  await update(iRef(`${chatPath(uid, mid)}/${id}`), { text, editedAt: Date.now() })
 }
 
 export async function editGeneralMessage(id, text) {

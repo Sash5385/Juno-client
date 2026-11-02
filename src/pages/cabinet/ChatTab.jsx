@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
+import { useLocation } from 'react-router-dom'
 import {
   subscribeStudentChat, sendStudentMessage, markDirectChatRead, clearStudentChat,
   editStudentMessage,
@@ -12,7 +13,8 @@ const EDIT_WINDOW = 24 * 60 * 60 * 1000
 const fmtTime = ts => new Date(ts).toLocaleTimeString('uk', { hour: '2-digit', minute: '2-digit' })
 
 // ─── DIRECT CHAT (with instructor) ───────────────────────────────
-function DirectChat({ user, profile }) {
+// mid/title — тред із майстром салону (chats_m/{mid}); без mid — тред «Салон» (як раніше)
+function DirectChat({ user, profile, mid, title }) {
   const salonOn = useSalonMode()
   const [messages, setMessages] = useState([])
   const { showToast, ToastEl } = useToast()
@@ -24,9 +26,9 @@ function DirectChat({ user, profile }) {
 
   useEffect(() => {
     if (!user?.uid) return
-    markDirectChatRead(user.uid).catch(() => {})
-    return subscribeStudentChat(user.uid, setMessages)
-  }, [user?.uid])
+    markDirectChatRead(user.uid, mid).catch(() => {})
+    return subscribeStudentChat(user.uid, setMessages, mid)
+  }, [user?.uid, mid])
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -37,10 +39,10 @@ function DirectChat({ user, profile }) {
     setSending(true)
     try {
       if (editing) {
-        await editStudentMessage(user.uid, editing, text.trim())
+        await editStudentMessage(user.uid, editing, text.trim(), mid)
         setEditing(null)
       } else {
-        await sendStudentMessage(user.uid, text.trim())
+        await sendStudentMessage(user.uid, text.trim(), mid)
       }
       setText('')
       taRef.current?.focus()
@@ -65,7 +67,7 @@ function DirectChat({ user, profile }) {
   const handleClear = async () => {
     if (!clearPending) { setClearPending(true); return }
     setClearPending(false)
-    await clearStudentChat(user.uid)
+    await clearStudentChat(user.uid, mid)
   }
 
   return (
@@ -74,7 +76,7 @@ function DirectChat({ user, profile }) {
       <div className="chat-header">
         <div className="chat-instructor-avatar">{salonOn ? "👤" : "🚗"}</div>
         <div className="chat-instructor-info">
-          <div className="chat-instructor-name">{salonOn ? "Салон" : "Майстер"}</div>
+          <div className="chat-instructor-name">{title || (salonOn ? "Салон" : "Майстер")}</div>
           <div className="chat-instructor-status">Відповідає протягом дня</div>
         </div>
         {messages.length > 0 && (
@@ -177,10 +179,37 @@ function DirectChat({ user, profile }) {
   )
 }
 
-export default function ChatTab({ user, profile }) {
+export default function ChatTab({ user, profile, threads = {}, unreadSalon = 0 }) {
+  // Тред «Салон» ('') + по треду на кожного майстра, у якого є запис. Без майстрів — один тред, як і раніше.
+  const want = new URLSearchParams(useLocation().search).get('m') // push відкриває тред цього майстра
+  const [sel, setSel] = useState(null)
+  const ready = threads.ready
+  const list = threads.threads || []
+  useEffect(() => {
+    if (sel !== null || !ready) return
+    const firstUnread = list.find(t => (threads.unread?.[t.id] || 0) > 0)
+    if (want && list.some(t => t.id === want)) setSel(want)
+    else if (!unreadSalon && firstUnread) setSel(firstUnread.id)
+    else setSel('')
+  }, [ready, sel, want, list.length, unreadSalon])
+  const active = sel !== null && list.some(t => t.id === sel) ? sel : ''
+  const th = list.find(t => t.id === active)
   return (
     <div className="chat-tab">
-      <DirectChat user={user} profile={profile} />
+      {list.length > 0 && (
+        <div className="chat-tabs" style={{ overflowX: 'auto' }}>
+          {[{ id: '', name: 'Салон' }, ...list].map(t => {
+            const n = t.id ? (threads.unread?.[t.id] || 0) : unreadSalon
+            return (
+              <button key={t.id || 'salon'} className={`chat-tab-btn${t.id === active ? ' active' : ''}`}
+                style={{ flex: '1 0 auto', whiteSpace: 'nowrap' }} onClick={() => setSel(t.id)}>
+                {t.name}{n > 0 && t.id !== active ? ` · ${n}` : ''}
+              </button>
+            )
+          })}
+        </div>
+      )}
+      <DirectChat key={active || 'salon'} user={user} profile={profile} mid={active || undefined} title={th ? th.name : undefined} />
     </div>
   )
 }
