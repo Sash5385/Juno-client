@@ -8,6 +8,7 @@ import { APP_VERSION } from "../../version.js";
 import { auth } from "../../firebase/config";
 import { getCurrentIid } from "../../firebase/db";
 import { signOut } from "../../firebase/auth";
+import { useSalonMode } from "../../hooks/useSalonMode";
 import PhotoCropModal from "./PhotoCropModal";
 import ConfirmDialog from "./ConfirmDialog";
 import "./ProfileTab.css";
@@ -16,6 +17,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const { palette, setPalette, uiScale, setUiScale } = useTheme();
   const { showToast, ToastEl } = useToast();
 
+  const salonOn = useSalonMode();
   const [instructorProfile, setInstructorProfile] = useState(null);
   useEffect(() => {
     getAdminSettings().then(s => setInstructorProfile(s.profile || null)).catch(() => {});
@@ -194,7 +196,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         <div className="profile-section">
         {instructorProfile?.name && (
           <>
-          <div className="section-title">🚗 Мій майстер</div>
+          <div className="section-title">{salonOn ? "🏠 Салон" : "🚗 Мій майстер"}</div>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             {(instructorProfile.photoUrl || instructorProfile.photo)
               ? <img src={instructorProfile.photoUrl || instructorProfile.photo} alt="" style={{width:52,height:52,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />

@@ -2,6 +2,7 @@ import LangSwitch from '../i18n/LangSwitch'
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
+import { useSalonMode } from '../hooks/useSalonMode'
 import { getAdminSettings, getApprovedReviews, getAdminServices, getUpcomingFreeSlots } from '../firebase/db'
 import { parseYMD, getDayName, getMonthShort, formatDateYMD } from '../utils/date'
 import './Landing.css'
@@ -125,8 +126,12 @@ export default function Landing({ user, profile }) {
   }, [])
 
   // Ціна за годину для кожного напрямку — перша активна 1-годинна послуга цього типу.
-  const schoolService = services.find(s => s.type === 'school' && Number(s.duration) === 60)
-  const privateService = services.find(s => s.type === 'private' && Number(s.duration) === 60)
+  // Дефолтні послуги з ціною 0 ₴ не показуємо
+  const salonOn = useSalonMode()
+  const schoolService = services.find(s => s.type === 'school' && Number(s.duration) === 60 && Number(s.price) > 0)
+  const privateService = services.find(s => s.type === 'private' && Number(s.duration) === 60 && Number(s.price) > 0)
+  // Салон: усі активні послуги з ціною (а не лише «Стандарт/Індивідуальні»)
+  const salonServices = salonOn ? services.filter(s => Number(s.price) > 0).slice(0, 8) : []
   const schoolService2h = services.find(s => s.type === 'school' && Number(s.duration) === 120)
   const privateService2h = services.find(s => s.type === 'private' && Number(s.duration) === 120)
   const nearestSlot = upcomingSlots[0]
@@ -231,7 +236,22 @@ export default function Landing({ user, profile }) {
         )}
 
         {/* PRICING */}
-        {(schoolService || privateService) && (
+        {salonServices.length > 0 ? (
+        <Reveal>
+        <section className="lsection">
+          <h2>Скільки коштує запис</h2>
+          <div className="pricing-bubbles">
+            {salonServices.map(sv => (
+              <div key={sv.id || sv.name} className="pricing-bubble" style={{ '--c': colorOfService(sv.colorId) }}>
+                <div className="pricing-bubble-lbl">{sv.name}</div>
+                <div className="pricing-bubble-num">{sv.price}<span>₴</span></div>
+                {Number(sv.duration) > 0 && <div className="pricing-bubble-sub">{`${sv.duration} хв`}</div>}
+              </div>
+            ))}
+          </div>
+        </section>
+        </Reveal>
+        ) : (schoolService || privateService) && (
         <Reveal>
         <section className="lsection">
           <h2>Скільки коштує запис</h2>
@@ -391,7 +411,7 @@ export default function Landing({ user, profile }) {
 
         {/* FOOTER */}
         <div className="footer">
-          <button className="footer-cta" onClick={goAuth}>🚗 Записатись зараз</button>
+          <button className="footer-cta" onClick={goAuth}>{salonOn ? 'Записатись зараз' : '🚗 Записатись зараз'}</button>
           <div>© 2026 Juno.</div>
           <div className="devby">
             <small>Розробка та дизайн</small>

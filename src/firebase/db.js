@@ -305,7 +305,7 @@ export async function cancelBooking(uid, bookingId, { isReschedule = false } = {
 }
 
 // в”Ђв”Ђв”Ђ QUEUE (Р»РёСЃС‚ РѕС‡С–РєСѓРІР°РЅРЅСЏ) в”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђв”Ђ
-export async function joinQueue(uid, date, time, studentType, durationHours = 1, name = '', phone = '') {
+export async function joinQueue(uid, date, time, studentType, durationHours = 1, name = '', phone = '', svc = {}) {
   if (_blocked) throw new Error('Не вдалося приєднатись до черги, спробуйте пізніше')
   const slotKey = qKey(date, time)
   await set(iRef(`queue/${slotKey}/entries/${uid}`), {
@@ -314,6 +314,11 @@ export async function joinQueue(uid, date, time, studentType, durationHours = 1,
     durationHours,
     name,
     phone,
+    // Послуга з початкового запиту — щоб запис із черги мав назву, ціну й перерву
+    ...(svc.serviceId ? { serviceId: svc.serviceId } : {}),
+    ...(svc.serviceName ? { serviceName: svc.serviceName } : {}),
+    ...(svc.price > 0 ? { price: svc.price } : {}),
+    ...(svc.bufferMin > 0 ? { bufferMin: svc.bufferMin } : {}),
     addedAt: Date.now(),
     status: 'waiting'
   })
@@ -500,6 +505,10 @@ export async function claimQueueOffer(uid, slotKey, offer, profile) {
     date: offer.date,
     time: offer.time,
     serviceType: entry.studentType,
+    ...(entry.serviceId ? { serviceId: entry.serviceId } : {}),
+    ...(entry.serviceName ? { serviceName: entry.serviceName } : {}),
+    ...(entry.price > 0 ? { price: entry.price } : {}),
+    ...(entry.bufferMin > 0 ? { bufferMin: entry.bufferMin } : {}),
     durationHours,
     ...(master ? { masterId: master } : {}),
     studentName: entry.name || profile?.name || '',

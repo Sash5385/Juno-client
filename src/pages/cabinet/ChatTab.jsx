@@ -4,6 +4,7 @@ import {
   editStudentMessage,
 } from '../../firebase/db'
 import { useToast } from '../../hooks/useToast'
+import { useSalonMode } from '../../hooks/useSalonMode'
 import './ChatTab.css'
 
 // Редагувати можна свої повідомлення протягом доби
@@ -12,6 +13,7 @@ const fmtTime = ts => new Date(ts).toLocaleTimeString('uk', { hour: '2-digit', m
 
 // ─── DIRECT CHAT (with instructor) ───────────────────────────────
 function DirectChat({ user, profile }) {
+  const salonOn = useSalonMode()
   const [messages, setMessages] = useState([])
   const { showToast, ToastEl } = useToast()
   const [text, setText] = useState('')
@@ -70,9 +72,9 @@ function DirectChat({ user, profile }) {
     <div className="chat-inner fade-up">
       {ToastEl}
       <div className="chat-header">
-        <div className="chat-instructor-avatar">🚗</div>
+        <div className="chat-instructor-avatar">{salonOn ? "👤" : "🚗"}</div>
         <div className="chat-instructor-info">
-          <div className="chat-instructor-name">Майстер</div>
+          <div className="chat-instructor-name">{salonOn ? "Салон" : "Майстер"}</div>
           <div className="chat-instructor-status">Відповідає протягом дня</div>
         </div>
         {messages.length > 0 && (
@@ -113,7 +115,7 @@ function DirectChat({ user, profile }) {
           const isBroadcast = m.broadcast
           return (
             <div key={m.id} className={`chat-msg-row ${isMe ? 'out' : 'in'}`}>
-              {!isMe && <div className="chat-msg-avatar instructor">🚗</div>}
+              {!isMe && <div className="chat-msg-avatar instructor">{salonOn ? "👤" : "🚗"}</div>}
               <div className={`chat-bubble ${isMe ? 'bubble-out' : isBroadcast ? 'bubble-broadcast' : 'bubble-in'}`}>
                 {isBroadcast && <div className="bubble-broadcast-label">📢 Оголошення</div>}
                 <div className="bubble-text">{m.text}</div>

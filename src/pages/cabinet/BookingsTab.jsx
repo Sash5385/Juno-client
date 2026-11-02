@@ -8,6 +8,7 @@ import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { LicenseContext } from '../../hooks/useLicense'
+import { useSalonMode } from '../../hooks/useSalonMode'
 import './BookingsTab.css'
 import './BookTab.css'
 
@@ -127,6 +128,8 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
 
   const handleConfirm = async () => {
     if (!selectedDate || !selectedTime) return
+    // Той самий день дозволено, але не той самий час
+    if (formatDateYMD(selectedDate) === booking.date && selectedTime === booking.time) return
     setSaving(true)
     try {
       const newDate = formatDateYMD(selectedDate)
@@ -205,7 +208,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         <div className="dialog-handle" />
         <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}>📅 Перенести запис</div>
         <div style={{ fontSize: 12, color: 'var(--dim)', marginBottom: 14, textAlign: 'center' }}>
-          {booking.serviceName} · {booking.date} о {booking.time}
+          {booking.serviceName} · {formatDateLabel(parseYMD(booking.date))} о {booking.time}
         </div>
 
         {/* CALENDAR */}
@@ -224,16 +227,15 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
               const disabled = isPast(d)
               const isToday = isSameDay(d, today)
               const selected = selectedDate && isSameDay(d, selectedDate)
-              const isCurrent = d && formatDateYMD(d) === booking.date
               const dateStr = formatDateYMD(d)
               const avail = monthAvail[dateStr]
-              const availClass = (!disabled && !isCurrent) ? (avail ? `day-${avail}` : '') : ''
+              const availClass = !disabled ? (avail ? `day-${avail}` : '') : ''
               return (
                 <button
                   key={i}
-                  className={`cal-day ${disabled || isCurrent ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${availClass}`}
-                  onClick={() => !disabled && !isCurrent && setSelectedDate(d)}
-                  disabled={disabled || isCurrent}
+                  className={`cal-day ${disabled ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${availClass}`}
+                  onClick={() => !disabled && setSelectedDate(d)}
+                  disabled={disabled}
                 >
                   {d.getDate()}
                 </button>
@@ -296,6 +298,10 @@ export default function BookingsTab({ user, profile, bookingsData }) {
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
   const [masters, setMasters] = useState([]) // салон: імена майстрів для підпису запису
   useEffect(() => subscribeMasters(setMasters), [])
+  const salonOn = useSalonMode()
+  const ownerMaster = masters.find(m => m.owner)
+  // Запис до власника не має masterId — у салоні підписуємо його ім'ям власника
+  const masterOf = (b) => masters.find(m => m.id === b.masterId) || (masters.length > 1 && !b.masterId ? ownerMaster : null)
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
   const [noteOpenId, setNoteOpenId] = useState(null)
   const [noteDraft, setNoteDraft] = useState('')
@@ -327,7 +333,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
     setCancelConfirmId(null)
     try {
       await cancelBooking(user.uid, booking.id)
-      showToast(`Запис ${booking.date} о ${booking.time} скасовано`)
+      showToast(`Запис ${formatDateLabel(parseYMD(booking.date))} о ${booking.time} скасовано`)
     } catch (e) {
       showToast('Помилка: ' + e.message, 'error')
     }
@@ -359,9 +365,9 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {b.serviceType === 'school' ? '🎓' : '🚙'} {b.serviceName} · {formatDurHours(b.durationHours || 1)}
-            {b.masterId && masters.find(m => m.id === b.masterId) && (
-              <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masters.find(m => m.id === b.masterId).name}</span>
+            {salonOn ? '' : (b.serviceType === 'school' ? '🎓 ' : '🚙 ')}{b.serviceName} · {formatDurHours(b.durationHours || 1)}
+            {masterOf(b) && (
+              <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masterOf(b).name}</span>
             )}
             {(b.price > 0) && (
               <span style={{marginLeft:6, color:'var(--gold)', fontWeight:700}}>
@@ -411,6 +417,11 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               ✓ Ви підтвердили присутність
             </div>
           )}
+          {!isPast && b.status !== 'cancelled' && cancelConfirmId === b.id && (
+            <div className="booking-meta" style={{ color: 'var(--bad)', marginTop: 4, fontWeight: 700 }}>
+              {`Скасувати цей запис? Скасування доступне не пізніше ніж за ${cancelCutoff} год`}
+            </div>
+          )}
           {!isPast && b.status !== 'cancelled' && cancelLocked && cancelAllowed && (
             <div className="booking-meta" style={{ color: 'var(--dim)', marginTop: 4 }}>
               ⏳ Скасування — не пізніше ніж за {cancelCutoff} год
@@ -453,7 +464,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" onClick={() => setRescheduleBooking(b)}>📅</button>}
+            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}>📅</button>}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: 'var(--bad)', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
@@ -503,7 +514,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             if (!next) return null
             const hrs = hoursUntilLesson(next)
             const d = parseYMD(next.date)
-            const countdown = !isFinite(hrs) ? '' : hrs <= 0 ? 'Триває зараз' : hrs < 1 ? 'Менше за годину' : hrs < 24 ? `Через ${Math.round(hrs)} год` : `Через ${Math.ceil(hrs / 24)} дн`
+            const countdown = !isFinite(hrs) ? '' : hrs <= 0 ? 'Триває зараз' : hrs < 1 ? 'Менше за годину' : hrs < 24 ? `Через ${Math.round(hrs)} год` : `Через ${Math.round(hrs / 24)} дн`
             return (
               <div style={{borderRadius:18,background:'linear-gradient(135deg,rgba(99,155,255,0.1) 0%,rgba(120,80,255,0.06) 100%)',border:'1px solid rgba(99,155,255,0.18)',padding:'16px',marginBottom:16}}>
                 <div style={{display:'flex',justifyContent:'space-between',alignItems:'center',marginBottom:10}}>

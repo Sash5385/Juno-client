@@ -3,7 +3,8 @@ import { useState, useEffect, useRef } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { sendSmsCode, verifySmsCode, resetRecaptcha, getSmsErrorMessage, renderRecaptcha, isIOSDevice, isInAppBrowser } from '../firebase/auth'
 import { signInWithEmail, signUpWithEmail, sendPasswordReset, signInWithGoogle, getGoogleRedirectResult, signOut } from '../firebase/auth-email'
-import { saveUserProfile, getUserProfile, sendWelcomeIfEnabled } from '../firebase/db'
+import { saveUserProfile, getUserProfile, sendWelcomeIfEnabled, getAdminSettings } from '../firebase/db'
+import { useSalonMode } from '../hooks/useSalonMode'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
 import { normalizePhone, formatPhone } from '../utils/format'
@@ -47,6 +48,12 @@ export default function Auth({ user, profile, onProfileSaved }) {
   const { showToast, ToastEl } = useToast()
   const nav = useNavigate()
   const loc = useLocation()
+  const salonOn = useSalonMode()
+  // Умови скасування беруть реальну політику майстра (bookCutoffHours); поки не завантажилась — типові 24 години
+  const [cutoffH, setCutoffH] = useState(null)
+  useEffect(() => { getAdminSettings().then(s => { const h = Number(s?.bookCutoffHours); if (Number.isFinite(h) && h >= 0) setCutoffH(h) }).catch(() => {}) }, [])
+  const termsText = cutoffH == null || cutoffH === 24 ? TERMS_TEXT
+    : TERMS_TEXT.replace('не пізніше ніж за 24 години до початку', cutoffH === 0 ? 'у будь-який час до початку' : `не пізніше ніж за ${cutoffH} год до початку`)
 
   // Токен запрошення від майстра (?invite=...) — зберігаємо в sessionStorage, бо крок
   // SMS/reCAPTCHA іноді перезавантажує сторінку і параметр першого рендеру був би втрачений.
@@ -673,7 +680,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       {step === 'survey' && (
         <div className="fade-up" style={{display:'flex',flexDirection:'column'}}>
           <h1 className="auth-h1" style={{marginTop:8}}>Розкажи <span className="acc">про себе</span></h1>
-          <p className="auth-sub">Допоможе підібрати програму навчання</p>
+          <p className="auth-sub">{salonOn ? 'Допоможе підібрати послугу' : 'Допоможе підібрати програму навчання'}</p>
           {(user?.email || user?.phoneNumber) && (
             <p className="auth-sub" style={{marginTop:-6}}>
               Ви увійшли як <b>{user.email || user.phoneNumber}</b>.{' '}
@@ -723,7 +730,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
 
           {termsOpen && !termsAgreed && (
             <div style={{background:'var(--surface)',borderRadius:14,padding:'14px 16px',marginTop:-8,marginBottom:12,boxShadow:'var(--shadow)'}}>
-              <pre style={{fontSize:12,lineHeight:1.7,color:'var(--dim)',whiteSpace:'pre-wrap',fontFamily:'inherit',margin:0,maxHeight:200,overflowY:'auto'}}>{TERMS_TEXT}</pre>
+              <pre style={{fontSize:12,lineHeight:1.7,color:'var(--dim)',whiteSpace:'pre-wrap',fontFamily:'inherit',margin:0,maxHeight:200,overflowY:'auto'}}>{termsText}</pre>
               <button className="btn-primary" style={{marginTop:12}} onClick={()=>{setTermsAgreed(true);setTermsOpen(false)}}>
                 Погоджуюсь ✓
               </button>

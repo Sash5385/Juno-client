@@ -18,7 +18,7 @@ import ChatTab from './cabinet/ChatTab'
 import NotifTab from './cabinet/NotifTab'
 import QueueTab from './cabinet/QueueTab'
 
-import { formatDateLabel } from '../utils/date'
+import { formatDateLabel, parseYMD } from '../utils/date'
 import { useMosaicSwitch, MosaicOverlay } from '../mosaic'
 import './Cabinet.css'
 
@@ -64,6 +64,12 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
   const [userQueue, setUserQueue] = useState([])
   const [queueOffers, setQueueOffers] = useState({})
   const [selectedOffer, setSelectedOffer] = useState(null)
+  const [, setOfferTick] = useState(0) // оновлення лічильника «ще N хв» на банері черги
+  useEffect(() => {
+    if (!Object.keys(queueOffers || {}).length) return
+    const t = setInterval(() => setOfferTick(n => n + 1), 30000)
+    return () => clearInterval(t)
+  }, [queueOffers])
   useBackClose(!!selectedOffer, () => setSelectedOffer(null))
   const [offerSubmitting, setOfferSubmitting] = useState(false)
   const [unreadChat, setUnreadChat] = useState(0)
@@ -282,7 +288,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
             <div style={{flex:1}}>
               <div style={{fontSize:13, fontWeight:800, color:'var(--green)'}}>Слот зарезервовано для вас!</div>
               <div style={{fontSize:11, color:'var(--dim)', marginTop:2}}>
-                {offer.date} о {offer.time} · ще {minsLeft} хв
+                {offer.date ? formatDateLabel(parseYMD(offer.date)) : ''} о {offer.time} · ще {minsLeft} хв
               </div>
             </div>
             <div style={{fontSize:11, fontWeight:700, color:'var(--green)'}}>Підтвердити →</div>

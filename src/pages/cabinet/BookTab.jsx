@@ -8,6 +8,7 @@ import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { isGroupService, capacityOf, groupKeyOf, seatTimeKey, canJoinGroup, seatsLeft, seatsLabel } from '../../groups'
 import { normPackages, pickPackage, expiresLabel } from '../../packages'
 import { normIntake, answersOf, missingRequired, intakeNeeded, buildItems, YES, NO } from '../../intake'
+import { useSalonMode } from '../../hooks/useSalonMode'
 import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
@@ -129,6 +130,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   useEffect(() => { setAddonIds([]) }, [selectedService?.id])
 
   // Салон: майстри простору (публічний список). Їх >1 → клієнт спершу обирає майстра; слоти, запис і скасування йдуть у календар цього майстра.
+  const salonOn = useSalonMode()
   const [masters, setMasters] = useState([])
   const [pickedMaster, setPickedMaster] = useState(null)
   useEffect(() => subscribeMasters(setMasters), [])
@@ -554,7 +556,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       }
       setSelectedTime(null)
       setSelectedTime2(null)
-      setSuccessData({ type: 'booking', date: formatDateYMD(selectedDate), time: startTime, service: selectedService, surcharge, durationHours, baseHours, price: totalPrice, addons: chosenAddons, addonsPrice: addonTot.price, packageName: pkgOn ? pkgAvail.name : null, pending: !!adminSettings.pendingEnabled })
+      setSuccessData({ type: 'booking', masterName: salonMode ? masters.find(m => m.id === pickedMaster)?.name : undefined, date: formatDateYMD(selectedDate), time: startTime, service: selectedService, surcharge, durationHours, baseHours, price: totalPrice, addons: chosenAddons, addonsPrice: addonTot.price, packageName: pkgOn ? pkgAvail.name : null, pending: !!adminSettings.pendingEnabled })
     } catch (e) {
       showToast('Помилка: ' + e.message)
     } finally {
@@ -581,9 +583,14 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     }
     setSubmitting(true)
     try {
-      await joinQueue(user.uid, dateStr, dialogSlot.time, selectedService.type, queueDur, profile?.name || '', profile?.phone || user?.phoneNumber || '')
+      await joinQueue(user.uid, dateStr, dialogSlot.time, selectedService.type, queueDur, profile?.name || '', profile?.phone || user?.phoneNumber || '', {
+        serviceId: selectedService.id,
+        serviceName: selectedService.name,
+        price: typeof dialogSlot.totalPrice === 'number' ? Math.max(0, dialogSlot.totalPrice - (addonTot?.price || 0)) : undefined,
+        bufferMin,
+      })
       setDialogSlot(null)
-      setSuccessData({ type: 'queue', date: formatDateYMD(selectedDate), time: dialogSlot.time, service: selectedService, durationHours: queueDur, surcharge: dialogSlot.surcharge || 0 })
+      setSuccessData({ type: 'queue', masterName: salonMode ? masters.find(m => m.id === pickedMaster)?.name : undefined, date: formatDateYMD(selectedDate), time: dialogSlot.time, service: selectedService, durationHours: queueDur, surcharge: dialogSlot.surcharge || 0 })
     } catch (e) {
       showToast('Помилка: ' + e.message)
     } finally {
@@ -824,7 +831,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           <div className="banner-greet">Привіт,</div>
           <div className="banner-name">{profile?.name?.split(' ')[0] || 'Клієнт'}</div>
           <div className="banner-tag">
-            {selectedService?.type === 'school' ? '🎓 Стандарт' : '🚙 Індивідуальний'}
+            {salonOn ? (selectedService?.name || '') : (selectedService?.type === 'school' ? '🎓 Стандарт' : '🚙 Індивідуальний')}
           </div>
         </div>
       </div>
@@ -1322,6 +1329,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 <span className="lbl">Послуга</span>
                 <span className="val">{successData.service?.name || successData.service}</span>
               </div>
+              {successData.masterName && (
+                <div className="dialog-info-row">
+                  <span className="lbl">Майстер</span>
+                  <span className="val">{successData.masterName}</span>
+                </div>
+              )}
               {successData.packageName && (
                 <div className="dialog-info-row">
                   <span className="lbl">Пакет</span>
