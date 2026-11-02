@@ -7,7 +7,7 @@ export function useChatThreads(uid, bookings, bookingsLoading) {
   const iid = getCurrentIid()
   const mids = useMemo(() => {
     const set = new Set()
-    ;(bookings || []).forEach(b => { if (b && b.masterId && b.masterId !== iid) set.add(String(b.masterId)) })
+    ;(bookings || []).forEach(b => { if (b && b.masterId && b.masterId !== iid && b.status !== 'cancelled') set.add(String(b.masterId)) })
     return [...set].sort()
   }, [bookings, iid])
   const midsKey = mids.join(',')
