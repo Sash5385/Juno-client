@@ -6,7 +6,6 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "build:aldemi": "VITE_BASE=/junoclient/ vite build --outDir dist-aldemi",
     "preview": "vite preview"
   },
   "dependencies": {
