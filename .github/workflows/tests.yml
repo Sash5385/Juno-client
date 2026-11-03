@@ -25,6 +25,11 @@ jobs:
           npm ci
           npm run build
 
+      - name: Unit tests (salon client logic)
+        run: |
+          node tests/unit/salonClient.test.mjs
+          npm run build:salon
+
       - name: Install Playwright
         run: |
           cd tests/smoke
