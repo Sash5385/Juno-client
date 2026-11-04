@@ -6,23 +6,23 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <meta name="color-scheme" content="dark light" />
     <meta name="theme-color" content="#1c1d21" />
-    <meta name="description" content="DrivePad — онлайн-запис на уроки водіння. Автошкола та приватні уроки." />
+    <meta name="description" content="Juno — онлайн-запис для майстрів. Стандартні та індивідуальні записи." />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-    <meta name="apple-mobile-web-app-title" content="DrivePad" />
+    <meta name="apple-mobile-web-app-title" content="Juno" />
     <link rel="apple-touch-icon" href="/junoclient/icon-192.png" />
-    <title>DrivePad — Запис на уроки водіння</title>
+    <title>Juno — онлайн-запис</title>
     <script>
       // Палітра й режим застосовуємо до першого малювання (див. hooks/useTheme.js)
       try {
-        var p = localStorage.getItem('palette'); if (p !== 'ocean' && p !== 'classic') p = 'neon';
+        var p = localStorage.getItem('palette'); if (localStorage.getItem('palette_v') !== '2' || (p !== 'ocean' && p !== 'classic' && p !== 'neon')) p = 'fog';
         document.documentElement.setAttribute('data-palette', p);
         var t = localStorage.getItem('theme'); if (t !== 'light') t = 'dark';
         document.addEventListener('DOMContentLoaded', function () { document.body.setAttribute('data-theme', t); });
       } catch (e) {}
     </script>
-    <script type="module" crossorigin src="/junoclient/assets/index-B9KxhwdR.js"></script>
-    <link rel="stylesheet" crossorigin href="/junoclient/assets/index-D5P9aMEy.css">
+    <script type="module" crossorigin src="/junoclient/assets/index-BH1qZe7W.js"></script>
+    <link rel="stylesheet" crossorigin href="/junoclient/assets/index-BPTUznRA.css">
   <script>// Повноекранна анімація оновлення застосунку — кільце прогресу (як у проєкті Magentic).
 //
 // Це ЗВИЧАЙНИЙ скрипт без залежностей і без React: vite.config.js вставляє його в
@@ -90,7 +90,7 @@
     return new Promise(function (resolve) {
       var timer = setTimeout(function () { resolve(''); }, 2000);
       try {
-        fetch('/junoclient/version.json?_=' + Date.now(), { cache: 'no-store' })
+        fetch((window.__BASE || '/') + 'version.json?_=' + Date.now(), { cache: 'no-store' })
           .then(function (r) { return r.json(); })
           .then(function (d) { clearTimeout(timer); resolve((d && d.version) || ''); })
           .catch(function () { clearTimeout(timer); resolve(''); });
@@ -199,7 +199,7 @@
     onBody(function () { setTimeout(preview, 600); });
   }
 })();
-</script><script>(function(){var B="v26.10.8";function check(){try{fetch("/junoclient/version.json?_="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(d){if(d&&d.version&&d.version!==B){var k="vreset_"+d.version;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");var ov=window.__updOverlay;var anim=ov?ov.show(d.version):Promise.resolve();function rl(){location.reload()}var done_=false;function done(){if(done_)return;done_=true;anim.then(rl,rl)}setTimeout(done,2500);if("serviceWorker"in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister()}))}).then(function(){return window.caches?caches.keys().then(function(ks){return Promise.all(ks.map(function(x){return caches.delete(x)}))}):null}).then(done).catch(done)}else{done()}}else if("serviceWorker"in navigator){navigator.serviceWorker.getRegistration().then(function(r){r&&r.update()}).catch(function(){})}}).catch(function(){})}catch(e){}}check();setInterval(check,45000);document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")check()});if("serviceWorker"in navigator){var hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",function(){var o=window.__updOverlay;function rl(){location.reload()}if(hadCtl&&o){o.show().then(rl,rl)}else{rl()}})}})();</script><link rel="manifest" href="/junoclient/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/junoclient/registerSW.js"></script></head>
+</script><script>window.__BASE="/junoclient/";(function(){var B="v02.11.6";function check(){try{fetch(window.__BASE+"version.json?_="+Date.now(),{cache:"no-store"}).then(function(r){return r.json()}).then(function(d){if(d&&d.version&&d.version!==B){var k="vreset_"+d.version;if(sessionStorage.getItem(k))return;sessionStorage.setItem(k,"1");var ov=window.__updOverlay;var anim=ov?ov.show(d.version):Promise.resolve();function rl(){location.reload()}var done_=false;function done(){if(done_)return;done_=true;anim.then(rl,rl)}setTimeout(done,2500);if("serviceWorker"in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){return Promise.all(rs.map(function(r){return r.unregister()}))}).then(function(){return window.caches?caches.keys().then(function(ks){return Promise.all(ks.map(function(x){return caches.delete(x)}))}):null}).then(done).catch(done)}else{done()}}else if("serviceWorker"in navigator){navigator.serviceWorker.getRegistration().then(function(r){r&&r.update()}).catch(function(){})}}).catch(function(){})}catch(e){}}check();setInterval(check,45000);document.addEventListener("visibilitychange",function(){if(document.visibilityState==="visible")check()});if("serviceWorker"in navigator){var hadCtl=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener("controllerchange",function(){var o=window.__updOverlay;function rl(){location.reload()}if(hadCtl&&o){o.show().then(rl,rl)}else{rl()}})}})();</script><link rel="manifest" href="/junoclient/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/junoclient/registerSW.js"></script></head>
   <body>
     <div id="root"></div>
   </body>
