@@ -8,6 +8,7 @@ import { useSalonMode } from '../hooks/useSalonMode'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
 import { normalizePhone, formatPhone } from '../utils/format'
+import { consumeRedirectAfterLogin } from '../utils/redirectAfterLogin'
 import './Auth.css'
 import { COUNTRIES, getCountry } from '../phoneCountries'
 
@@ -205,7 +206,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       const existing = await getUserProfile(u.uid)
       if (existing) {
         if (onProfileSaved) await onProfileSaved()
-        nav('/cabinet')
+        nav(consumeRedirectAfterLogin())
       } else {
         setStep('survey')
       }
@@ -265,7 +266,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       try { sessionStorage.removeItem('dp_invite_token') } catch { /* ignore */ }
       sendWelcomeIfEnabled(uid).catch(() => {})
       if (onProfileSaved) await onProfileSaved()
-      nav('/cabinet')
+      nav(consumeRedirectAfterLogin())
     } catch (e) {
       console.error(e)
       showToast('Не вдалось зберегти профіль')
@@ -279,7 +280,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
     const existing = await getUserProfile(u.uid)
     if (existing) {
       if (onProfileSaved) await onProfileSaved()
-      nav('/cabinet')
+      nav(consumeRedirectAfterLogin())
     } else {
       setStep('survey')
     }
@@ -340,7 +341,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
       const existing = await getUserProfile(u.uid)
       if (existing) {
         if (onProfileSaved) await onProfileSaved()
-        nav('/cabinet')
+        nav(consumeRedirectAfterLogin())
       } else {
         setStep('survey')
       }

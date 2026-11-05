@@ -1,4 +1,12 @@
 import { Routes, Route, Navigate, useNavigate, useLocation } from 'react-router-dom'
+import { saveRedirectAfterLogin } from './utils/redirectAfterLogin'
+
+// Неавторизований вхід за глибоким посиланням (напр. пуш ?review=...) — запам'ятати ціль і повернутись після входу
+function SaveRedirect({ to }) {
+  const location = useLocation()
+  if (location.search) saveRedirectAfterLogin(location.pathname, location.search)
+  return <Navigate to={to} replace />
+}
 import { useEffect, useState, useRef } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { Capacitor } from '@capacitor/core'
@@ -477,7 +485,7 @@ export default function App() {
       <Route path="/cabinet/*" element={
         user && profile
           ? <Cabinet user={user} profile={profile} onProfileUpdate={reloadProfile} />
-          : <Navigate to="/" replace />
+          : <SaveRedirect to="/" />
       } />
 
       <Route path="*" element={<Navigate to="/" replace />} />
