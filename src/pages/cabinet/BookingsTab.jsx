@@ -295,6 +295,18 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
 export default function BookingsTab({ user, profile, bookingsData }) {
   const { readOnly: licenseReadOnly } = useContext(LicenseContext)
   const { upcoming, completed, loading } = bookingsData
+  // ?review=<bookingId> з пушу «Оцініть урок» — прокрутити до картки уроку (там зірки оцінки) і підсвітити
+  useEffect(() => {
+    if (loading) return
+    let id = null
+    try { id = new URLSearchParams(window.location.search).get('review') } catch { /* немає window */ }
+    const el = id ? document.getElementById('booking-' + id) : null
+    if (!el) return
+    el.scrollIntoView({ block: 'center', behavior: 'smooth' })
+    el.style.outline = '2px solid #fbbf24'
+    const tm = setTimeout(() => { el.style.outline = '' }, 3000)
+    return () => clearTimeout(tm)
+  }, [loading, upcoming.length, completed.length])
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
   const [masters, setMasters] = useState([]) // салон: імена майстрів для підпису запису
   useEffect(() => subscribeMasters(setMasters), [])
@@ -355,7 +367,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
       : b.status === 'cancelled' ? 'Скасовано' : 'Очікує'
 
     return (
-      <div key={b.id} className="booking-card" style={isPast ? {opacity:0.92} : {}}>
+      <div key={b.id} id={'booking-' + b.id} className="booking-card" style={isPast ? {opacity:0.92} : {}}>
         <div className="booking-date">
           <div className="booking-day">{d.getDate()}</div>
           <div className="booking-mon">{getMonthShort(d.getMonth())}</div>
@@ -388,6 +400,15 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               <div style={{fontSize:11,fontWeight:700,color:'var(--warn)',padding:'2px 7px',borderRadius:6,background:'rgba(251,146,60,0.1)'}}>⏱ {lessonCountdown(b)}</div>
             )}
           </div>
+          {isPast && b.status !== 'cancelled' && (b.lessonRating >= 1 || b.lessonNote) && (
+            <div style={{marginTop:6,padding:'7px 10px',borderRadius:9,
+              background:'rgba(251,191,36,0.08)',border:'1px solid rgba(251,191,36,0.25)',
+              fontSize:11,color:'var(--text)',lineHeight:1.5,wordBreak:'break-word'}}>
+              <span style={{fontSize:11,fontWeight:700,color:'#fbbf24',display:'block',marginBottom:2}}>Оцінка майстра</span>
+              {b.lessonRating >= 1 && <span style={{fontSize:15,letterSpacing:1,color:'#fbbf24'}}>{'★'.repeat(Math.min(5, Math.round(b.lessonRating)))}{'☆'.repeat(5 - Math.min(5, Math.round(b.lessonRating)))}</span>}
+              {b.lessonNote && <div>{b.lessonNote}</div>}
+            </div>
+          )}
           {isPast && b.status === 'confirmed' && b.instructorNote && (
             <div style={{marginTop:6,padding:'7px 10px',borderRadius:9,
               background:'rgba(59,130,246,0.08)',border:'1px solid rgba(59,130,246,0.2)',
