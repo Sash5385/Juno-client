@@ -2,6 +2,7 @@
 // посилання запису (/i/{slug майстра}). Дані публічні: salons/{slug}, а профіль і послуги майстра читаються з його
 // admin_settings/profile та admin_data/services (читання відкрите — так само, як для лендингу майстра).
 import { useState, useEffect } from 'react'
+import { DEMO } from '../demo/demoMode'
 import { ref, get } from 'firebase/database'
 import { db } from '../firebase/config'
 import { getInitials } from '../utils/format'
@@ -92,7 +93,9 @@ export default function SalonPage({ slug }) {
               )}
               <button
                 className="btn-primary" style={{ marginTop: 12 }} disabled={!m.slug}
-                onClick={() => window.location.assign(`${import.meta.env.BASE_URL}i/${encodeURIComponent(m.slug)}`)}
+                onClick={() => window.location.assign(DEMO
+                  ? `${import.meta.env.BASE_URL}${window.location.search}` // демо: усі майстри ведуть у демо-кабінет (/i/{slug} у демо не резолвиться — був білий екран)
+                  : `${import.meta.env.BASE_URL}i/${encodeURIComponent(m.slug)}`)}
               >{m.slug ? 'Записатись' : 'Скоро'}</button>
             </div>
           ))}

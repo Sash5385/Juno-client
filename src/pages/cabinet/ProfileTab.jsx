@@ -204,7 +204,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
             <div style={{minWidth:0}}>
               <div style={{fontSize:15,fontWeight:800,color:'var(--text)',wordBreak:'break-word'}}>{instructorProfile.name}</div>
               {Number(instructorProfile.experience) > 0 && (
-                <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>Досвід: {instructorProfile.experience} р.</div>
+                <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>{`Досвід: ${instructorProfile.experience} р.`}</div>
               )}
             </div>
           </div>

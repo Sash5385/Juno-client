@@ -30,8 +30,19 @@ export function getDayName(dayIndex) {
   return DAYS_UA[dayIndex]
 }
 
+// Мова інтерфейсу (src/i18n): для не-української дату формуємо через Intl — рядок «Пн, 9 Листопад»
+// словник DOM-перекладу не впізнає цілком, і він лишався українським (черга, кабінет).
+const LOCALES = { en: 'en-GB', pl: 'pl-PL', de: 'de-DE', es: 'es-ES', fr: 'fr-FR' }
+const uiLang = () => {
+  try { return document.documentElement.lang || localStorage.getItem('dp_lang') || 'uk' } catch { return 'uk' }
+}
+
 export function formatDateLabel(date) {
   const d = new Date(date)
+  const loc = LOCALES[uiLang()]
+  if (loc) {
+    try { return d.toLocaleDateString(loc, { weekday: 'short', day: 'numeric', month: 'long' }) } catch { /* нижче — український формат */ }
+  }
   return `${DAYS_UA[d.getDay()]}, ${d.getDate()} ${MONTHS_UA[d.getMonth()]}`
 }
 
