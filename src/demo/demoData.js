@@ -91,7 +91,7 @@ export function buildDemoTree() {
     const b = {
       id, date, time: hhmm(startMin), startMin, durMin, durationHours: durMin / 60,
       studentName: st.n, name: st.n, phone: st.phone,
-      serviceId: svc, serviceType: st.t, type: st.t,
+      serviceId: svc, serviceName: SERVICES.find((x) => x.id === svc)?.name || "", serviceType: st.t, type: st.t,
       status: "confirmed", hours: 0,
       createdAt: Math.min(nowTs - seq * 60000, new Date(`${date}T00:00:00`).getTime() - 86400000 * (1 + (seq % 3)) + ((9 + (seq * 7) % 11) * 60 + (seq * 13) % 60) * 60000), createdBy: "admin",
       ...(st.vip ? { isVipOnly: true, categoryId: "cat-vip" } : {}),
@@ -349,6 +349,39 @@ export function buildDemoTree() {
     services: SERVICES,
   };
 
+  // ?demo=1&salon=N (2…30): салон у кабінеті клієнта — власник + N майстрів (masters, timeslots_m, masterId у записах),
+  // клієнт обирає майстра у вкладці запису. N запам'ятовується на сесію (адреса губить параметр після переходів).
+  let salonExtra = {};
+  try {
+    let sv = new URLSearchParams(window.location.search).get("salon");
+    if (sv) sessionStorage.setItem("dp_demo_salon", sv); else sv = sessionStorage.getItem("dp_demo_salon");
+    const many = sv ? Math.min(30, Math.max(2, parseInt(sv, 10) || 0)) : 0;
+    if (many) {
+      const NAMES = ["Олена", "Ігор", "Марія", "Дмитро", "Софія", "Максим", "Анна", "Тарас", "Юлія", "Богдан", "Наталя", "Олег", "Вікторія", "Роман", "Ірина", "Павло", "Катерина", "Сергій", "Оксана", "Назар"];
+      const COLS = ["#f472b6", "#34d399", "#fbbf24", "#f87171", "#a78bfa", "#2dd4bf", "#fb923c", "#38bdf8", "#a3e635", "#e879f9"];
+      const masters = { [DEMO_UID]: { name: "Андрій", color: "#60a5fa", owner: true } };
+      const ids = [];
+      for (let i = 0; i < many; i++) { const id = `demo-master-${i + 1}`; ids.push(id); masters[id] = { name: i < NAMES.length ? NAMES[i] : `Майстер ${i + 1}`, color: COLS[i % COLS.length], owner: false }; }
+      // записи по колу між власником і майстрами (власник — без masterId)
+      let n = 0;
+      list.forEach(({ uid, b }) => { if (uid === "personal" || b.status === "cancelled") return; const k = n++ % (many + 1); if (k) b.masterId = ids[k - 1]; });
+      // власні календарі: слоти з шаблону, частина зайнята (детерміновано)
+      const r3 = rng(4242);
+      const timeslots_m = {};
+      ids.forEach((mid) => {
+        const out = {};
+        Object.entries(timeslots).forEach(([ds, day]) => {
+          const d = {};
+          Object.entries(day).forEach(([id, v]) => { if (!v.phantom) d[id] = { time: v.time, available: r3() > 0.35 }; });
+          out[ds] = d;
+        });
+        timeslots_m[mid] = out;
+      });
+      admin_settings.accountType = "salon";
+      salonExtra = { masters, timeslots_m };
+    }
+  } catch { /* лише демо */ }
+
   // Демо-салон /s/demo: власник — демо-майстер + ще двоє майстрів із власними послугами
   const extraMaster = (name, slug, city, services) => ({
     admin_settings: { profile: { name, slug, city, photo: null } },
@@ -367,6 +400,7 @@ export function buildDemoTree() {
         { id: "y1", name: "Індивідуальний запис", price: 900, duration: 60, colorId: "yellow", active: true },
       ]),
       [DEMO_UID]: {
+        ...salonExtra,
         admin_settings,
         admin_data: { services: SERVICES },
         users, bookings, timeslots, queue, dayNotes, chats, chatMeta, reviews, notifications,

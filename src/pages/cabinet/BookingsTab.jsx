@@ -5,7 +5,7 @@ import { useBackClose } from '../../hooks/useBackButton'
 import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster, subscribeMasters, saveReview, subscribeMyReviews } from '../../firebase/db'
 import { formatDurHours } from '../../utils/format'
 import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
-import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
+import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { LicenseContext } from '../../hooks/useLicense'
 import './BookingsTab.css'
@@ -14,6 +14,8 @@ import { cur as curSym } from '../../currency'
 
 // Мінімальний час до запису, коли клієнт ще може самостійно скасувати (год)
 const CANCEL_WINDOW_HOURS = 24
+// «пн, 30 листопада» — родовий відмінок; для іншої мови інтерфейсу toLocaleDateString підмінено в i18n
+const fmtLongDate = (d) => { const x = typeof d === 'string' ? parseYMD(d) : new Date(d); return isNaN(x) ? String(d || '') : x.toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' }) }
 
 function hoursUntilLesson(booking) {
   if (!booking?.date || !booking?.time) return Infinity
@@ -206,7 +208,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         <div className="dialog-handle" />
         <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}>📅 Перенести запис</div>
         <div style={{ fontSize: 12, color: 'var(--dim)', marginBottom: 14, textAlign: 'center' }}>
-          {booking.serviceName} · {booking.date} о {booking.time}
+          {[booking.serviceName, `${fmtLongDate(booking.date)}, ${booking.time}`].filter(Boolean).join(' · ')}
         </div>
 
         {/* CALENDAR */}
@@ -247,7 +249,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         {selectedDate && (
           <>
             <div className="section-title" style={{ marginTop: 0 }}>
-              Час · {formatDateLabel(selectedDate)}
+              Час · {fmtLongDate(selectedDate)}
             </div>
             {loading ? (
               <div style={{ textAlign:'center', padding:16 }}><div className="spinner" style={{ margin:'0 auto' }} /></div>
@@ -373,7 +375,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {b.serviceType === 'school' ? '🎓' : '🚙'} {b.serviceName} · {formatDurHours(b.durationHours || 1)}
+            {b.serviceType === 'school' ? '🎓' : '🚙'} {b.serviceName} · {formatDurHours(b.durationHours || 1)}{' '}
             {b.masterId && masters.find(m => m.id === b.masterId) && (
               <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masters.find(m => m.id === b.masterId).name}</span>
             )}
@@ -557,7 +559,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                   {countdown && <div className="nl-pill" style={{fontSize:11,fontWeight:800,padding:'3px 9px',borderRadius:8}}>{countdown}</div>}
                 </div>
                 <div style={{fontSize:28,fontWeight:900,color:'var(--text)',lineHeight:1}}>{next.time}</div>
-                <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())} · {next.serviceName}</div>
+                <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())}{next.serviceName ? ` · ${next.serviceName}` : ''}</div>
                 <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{formatDurHours(next.durationHours || 1)}{normAddons(next.addons).length > 0 ? ` · ➕ ${addonsLabel(normAddons(next.addons))}` : ''}</div>
                 <div className="booking-cal-row">
                   <a href={googleCalendarLink(next)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">Google Calendar</a>

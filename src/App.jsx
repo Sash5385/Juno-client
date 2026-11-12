@@ -212,7 +212,12 @@ export default function App() {
   // посилання-запрошення /i/{slug} (одноразово прив'язує пристрій до
   // майстра) або збережений з попереднього візиту iid.
   useEffect(() => {
-    if (DEMO) { setCurrentTenant(DEMO_IID, DEMO_SLUG); setTenantIid(DEMO_IID); return } // ?demo=1: вигаданий майстер
+    if (DEMO) { // ?demo=1: вигаданий майстер; /i/{slug} (перехід зі сторінки демо-салону) → кабінет того ж демо-майстра
+      setCurrentTenant(DEMO_IID, DEMO_SLUG); setTenantIid(DEMO_IID)
+      const dm = location.pathname.match(/^\/i\/[^/]+/)
+      if (dm) navigate((location.pathname.slice(dm[0].length) || '/') + location.search + location.hash, { replace: true })
+      return
+    }
     // Slug береться з /i/{slug} АБО з ?i={slug}: параметр ми самі лишаємо в адресі
     // (див. ефект нижче), щоб ярлик "На екран Домой" (iOS зберігає ПОТОЧНУ адресу
     // сторінки, а сховище PWA на iPhone ізольоване від Safari) відкривався вже

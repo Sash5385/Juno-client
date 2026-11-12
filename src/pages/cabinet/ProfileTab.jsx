@@ -195,7 +195,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         <div className="profile-section">
         {instructorProfile?.name && (
           <>
-          <div className="section-title">🚗 Мій майстер</div>
+          <div className="section-title">👤 Мій майстер</div>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             {(instructorProfile.photoUrl || instructorProfile.photo)
               ? <img src={instructorProfile.photoUrl || instructorProfile.photo} alt="" style={{width:52,height:52,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
@@ -325,6 +325,10 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         </div>
       </div>
 
+      <button type="button" className="pf-version" onClick={forceUpdate} title="Натисніть, щоб перевірити оновлення">
+        <span>{APP_VERSION}</span> · <span>перевірити оновлення</span>
+      </button>
+
       <div className="pf-account">
         <button className="pf-btn" onClick={() => setLogoutOpen(true)}>Вийти з акаунта</button>
         {!delOpen ? (
@@ -346,10 +350,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           </div>
         )}
       </div>
-
-      <button type="button" className="pf-version" onClick={forceUpdate} title="Натисніть, щоб перевірити оновлення">
-        <span>{APP_VERSION}</span> · <span>перевірити оновлення</span>
-      </button>
 
       {cropFile && (
         <PhotoCropModal
