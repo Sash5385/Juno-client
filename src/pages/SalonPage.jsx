@@ -39,7 +39,7 @@ export default function SalonPage({ slug }) {
   useEffect(() => {
     let alive = true
     ;(async () => {
-      let salon = null
+      let salon
       let masters = []
       try {
         salon = (await get(ref(db, `salons/${slug}`))).val()

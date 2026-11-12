@@ -142,14 +142,14 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     msUnsub.current?.(); setMasterMs(null)
     msUnsub.current = id === getCurrentIid() ? null : subscribeMasterSettings(id, setMasterMs)
     setClientMaster(id)           // спершу корінь слотів — потім стан, щоб підписки одразу читали календар цього майстра
-    try { localStorage.setItem(`dp_master_${ownerId}`, id) } catch {}
+    try { localStorage.setItem(`dp_master_${ownerId}`, id) } catch { /* ignore */ }
     setSelectedTime(null); setSelectedTime2(null); setSlots({}); setMonthAvail({})
     setPickedMaster(id)
   }
   useEffect(() => {
     if (!salonMode || pickedMaster) return
     let saved = notifParams?.master || null // пуш про звільнений слот веде у календар того майстра
-    if (!saved || !masters.some(m => m.id === saved)) { try { saved = localStorage.getItem(`dp_master_${ownerId}`) } catch {} }
+    if (!saved || !masters.some(m => m.id === saved)) { try { saved = localStorage.getItem(`dp_master_${ownerId}`) } catch { /* ignore */ } }
     if (saved && masters.some(m => m.id === saved)) pickMaster(saved)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [salonMode, masters])

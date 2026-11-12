@@ -361,7 +361,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
     setCancelConfirmId(null)
     try {
       await cancelBooking(user.uid, booking.id)
-      showToast(`Запис ${formatDateLabel(parseYMD(booking.date))} о ${booking.time} скасовано`)
+      showToast(`Запис ${fmtLongDate(booking.date)} о ${booking.time} скасовано`)
     } catch (e) {
       showToast('Помилка: ' + e.message, 'error')
     }

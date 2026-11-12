@@ -57,7 +57,7 @@ if (typeof window !== 'undefined') {
   })
   window.addEventListener('appinstalled', () => {
     _deferredInstall = null
-    try { localStorage.setItem('pwa_installed', '1') } catch {}
+    try { localStorage.setItem('pwa_installed', '1') } catch { /* ignore */ }
     _installSubs.forEach(f => f())
   })
 }
@@ -69,7 +69,7 @@ function useInstallPrompt() {
     return () => { _installSubs.delete(f) }
   }, [])
   let installed = isStandaloneMode()
-  try { if (localStorage.getItem('pwa_installed') === '1') installed = true } catch {}
+  try { if (localStorage.getItem('pwa_installed') === '1') installed = true } catch { /* ignore */ }
   return { deferredPrompt: _deferredInstall, installed }
 }
 
@@ -84,7 +84,7 @@ function InstallPrompt({ active }) {
   const [open, setOpen] = useState(false)
   const [hidden, setHidden] = useState(false)
   let snoozed = false
-  try { snoozed = Number(localStorage.getItem(INSTALL_SNOOZE_KEY) || 0) > Date.now() } catch {}
+  try { snoozed = Number(localStorage.getItem(INSTALL_SNOOZE_KEY) || 0) > Date.now() } catch { /* ignore */ }
   const eligible = active && !hidden && !snoozed && !installed && !Capacitor.isNativePlatform() && (!!deferredPrompt || ios)
 
   useEffect(() => {
@@ -96,7 +96,7 @@ function InstallPrompt({ active }) {
   if (!eligible || !open) return null
 
   const snooze = (days) => {
-    try { localStorage.setItem(INSTALL_SNOOZE_KEY, String(Date.now() + days * 86400000)) } catch {}
+    try { localStorage.setItem(INSTALL_SNOOZE_KEY, String(Date.now() + days * 86400000)) } catch { /* ignore */ }
     setHidden(true)
   }
   const install = async () => {
@@ -104,7 +104,7 @@ function InstallPrompt({ active }) {
     deferredPrompt.prompt()
     const choice = await deferredPrompt.userChoice.catch(() => null)
     if (choice?.outcome === 'accepted') {
-      try { localStorage.setItem('pwa_installed', '1') } catch {}
+      try { localStorage.setItem('pwa_installed', '1') } catch { /* ignore */ }
       setHidden(true)
     } else snooze(7)
   }

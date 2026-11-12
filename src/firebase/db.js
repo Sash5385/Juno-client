@@ -24,7 +24,7 @@ function writeTenantCookie(iid, slug) {
   try {
     if (iid) document.cookie = `${TENANT_COOKIE}=${encodeURIComponent(iid + '|' + (slug || ''))}; max-age=31536000; path=/; SameSite=Lax`
     else document.cookie = `${TENANT_COOKIE}=; max-age=0; path=/`
-  } catch {}
+  } catch { /* ignore */ }
 }
 function readTenantCookie() {
   try {
@@ -42,7 +42,7 @@ export function setCurrentTenant(iid, slug) {
   try {
     if (_iid) localStorage.setItem(IID_KEY, _iid); else localStorage.removeItem(IID_KEY)
     if (_slug) localStorage.setItem(SLUG_KEY, _slug); else localStorage.removeItem(SLUG_KEY)
-  } catch {}
+  } catch { /* ignore */ }
   writeTenantCookie(_iid, _slug)
 }
 
@@ -51,11 +51,11 @@ export function loadStoredTenant() {
     const iid = localStorage.getItem(IID_KEY)
     const slug = localStorage.getItem(SLUG_KEY)
     if (iid) { _iid = iid; _slug = slug || null; writeTenantCookie(_iid, _slug); return { iid, slug } }
-  } catch {}
+  } catch { /* ignore */ }
   const c = readTenantCookie()
   if (c) {
     _iid = c.iid; _slug = c.slug
-    try { localStorage.setItem(IID_KEY, c.iid); if (c.slug) localStorage.setItem(SLUG_KEY, c.slug) } catch {}
+    try { localStorage.setItem(IID_KEY, c.iid); if (c.slug) localStorage.setItem(SLUG_KEY, c.slug) } catch { /* ignore */ }
     return c
   }
   return null
@@ -691,7 +691,7 @@ export async function sendWelcomeIfEnabled(uid) {
       push(iRef(`notifications/${uid}`), { type:'system', title:'Вітаємо! 🎉', body:'Ваш профіль підключено. Забронюйте перший запис онлайн.', date:_dl, time:_tl, ts:Date.now() }),
       update(iRef(`users/${uid}`), { welcomeSent: true }),
     ])
-  } catch (_) {}
+  } catch (_) { /* ignore */ }
 }
 
 // ─── РЕДАГУВАННЯ ПОВІДОМЛЕНЬ (до 24 год; відмітка editedAt) ───────

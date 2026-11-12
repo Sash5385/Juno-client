@@ -19,7 +19,7 @@ export const isInAppBrowser = () => {
 export function initRecaptcha(containerId = 'recaptcha-container', force = false, onSolved = null, onExpired = null) {
   if (recaptchaVerifier && !force) return recaptchaVerifier
   if (recaptchaVerifier) {
-    try { recaptchaVerifier.clear() } catch {}
+    try { recaptchaVerifier.clear() } catch { /* ignore */ }
     recaptchaVerifier = null
   }
   recaptchaVerifier = new RecaptchaVerifier(auth, containerId, {
@@ -71,7 +71,7 @@ export async function verifySmsCode(code) {
 
 export async function resetRecaptcha() {
   if (recaptchaVerifier) {
-    try { recaptchaVerifier.clear() } catch {}
+    try { recaptchaVerifier.clear() } catch { /* ignore */ }
     recaptchaVerifier = null
   }
   confirmationResult = null
