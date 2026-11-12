@@ -11,7 +11,7 @@ import { LicenseContext } from '../../hooks/useLicense'
 import { useSalonMode } from '../../hooks/useSalonMode'
 import './BookingsTab.css'
 import './BookTab.css'
-import { cur as curSym } from '../../currency'
+import { cur as curSym, money } from '../../currency'
 
 // Мінімальний час до запису, коли клієнт ще може самостійно скасувати (год)
 const CANCEL_WINDOW_HOURS = 24
@@ -399,7 +399,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             )}
             {(b.price > 0) && (
               <span style={{marginLeft:6, color:'var(--gold)', fontWeight:700}}>
-                {b.price} {curSym()}{b.surcharge > 0 ? ` (+${b.surcharge}${curSym()})` : ''}
+                {money(b.price, ' ')}{b.surcharge > 0 ? ` (+${money(b.surcharge)})` : ''}
               </span>
             )}
           </div>
@@ -572,7 +572,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             <div style={{borderRadius:14,background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)',padding:'12px 14px',marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
               <div style={{fontSize:22,flexShrink:0}}>💳</div>
               <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:800,color:'var(--bad)'}}>Заборгованість: {totalDebt} {curSym()}</div>
+                <div style={{fontSize:13,fontWeight:800,color:'var(--bad)'}}>Заборгованість: {money(totalDebt, ' ')}</div>
                 <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>Зверніться до майстра для оплати</div>
               </div>
             </div>

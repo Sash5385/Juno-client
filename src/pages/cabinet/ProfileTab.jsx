@@ -12,7 +12,7 @@ import { useSalonMode } from "../../hooks/useSalonMode";
 import PhotoCropModal from "./PhotoCropModal";
 import ConfirmDialog from "./ConfirmDialog";
 import "./ProfileTab.css";
-import { cur as curSym } from '../../currency'
+import { money } from '../../currency'
 
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const { palette, setPalette, uiScale, setUiScale } = useTheme();
@@ -153,7 +153,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       {(profile?.discount || 0) > 0 && (
         <div style={{textAlign:'center',padding:'0 16px 12px'}}>
           <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'5px 14px',borderRadius:10,background:'rgba(246,178,27,0.1)',border:'1px solid rgba(246,178,27,0.25)',fontSize:13,fontWeight:700,color:'var(--warn)'}}>
-            🏷️ Ваша знижка: {profile.discount}{`${curSym()}/год`}
+            🏷️ Ваша знижка: {`${money(profile.discount)}/год`}
           </div>
         </div>
       )}

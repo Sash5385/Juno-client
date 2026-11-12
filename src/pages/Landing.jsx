@@ -6,7 +6,7 @@ import { useSalonMode } from '../hooks/useSalonMode'
 import { getAdminSettings, getApprovedReviews, getAdminServices, getUpcomingFreeSlots, subscribeMasters } from '../firebase/db'
 import { parseYMD, getDayName, getMonthShort, formatDateYMD } from '../utils/date'
 import './Landing.css'
-import { cur as curSym } from '../currency'
+import { cur as curSym, money } from '../currency'
 
 // Та сама палітра, що й у виборі кольору послуги в адмінці (colorId) —
 // бабл ціни на лендингу тонується в колір, обраний для послуги там.
@@ -264,7 +264,7 @@ export default function Landing({ user, profile }) {
                 <div className="pricing-bubble-icon">🎓</div>
                 <div className="pricing-bubble-lbl">Стандарт</div>
                 <div className="pricing-bubble-num">{schoolService.price}<span>{`${curSym()}/год`}</span></div>
-                {schoolService2h && <div className="pricing-bubble-sub">2 год — <b>{schoolService2h.price}{curSym()}</b></div>}
+                {schoolService2h && <div className="pricing-bubble-sub">2 год — <b>{money(schoolService2h.price)}</b></div>}
               </div>
             )}
             {privateService && (
@@ -272,7 +272,7 @@ export default function Landing({ user, profile }) {
                 <div className="pricing-bubble-icon">🚙</div>
                 <div className="pricing-bubble-lbl">Індивідуальні</div>
                 <div className="pricing-bubble-num">{privateService.price}<span>{`${curSym()}/год`}</span></div>
-                {privateService2h && <div className="pricing-bubble-sub">2 год — <b>{privateService2h.price}{curSym()}</b></div>}
+                {privateService2h && <div className="pricing-bubble-sub">2 год — <b>{money(privateService2h.price)}</b></div>}
               </div>
             )}
           </div>
