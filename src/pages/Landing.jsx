@@ -2,7 +2,7 @@ import LangSwitch from '../i18n/LangSwitch'
 import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
-import { getAdminSettings, getApprovedReviews, getAdminServices, getUpcomingFreeSlots } from '../firebase/db'
+import { getAdminSettings, getApprovedReviews, getAdminServices, getUpcomingFreeSlots, subscribeMasters } from '../firebase/db'
 import { parseYMD, getDayName, getMonthShort, formatDateYMD } from '../utils/date'
 import './Landing.css'
 import { cur as curSym } from '../currency'
@@ -111,6 +111,8 @@ export default function Landing({ user, profile }) {
   }, [])
 
   const [reviews, setReviews] = useState([])
+  const [masters, setMasters] = useState([]) // салон: підпис майстра під відгуком
+  useEffect(() => subscribeMasters(setMasters), [])
   useEffect(() => {
     getApprovedReviews().then(setReviews).catch(() => {})
   }, [])
@@ -312,6 +314,7 @@ export default function Landing({ user, profile }) {
                   <div>
                     <div className="review-name">{rv.studentName || 'Клієнт'}</div>
                     {rv.createdAt && <div className="review-date">{new Date(rv.createdAt).toLocaleDateString('uk-UA')}</div>}
+                    {masters.length > 1 && rv.masterId && masters.find(m => m.id === rv.masterId) && <div className="review-date">{`Майстер: ${masters.find(m => m.id === rv.masterId).name}`}</div>}
                   </div>
                 </div>
               </div>

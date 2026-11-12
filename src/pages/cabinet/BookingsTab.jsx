@@ -2,7 +2,7 @@ import { useState, useEffect, useMemo, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
-import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster, subscribeMasters } from '../../firebase/db'
+import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster, subscribeMasters, saveReview, subscribeMyReviews } from '../../firebase/db'
 import { formatDurHours } from '../../utils/format'
 import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
@@ -297,6 +297,19 @@ export default function BookingsTab({ user, profile, bookingsData }) {
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
   const [masters, setMasters] = useState([]) // салон: імена майстрів для підпису запису
   useEffect(() => subscribeMasters(setMasters), [])
+  const [myReviews, setMyReviews] = useState({}) // reviews/{uid}/{bookingId}
+  useEffect(() => (user?.uid ? subscribeMyReviews(user.uid, setMyReviews) : undefined), [user?.uid])
+  const [reviewDraft, setReviewDraft] = useState(null) // { id, rating, text }
+  const [reviewSaving, setReviewSaving] = useState(false)
+  const submitReview = async (b) => {
+    if (!reviewDraft?.rating) return
+    setReviewSaving(true)
+    try {
+      await saveReview(user.uid, b, reviewDraft.rating, reviewDraft.text, profile?.name || b.studentName || '')
+      setReviewDraft(null)
+    } catch { alert('Не вдалося надіслати відгук. Спробуйте ще раз.') }
+    setReviewSaving(false)
+  }
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
   const [noteOpenId, setNoteOpenId] = useState(null)
   const [noteDraft, setNoteDraft] = useState('')
@@ -407,6 +420,38 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               ))}
             </div>
           )}
+          {isPast && b.status === 'confirmed' && (() => {
+            const rv = myReviews[b.id]
+            const masterName = b.masterId ? (masters.find(m => m.id === b.masterId)?.name || '') : ''
+            if (reviewDraft?.id === b.id) return (
+              <div style={{marginTop:8,padding:10,borderRadius:12,background:'rgba(127,127,127,0.08)',border:'1px solid rgba(127,127,127,0.18)'}}>
+                {masterName && <div style={{fontSize:11,color:'var(--dim)',marginBottom:4}}>{`Відгук для майстра: ${masterName}`}</div>}
+                <div style={{display:'flex',gap:2,marginBottom:6}}>
+                  {[1,2,3,4,5].map(star => (
+                    <span key={star} onClick={() => setReviewDraft(d => ({ ...d, rating: star }))} style={{fontSize:26,cursor:'pointer',lineHeight:1,padding:'2px',color: reviewDraft.rating >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)'}}>★</span>
+                  ))}
+                </div>
+                <textarea value={reviewDraft.text} maxLength={1000} rows={3} placeholder="Що сподобалось? (необов'язково)"
+                  onChange={e => setReviewDraft(d => ({ ...d, text: e.target.value }))}
+                  style={{width:'100%',boxSizing:'border-box',borderRadius:10,padding:'8px 10px',fontSize:13,fontFamily:'inherit',resize:'vertical',background:'var(--bg, transparent)',color:'var(--text)',border:'1px solid rgba(127,127,127,0.3)'}}/>
+                <div style={{display:'flex',gap:8,marginTop:8}}>
+                  <button onClick={() => setReviewDraft(null)} style={{flex:1,padding:'9px 0',borderRadius:10,border:'1px solid rgba(127,127,127,0.3)',background:'transparent',color:'var(--dim)',fontFamily:'inherit',fontWeight:700,cursor:'pointer'}}>Скасувати</button>
+                  <button disabled={!reviewDraft.rating || reviewSaving} onClick={() => submitReview(b)} style={{flex:2,padding:'9px 0',borderRadius:10,border:'none',background:'#fbbf24',color:'#1a1203',fontFamily:'inherit',fontWeight:800,cursor:'pointer',opacity:!reviewDraft.rating || reviewSaving ? 0.5 : 1}}>{reviewSaving ? 'Надсилаємо…' : 'Надіслати відгук'}</button>
+                </div>
+              </div>
+            )
+            if (rv) return (
+              <div style={{marginTop:6,fontSize:12,color:'var(--dim)',lineHeight:1.45}}>
+                {`✍️ Ваш відгук${rv.status === 'hidden' ? ' (прихований майстром)' : ''}: `}{rv.text ? `«${rv.text}»` : ''}
+                {rv.status !== 'hidden' && <button onClick={() => setReviewDraft({ id: b.id, rating: rv.rating || 5, text: rv.text || '' })} style={{marginLeft:6,border:'none',background:'none',color:'var(--info)',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:'pointer',padding:0}}>Змінити</button>}
+              </div>
+            )
+            return (
+              <button onClick={() => setReviewDraft({ id: b.id, rating: b.rating || 0, text: '' })} style={{marginTop:6,padding:'7px 12px',borderRadius:10,border:'1px solid rgba(251,191,36,0.45)',background:'rgba(251,191,36,0.1)',color:'var(--text)',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:'pointer'}}>
+                {masterName ? `✍️ Залишити відгук майстру ${masterName}` : '✍️ Залишити відгук'}
+              </button>
+            )
+          })()}
           {!isPast && b.status !== 'cancelled' && b.studentConfirmed && (
             <div className="booking-meta" style={{ color: 'var(--ok)', marginTop: 4 }}>
               ✓ Ви підтвердили присутність

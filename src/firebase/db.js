@@ -270,6 +270,25 @@ export async function rateBooking(uid, bookingId, rating) {
   await update(iRef(`bookings/${uid}/${bookingId}`), { rating })
 }
 
+// Відгук до свого запису: reviews/{uid}/{bookingId}. Майстер — із запису (masterId), тож відгук іде саме йому.
+// Публікується одразу; майстер може сховати (status:"hidden") — тоді клієнт його вже не змінює (правила БД).
+export async function saveReview(uid, booking, rating, text, studentName) {
+  const v = { rating, createdAt: Date.now(), status: 'approved' }
+  const tx = (text || '').trim().slice(0, 1000)
+  if (tx) v.text = tx
+  if (studentName) v.studentName = String(studentName).slice(0, 80)
+  if (booking.serviceName) v.serviceName = String(booking.serviceName).slice(0, 120)
+  if (booking.masterId) v.masterId = booking.masterId
+  await set(iRef(`reviews/${uid}/${booking.id}`), v)
+  await update(iRef(`bookings/${uid}/${booking.id}`), { rating }).catch(() => {})
+}
+
+export function subscribeMyReviews(uid, cb) {
+  const r = iRef(`reviews/${uid}`)
+  const h = onValue(r, snap => cb(snap.val() || {}), () => cb({}))
+  return () => off(r, 'value', h)
+}
+
 export async function saveStudentNote(uid, bookingId, note) {
   await update(iRef(`bookings/${uid}/${bookingId}`), { studentNote: note || null })
 }
