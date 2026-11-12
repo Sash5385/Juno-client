@@ -165,6 +165,7 @@ function DirectChat({ user, profile, mid, title }) {
           />
           <button
             className={`chat-send-btn ${text.trim() ? 'active' : ''}`}
+            aria-label="Надіслати"
             onClick={send}
             disabled={!text.trim() || sending}
           >

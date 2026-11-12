@@ -426,7 +426,7 @@
 /* ─── РЕДАГУВАННЯ ──────────────────────────────────────────────── */
 .bubble-edit {
   background: none; border: none; cursor: pointer; color: inherit; opacity: .7;
-  font-size: 12px; padding: 0 0 0 8px; line-height: 1;
+  font-size: 12px; padding: 8px 6px 8px 10px; margin: -8px -6px -8px 0; line-height: 1;
 }
 .chat-edit-bar {
   display: flex; align-items: center; justify-content: space-between;

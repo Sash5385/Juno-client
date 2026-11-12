@@ -231,3 +231,6 @@
   .cab-content > .book-tab { max-width: 1040px; }
   .book-cols { display: grid; grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr); gap: 28px; align-items: start; }
 }
+
+/* Більша зона дотику, де вміщається (на 320px — 8 іконок по 28px) */
+@media (min-width: 360px) { .cab-icon-btn { width: 32px; height: 32px; } }

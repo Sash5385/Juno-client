@@ -263,3 +263,5 @@ html[data-palette="fog"] body[data-theme="dark"] .bubble-in{border-radius:99px}
 html[data-palette="fog"] body[data-theme="dark"] .bubble-out{background:linear-gradient(135deg,rgba(96,165,250,.28),rgba(129,140,248,.18));border:1px solid rgba(147,197,253,.4)}
 html[data-palette="fog"] body[data-theme="dark"] .chat-bubble .bubble-time{text-align:center}
 html[data-palette="fog"] body[data-theme="dark"] .chat-sender-name{text-align:center;width:100%;padding-left:0}
+
+@media (min-width: 360px) { html[data-palette="neon"] body[data-theme="dark"] .cab-icon-btn { width: 32px; height: 32px; } }
