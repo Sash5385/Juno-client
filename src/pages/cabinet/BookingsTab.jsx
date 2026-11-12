@@ -2,18 +2,21 @@ import { useState, useEffect, useMemo, useContext } from 'react'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
-import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster, subscribeMasters } from '../../firebase/db'
+import { cancelBooking, rateBooking, saveStudentNote, createBooking, claimSlot, subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability, setClientMaster, getClientMaster, subscribeMasters, saveReview, subscribeMyReviews } from '../../firebase/db'
 import { formatDurHours } from '../../utils/format'
 import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
-import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../../utils/date'
+import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { LicenseContext } from '../../hooks/useLicense'
 import { useSalonMode } from '../../hooks/useSalonMode'
 import './BookingsTab.css'
 import './BookTab.css'
+import { cur as curSym } from '../../currency'
 
 // Мінімальний час до запису, коли клієнт ще може самостійно скасувати (год)
 const CANCEL_WINDOW_HOURS = 24
+// «пн, 30 листопада» — родовий відмінок; для іншої мови інтерфейсу toLocaleDateString підмінено в i18n
+const fmtLongDate = (d) => { const x = typeof d === 'string' ? parseYMD(d) : new Date(d); return isNaN(x) ? String(d || '') : x.toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' }) }
 
 function hoursUntilLesson(booking) {
   if (!booking?.date || !booking?.time) return Infinity
@@ -208,7 +211,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         <div className="dialog-handle" />
         <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}>📅 Перенести запис</div>
         <div style={{ fontSize: 12, color: 'var(--dim)', marginBottom: 14, textAlign: 'center' }}>
-          {booking.serviceName} · {formatDateLabel(parseYMD(booking.date))} о {booking.time}
+          {[booking.serviceName, `${fmtLongDate(booking.date)}, ${booking.time}`].filter(Boolean).join(' · ')}
         </div>
 
         {/* CALENDAR */}
@@ -248,7 +251,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         {selectedDate && (
           <>
             <div className="section-title" style={{ marginTop: 0 }}>
-              Час · {formatDateLabel(selectedDate)}
+              Час · {fmtLongDate(selectedDate)}
             </div>
             {loading ? (
               <div style={{ textAlign:'center', padding:16 }}><div className="spinner" style={{ margin:'0 auto' }} /></div>
@@ -314,6 +317,19 @@ export default function BookingsTab({ user, profile, bookingsData }) {
   const ownerMaster = masters.find(m => m.owner)
   // Запис до власника не має masterId — у салоні підписуємо його ім'ям власника
   const masterOf = (b) => masters.find(m => m.id === b.masterId) || (masters.length > 1 && !b.masterId ? ownerMaster : null)
+  const [myReviews, setMyReviews] = useState({}) // reviews/{uid}/{bookingId}
+  useEffect(() => (user?.uid ? subscribeMyReviews(user.uid, setMyReviews) : undefined), [user?.uid])
+  const [reviewDraft, setReviewDraft] = useState(null) // { id, rating, text }
+  const [reviewSaving, setReviewSaving] = useState(false)
+  const submitReview = async (b) => {
+    if (!reviewDraft?.rating) return
+    setReviewSaving(true)
+    try {
+      await saveReview(user.uid, b, reviewDraft.rating, reviewDraft.text, profile?.name || b.studentName || '')
+      setReviewDraft(null)
+    } catch { alert('Не вдалося надіслати відгук. Спробуйте ще раз.') }
+    setReviewSaving(false)
+  }
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
   const [noteOpenId, setNoteOpenId] = useState(null)
   const [noteDraft, setNoteDraft] = useState('')
@@ -377,13 +393,13 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {salonOn ? '' : (b.serviceType === 'school' ? '🎓 ' : '🚙 ')}{b.serviceName} · {formatDurHours(b.durationHours || 1)}
+            {salonOn ? '' : (b.serviceType === 'school' ? '🎓 ' : '🚙 ')}{b.serviceName} · {formatDurHours(b.durationHours || 1)}{' '}
             {masterOf(b) && (
               <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masterOf(b).name}</span>
             )}
             {(b.price > 0) && (
               <span style={{marginLeft:6, color:'var(--gold)', fontWeight:700}}>
-                {b.price} ₴{b.surcharge > 0 ? ` (+${b.surcharge}₴)` : ''}
+                {b.price} {curSym()}{b.surcharge > 0 ? ` (+${b.surcharge}${curSym()})` : ''}
               </span>
             )}
           </div>
@@ -433,6 +449,38 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               ))}
             </div>
           )}
+          {isPast && b.status === 'confirmed' && (() => {
+            const rv = myReviews[b.id]
+            const masterName = b.masterId ? (masters.find(m => m.id === b.masterId)?.name || '') : ''
+            if (reviewDraft?.id === b.id) return (
+              <div style={{marginTop:8,padding:10,borderRadius:12,background:'rgba(127,127,127,0.08)',border:'1px solid rgba(127,127,127,0.18)'}}>
+                {masterName && <div style={{fontSize:11,color:'var(--dim)',marginBottom:4}}>{`Відгук для майстра: ${masterName}`}</div>}
+                <div style={{display:'flex',gap:2,marginBottom:6}}>
+                  {[1,2,3,4,5].map(star => (
+                    <span key={star} onClick={() => setReviewDraft(d => ({ ...d, rating: star }))} style={{fontSize:26,cursor:'pointer',lineHeight:1,padding:'2px',color: reviewDraft.rating >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)'}}>★</span>
+                  ))}
+                </div>
+                <textarea value={reviewDraft.text} maxLength={1000} rows={3} placeholder="Що сподобалось? (необов'язково)"
+                  onChange={e => setReviewDraft(d => ({ ...d, text: e.target.value }))}
+                  style={{width:'100%',boxSizing:'border-box',borderRadius:10,padding:'8px 10px',fontSize:13,fontFamily:'inherit',resize:'vertical',background:'var(--bg, transparent)',color:'var(--text)',border:'1px solid rgba(127,127,127,0.3)'}}/>
+                <div style={{display:'flex',gap:8,marginTop:8}}>
+                  <button onClick={() => setReviewDraft(null)} style={{flex:1,padding:'9px 0',borderRadius:10,border:'1px solid rgba(127,127,127,0.3)',background:'transparent',color:'var(--dim)',fontFamily:'inherit',fontWeight:700,cursor:'pointer'}}>Скасувати</button>
+                  <button disabled={!reviewDraft.rating || reviewSaving} onClick={() => submitReview(b)} style={{flex:2,padding:'9px 0',borderRadius:10,border:'none',background:'#fbbf24',color:'#1a1203',fontFamily:'inherit',fontWeight:800,cursor:'pointer',opacity:!reviewDraft.rating || reviewSaving ? 0.5 : 1}}>{reviewSaving ? 'Надсилаємо…' : 'Надіслати відгук'}</button>
+                </div>
+              </div>
+            )
+            if (rv) return (
+              <div style={{marginTop:6,fontSize:12,color:'var(--dim)',lineHeight:1.45}}>
+                {`✍️ Ваш відгук${rv.status === 'hidden' ? ' (прихований майстром)' : ''}: `}{rv.text ? `«${rv.text}»` : ''}
+                {rv.status !== 'hidden' && <button onClick={() => setReviewDraft({ id: b.id, rating: rv.rating || 5, text: rv.text || '' })} style={{marginLeft:6,border:'none',background:'none',color:'var(--info)',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:'pointer',padding:0}}>Змінити</button>}
+              </div>
+            )
+            return (
+              <button onClick={() => setReviewDraft({ id: b.id, rating: b.rating || 0, text: '' })} style={{marginTop:6,padding:'7px 12px',borderRadius:10,border:'1px solid rgba(251,191,36,0.45)',background:'rgba(251,191,36,0.1)',color:'var(--text)',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:'pointer'}}>
+                {masterName ? `✍️ Залишити відгук майстру ${masterName}` : '✍️ Залишити відгук'}
+              </button>
+            )
+          })()}
           {!isPast && b.status !== 'cancelled' && b.studentConfirmed && (
             <div className="booking-meta" style={{ color: 'var(--ok)', marginTop: 4 }}>
               ✓ Ви підтвердили присутність
@@ -524,7 +572,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             <div style={{borderRadius:14,background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)',padding:'12px 14px',marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
               <div style={{fontSize:22,flexShrink:0}}>💳</div>
               <div style={{flex:1}}>
-                <div style={{fontSize:13,fontWeight:800,color:'var(--bad)'}}>Заборгованість: {totalDebt} ₴</div>
+                <div style={{fontSize:13,fontWeight:800,color:'var(--bad)'}}>Заборгованість: {totalDebt} {curSym()}</div>
                 <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>Зверніться до майстра для оплати</div>
               </div>
             </div>
@@ -543,7 +591,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                   {countdown && <div className="nl-pill" style={{fontSize:11,fontWeight:800,padding:'3px 9px',borderRadius:8}}>{countdown}</div>}
                 </div>
                 <div style={{fontSize:28,fontWeight:900,color:'var(--text)',lineHeight:1}}>{next.time}</div>
-                <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())} · {next.serviceName}</div>
+                <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())}{next.serviceName ? ` · ${next.serviceName}` : ''}</div>
                 <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{formatDurHours(next.durationHours || 1)}{normAddons(next.addons).length > 0 ? ` · ➕ ${addonsLabel(normAddons(next.addons))}` : ''}</div>
                 <div className="booking-cal-row">
                   <a href={googleCalendarLink(next)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">Google Calendar</a>

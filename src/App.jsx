@@ -32,6 +32,7 @@ import Landing from './pages/Landing'
 import PublicSchedule from './pages/PublicSchedule'
 import About from './pages/About'
 import SalonPage from './pages/SalonPage'
+import { setCurrency } from './currency'
 
 // ─── PWA INSTALL PROMPT (пропонуємо зберегти застосунок лише при
 // першому вході — раз показали (banner з'явився), більше не пропонуємо,
@@ -204,6 +205,7 @@ export default function App() {
   // "недійсне посилання") — на відміну від голого заходу на домен без
   // жодного slug узагалі, де показуємо About() замість помилки.
   const [tenantResolveFailed, setTenantResolveFailed] = useState(false)
+  const [, setCurV] = useState(0) // перемальовує ціни після завантаження валюти майстра
   const license = useLicense(tenantIid)
   const pendingBookingRef = useRef(null)
   const { needRefresh, updateServiceWorker, isUpdating } = useAppUpdate()
@@ -218,7 +220,12 @@ export default function App() {
   // посилання-запрошення /i/{slug} (одноразово прив'язує пристрій до
   // майстра) або збережений з попереднього візиту iid.
   useEffect(() => {
-    if (DEMO) { setCurrentTenant(DEMO_IID, DEMO_SLUG); setTenantIid(DEMO_IID); return } // ?demo=1: вигаданий майстер
+    if (DEMO) { // ?demo=1: вигаданий майстер; /i/{slug} (перехід зі сторінки демо-салону) → кабінет того ж демо-майстра
+      setCurrentTenant(DEMO_IID, DEMO_SLUG); setTenantIid(DEMO_IID)
+      const dm = location.pathname.match(/^\/i\/[^/]+/)
+      if (dm) navigate((location.pathname.slice(dm[0].length) || '/') + location.search + location.hash, { replace: true })
+      return
+    }
     // Slug береться з /i/{slug} АБО з ?i={slug}: параметр ми самі лишаємо в адресі
     // (див. ефект нижче), щоб ярлик "На екран Домой" (iOS зберігає ПОТОЧНУ адресу
     // сторінки, а сховище PWA на iPhone ізольоване від Safari) відкривався вже
@@ -267,7 +274,7 @@ export default function App() {
   // Напрямок послуг майстра (admin_settings/direction): підміняє «майстер/клієнт/запис» у тексті
   useEffect(() => {
     if (!tenantIid) return
-    getAdminSettings().then(s => startTerms(s?.direction)).catch(() => {})
+    getAdminSettings().then(s => { startTerms(s?.direction); setCurrency(s?.currency); setCurV(v => v + 1) }).catch(() => {})
   }, [tenantIid])
 
   useEffect(() => {

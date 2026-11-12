@@ -1,5 +1,6 @@
 import { useMemo } from "react";
 import "./ProgressTab.css";
+import { cur as curSym } from '../../currency'
 
 const getWeekStart = dateStr => {
   const d = new Date(dateStr + 'T12:00:00');
@@ -9,7 +10,7 @@ const getWeekStart = dateStr => {
 };
 
 export default function ProgressTab({ user, profile, bookingsData }) {
-  const { bookings, schoolHours } = bookingsData || { bookings: [], schoolHours: 0 };
+  const { bookings } = bookingsData || { bookings: [] };
 
   const completed = useMemo(
     () => bookings.filter(b => b.status === "confirmed" && new Date(b.date) < new Date()),
@@ -124,7 +125,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             <div className="lbl">всього</div>
           </div>
           <div className="stat-btn">
-            <div className="num">{schoolHours}</div>
+            <div className="num">{schoolLessons}</div>
             <div className="lbl">стандарт</div>
           </div>
           <div className="stat-btn">
@@ -146,13 +147,13 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           <div className="stat-row">
             {totalSpent > 0 && (
               <div className="stat-btn">
-                <div className="num" style={{ color:'var(--ok)', fontSize:14 }}>{totalSpent.toLocaleString()} ₴</div>
+                <div className="num" style={{ color:'var(--ok)', fontSize:14 }}>{totalSpent.toLocaleString()} {curSym()}</div>
                 <div className="lbl">оплачено</div>
               </div>
             )}
             {totalDebt > 0 && (
               <div className="stat-btn">
-                <div className="num" style={{ color:'var(--bad)', fontSize:14 }}>{totalDebt.toLocaleString()} ₴</div>
+                <div className="num" style={{ color:'var(--bad)', fontSize:14 }}>{totalDebt.toLocaleString()} {curSym()}</div>
                 <div className="lbl">борг</div>
               </div>
             )}
