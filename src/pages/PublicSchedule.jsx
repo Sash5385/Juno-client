@@ -128,6 +128,7 @@ export default function PublicSchedule({ onBook }) {
           </button>
           <button
             onClick={toggle}
+            aria-label="Тема"
             style={{ width:34, height:34, borderRadius:10, background:'var(--surface)', border:'none',
               cursor:'pointer', color:'var(--text)', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center',
               boxShadow:'var(--shadow)' }}
@@ -172,9 +173,9 @@ export default function PublicSchedule({ onBook }) {
       <div className="section-title">3. Дата</div>
       <div className="cal-card">
         <div className="cal-head">
-          <button className="cal-nav-btn" onClick={prevMonth}>‹</button>
+          <button className="cal-nav-btn" aria-label="Попередній місяць" onClick={prevMonth}>‹</button>
           <div className="cal-month">{getMonthName(viewMonth.getMonth())} {viewMonth.getFullYear()}</div>
-          <button className="cal-nav-btn" onClick={nextMonth}>›</button>
+          <button className="cal-nav-btn" aria-label="Наступний місяць" onClick={nextMonth}>›</button>
         </div>
         <div className="cal-weekdays">
           {['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d => <div key={d} className="cal-wd">{d}</div>)}

@@ -402,11 +402,11 @@ export default function Auth({ user, profile, onProfileSaved }) {
       <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',padding:'12px 0'}}>
         <div style={{display:'flex',gap:6}}>
           {step === 'sms'
-            ? <button className="back-btn" onClick={()=>{setStep('phone');resetRecaptcha()}}>
+            ? <button className="back-btn" aria-label="Назад" onClick={()=>{setStep('phone');resetRecaptcha()}}>
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
               </button>
             : step !== 'survey'
-              ? <button className="back-btn" onClick={() => nav(-1)}>
+              ? <button className="back-btn" aria-label="Назад" onClick={() => nav(-1)}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
               : <button className="back-btn" onClick={handleChangeAccount} aria-label="Змінити акаунт">
@@ -414,7 +414,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
                 </button>
           }
           {step !== 'survey' && (
-            <button className="back-btn" onClick={() => nav(1)}>
+            <button className="back-btn" aria-label="Вперед" onClick={() => nav(1)}>
               <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round"><polyline points="9 18 15 12 9 6"/></svg>
             </button>
           )}
@@ -431,7 +431,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
               <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
             </svg>
           </button>
-          <button className="back-btn" onClick={toggle} style={{border:'none',cursor:'pointer',fontSize:16}}>
+          <button className="back-btn" aria-label="Тема" onClick={toggle} style={{border:'none',cursor:'pointer',fontSize:16}}>
             {theme==='dark'?'🌙':'☀️'}
           </button>
         </div>

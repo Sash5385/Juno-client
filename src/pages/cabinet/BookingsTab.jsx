@@ -217,9 +217,9 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         {/* CALENDAR */}
         <div className="cal-card" style={{ marginBottom: 14 }}>
           <div className="cal-head">
-            <button className="cal-nav-btn" onClick={() => setViewMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1))}>‹</button>
+            <button className="cal-nav-btn" aria-label="Попередній місяць" onClick={() => setViewMonth(m => new Date(m.getFullYear(), m.getMonth() - 1, 1))}>‹</button>
             <div className="cal-month">{getMonthName(viewMonth.getMonth())} {viewMonth.getFullYear()}</div>
-            <button className="cal-nav-btn" onClick={() => setViewMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1))}>›</button>
+            <button className="cal-nav-btn" aria-label="Наступний місяць" onClick={() => setViewMonth(m => new Date(m.getFullYear(), m.getMonth() + 1, 1))}>›</button>
           </div>
           <div className="cal-weekdays">
             {['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d => <div key={d} className="cal-wd">{d}</div>)}
@@ -439,6 +439,8 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               {[1,2,3,4,5].map(star => (
                 <span
                   key={star}
+                  role="button"
+                  aria-label={`Оцінка ${star} з 5`}
                   onClick={() => rateBooking(user.uid, b.id, star).catch(()=>{})}
                   style={{
                     fontSize:22, cursor:'pointer', lineHeight:1, padding:'4px 2px',
@@ -457,7 +459,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 {masterName && <div style={{fontSize:11,color:'var(--dim)',marginBottom:4}}>{`Відгук для майстра: ${masterName}`}</div>}
                 <div style={{display:'flex',gap:2,marginBottom:6}}>
                   {[1,2,3,4,5].map(star => (
-                    <span key={star} onClick={() => setReviewDraft(d => ({ ...d, rating: star }))} style={{fontSize:26,cursor:'pointer',lineHeight:1,padding:'2px',color: reviewDraft.rating >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)'}}>★</span>
+                    <span key={star} role="button" aria-label={`Оцінка ${star} з 5`} onClick={() => setReviewDraft(d => ({ ...d, rating: star }))} style={{fontSize:26,cursor:'pointer',lineHeight:1,padding:'2px',color: reviewDraft.rating >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)'}}>★</span>
                   ))}
                 </div>
                 <textarea value={reviewDraft.text} maxLength={1000} rows={3} placeholder="Що сподобалось? (необов'язково)"
@@ -520,7 +522,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                   />
                   <div style={{display:'flex',gap:6}}>
                     <button onClick={()=>{saveStudentNote(user.uid,b.id,noteDraft.trim()).catch(()=>{});setNoteOpenId(null);}} style={{flex:1,padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'rgba(99,211,120,0.15)',color:'#63d37b',fontSize:12,fontWeight:700,fontFamily:'inherit'}}>Зберегти</button>
-                    <button onClick={()=>setNoteOpenId(null)} style={{padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'var(--field-bg)',color:'var(--dim)',fontSize:12,fontFamily:'inherit'}}>✕</button>
+                    <button aria-label="Закрити" onClick={()=>setNoteOpenId(null)} style={{padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'var(--field-bg)',color:'var(--dim)',fontSize:12,fontFamily:'inherit'}}>✕</button>
                   </div>
                 </div>
               ) : (
@@ -533,7 +535,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}>📅</button>}
+            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" aria-label="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}>📅</button>}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: 'var(--bad)', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>

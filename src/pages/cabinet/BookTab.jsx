@@ -919,12 +919,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>1. Дата</div>
       <div className="cal-card" onTouchStart={handleCalTouchStart} onTouchEnd={handleCalTouchEnd}>
         <div className="cal-head">
-          <button className="cal-nav-btn" onClick={prevMonth}>‹</button>
+          <button className="cal-nav-btn" aria-label="Попередній місяць" onClick={prevMonth}>‹</button>
           <div className="cal-month">
             {getMonthName(viewMonth.getMonth())}
             <span style={{color:'var(--faint)', fontWeight:600, marginLeft:5}}>{viewMonth.getFullYear()}</span>
           </div>
-          <button className="cal-nav-btn" onClick={nextMonth}>›</button>
+          <button className="cal-nav-btn" aria-label="Наступний місяць" onClick={nextMonth}>›</button>
         </div>
         <div className="cal-weekdays">
           {['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d => <div key={d} className="cal-wd">{d}</div>)}
