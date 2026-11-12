@@ -18,6 +18,13 @@ export function consumeBackHandler() {
   return true
 }
 
+// Escape на клавіатурі закриває верхню модалку (як апаратна «назад»)
+if (typeof window !== 'undefined') {
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && consumeBackHandler()) e.preventDefault()
+  })
+}
+
 // Реєструє onClose як обробник апаратної кнопки "назад" поки active === true
 export function useBackClose(active, onClose) {
   useEffect(() => {
