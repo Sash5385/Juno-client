@@ -24,6 +24,7 @@ import Landing from './pages/Landing'
 import PublicSchedule from './pages/PublicSchedule'
 import About from './pages/About'
 import SalonPage from './pages/SalonPage'
+import { setCurrency } from './currency'
 
 // ─── PWA INSTALL PROMPT (пропонуємо зберегти застосунок лише при
 // першому вході — раз показали (banner з'явився), більше не пропонуємо,
@@ -196,6 +197,7 @@ export default function App() {
   // "недійсне посилання") — на відміну від голого заходу на домен без
   // жодного slug узагалі, де показуємо About() замість помилки.
   const [tenantResolveFailed, setTenantResolveFailed] = useState(false)
+  const [, setCurV] = useState(0) // перемальовує ціни після завантаження валюти майстра
   const license = useLicense(tenantIid)
   const pendingBookingRef = useRef(null)
   const { needRefresh, updateServiceWorker, isUpdating } = useAppUpdate()
@@ -259,7 +261,7 @@ export default function App() {
   // Напрямок послуг майстра (admin_settings/direction): підміняє «майстер/клієнт/запис» у тексті
   useEffect(() => {
     if (!tenantIid) return
-    getAdminSettings().then(s => startTerms(s?.direction)).catch(() => {})
+    getAdminSettings().then(s => { startTerms(s?.direction); setCurrency(s?.currency); setCurV(v => v + 1) }).catch(() => {})
   }, [tenantIid])
 
   useEffect(() => {

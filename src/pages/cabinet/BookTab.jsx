@@ -11,6 +11,7 @@ import { normIntake, answersOf, missingRequired, intakeNeeded, buildItems, YES, 
 import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
+import { cur as curSym } from '../../currency'
 
 const FALLBACK_SERVICES = [
   { id:'sv1', name:'Стандарт', type:'school',  duration:60, price:0, colorId:'blue'   },
@@ -987,7 +988,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                     <div style={{width:10, height:10, borderRadius:'50%', background:svcColor, margin:'0 auto 6px'}}></div>
                     <div className="svc-title">{stripDurationSuffix(svc.name)}</div>
                     <div className="svc-dur">{formatDurShort(svc.duration || 60)}</div>
-                    <div style={{fontSize:12, fontWeight:700, color:'var(--dim)', marginTop:2}}>{price > 0 ? `${price} ₴` : ''}</div>
+                    <div style={{fontSize:12, fontWeight:700, color:'var(--dim)', marginTop:2}}>{price > 0 ? `${price} ${curSym()}` : ''}</div>
                     {normAddons(svc.addons).length > 0 && (
                       <div style={{fontSize:11, color:'var(--faint)', marginTop:3}}>+ допуслуги</div>
                     )}
@@ -1005,7 +1006,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   return (
                     <button key={a.id} type="button" className={`dur-pill${on ? ' active' : ''}`} onClick={() => toggleAddon(a.id)} style={{padding:'8px 6px'}}>
                       <div style={{fontSize:12, fontWeight:800}}>{on ? '✓ ' : '+ '}{a.name}</div>
-                      <div style={{fontSize:11, fontWeight:700, opacity:0.9, marginTop:2}}>{a.price > 0 ? `${a.price} ₴` : 'безкоштовно'}{a.minutes > 0 ? ` · +${a.minutes} хв` : ''}</div>
+                      <div style={{fontSize:11, fontWeight:700, opacity:0.9, marginTop:2}}>{a.price > 0 ? `${a.price} ${curSym()}` : 'безкоштовно'}{a.minutes > 0 ? ` · +${a.minutes} хв` : ''}</div>
                     </button>
                   )
                 })}
@@ -1069,7 +1070,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         ) : isTakenByOthers || isOverlap ? (
                           <div style={{fontSize:11, opacity:0.85}}>зайнято</div>
                         ) : slot.totalSurcharge ? (
-                          <div className="slot-sur" style={{fontSize:11, fontWeight:700}}>{slot.totalPrice}₴</div>
+                          <div className="slot-sur" style={{fontSize:11, fontWeight:700}}>{slot.totalPrice}{curSym()}</div>
                         ) : isMyQueue ? (
                           <div className="slot-queue">
                             <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
@@ -1082,7 +1083,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                           <div style={{display:'flex', flexDirection:'column', alignItems:'center', gap:1}}>
                             <div className="slot-dur" style={{fontSize:11, fontWeight:700}}>{formatDurShort(Math.round((slot.needHours || slot.slotDurHours || baseDurationHours) * 60))}</div>
                             {slot.totalPrice > 0 && (
-                              <div className="slot-price" style={{fontSize:11, fontWeight:700}}>{slot.totalPrice}₴</div>
+                              <div className="slot-price" style={{fontSize:11, fontWeight:700}}>{slot.totalPrice}{curSym()}</div>
                             )}
                             {isGroup && (
                               <div style={{fontSize:11, fontWeight:700, color:'var(--info)'}}>👥 {slot.joinGroup ? seatsLabel(slot.groupLeft) : `до ${capacityOf(selectedService)}`}</div>
@@ -1162,7 +1163,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 background:'rgba(74,222,128,0.08)', border:'1px solid rgba(74,222,128,0.35)',
                 fontSize:13, color:'var(--ok)', fontWeight:700, textAlign:'center',
               }}>
-                Фіксована ціна: <strong>{ctaFixed}₴</strong>
+                Фіксована ціна: <strong>{ctaFixed}{curSym()}</strong>
               </div>
             ) : (!pkgOn && surcharge > 0) ? (
               <div style={{
@@ -1171,10 +1172,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 display:'flex', flexDirection:'column', gap:4,
               }}>
                 <div style={{fontSize:13, color:'var(--warn)', fontWeight:700}}>
-                  ⚠️ Ціна за цей час: <strong>{servicePrice}₴</strong>
+                  ⚠️ Ціна за цей час: <strong>{servicePrice}{curSym()}</strong>
                 </div>
                 <div style={{fontSize:11, color:'var(--warn)'}}>
-                  {customPriceAmt != null ? 'Індивідуальна' : 'Стандартна'} {baseP}₴ + надбавка +{surcharge}₴{customPriceAmt == null && discountAmt > 0 ? ` − знижка ${discountAmt * baseHours}₴` : ''}
+                  {customPriceAmt != null ? 'Індивідуальна' : 'Стандартна'} {baseP}{curSym()} + надбавка +{surcharge}{curSym()}{customPriceAmt == null && discountAmt > 0 ? ` − знижка ${discountAmt * baseHours}${curSym()}` : ''}
                 </div>
               </div>
             ) : servicePrice > 0 ? (
@@ -1183,8 +1184,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 background:'var(--field-bg)', border:'1px solid var(--field-bd)',
                 fontSize:12, color:'var(--dim)', textAlign:'center',
               }}>
-                Вартість запису: <strong style={{color:'var(--text)'}}>{servicePrice}₴</strong>
-                {customPriceAmt == null && discountAmt > 0 && <span style={{marginLeft:6, color:'var(--ok)', fontSize:11}}>−{discountAmt * baseHours}₴</span>}
+                Вартість запису: <strong style={{color:'var(--text)'}}>{servicePrice}{curSym()}</strong>
+                {customPriceAmt == null && discountAmt > 0 && <span style={{marginLeft:6, color:'var(--ok)', fontSize:11}}>−{discountAmt * baseHours}{curSym()}</span>}
               </div>
             ) : null}
             {pkgAvail && (
@@ -1205,8 +1206,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 background:'var(--field-bg)', border:'1px solid var(--field-bd)',
                 fontSize:12, color:'var(--dim)', textAlign:'center', lineHeight:1.5,
               }}>
-                ➕ {addonsLabel(chosenAddons)}: <strong style={{color:'var(--text)'}}>+{addonTot.price}₴</strong>{addonTot.minutes > 0 ? ` · +${addonTot.minutes} хв` : ''}
-                <div>Разом: <strong style={{color:'var(--text)'}}>{totalPrice}₴</strong> · {formatDurShort(Math.round(durationHours * 60))}</div>
+                ➕ {addonsLabel(chosenAddons)}: <strong style={{color:'var(--text)'}}>+{addonTot.price}{curSym()}</strong>{addonTot.minutes > 0 ? ` · +${addonTot.minutes} хв` : ''}
+                <div>Разом: <strong style={{color:'var(--text)'}}>{totalPrice}{curSym()}</strong> · {formatDurShort(Math.round(durationHours * 60))}</div>
               </div>
             )}
             <textarea
@@ -1224,7 +1225,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               }}
             />
             <button className="btn-primary" style={{marginTop:8}} onClick={() => handleBook()} disabled={submitting}>
-              {submitting ? 'Записуємо...' : `✓ Записатись ${dateLabel} о ${ctaStart}${durationHours > baseDurationHours ? ` на ${formatDurShort(Math.round(durationHours * 60))}` : ''}${totalPrice ? ` · ${totalPrice}₴` : ''}`}
+              {submitting ? 'Записуємо...' : `✓ Записатись ${dateLabel} о ${ctaStart}${durationHours > baseDurationHours ? ` на ${formatDurShort(Math.round(durationHours * 60))}` : ''}${totalPrice ? ` · ${totalPrice}${curSym()}` : ''}`}
             </button>
           </div>
         )
@@ -1344,9 +1345,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 <div className="dialog-info-row">
                   <span className="lbl">Ціна</span>
                   <span className="val" style={{color:'var(--gold)'}}>
-                    {successData.price != null ? successData.price : lessonPrice(successData.durationHours, successData.surcharge || 0)} ₴
-                    {successData.surcharge > 0 && !successData.packageName && <span style={{fontSize:11, color:'var(--gold)'}}> (+{successData.surcharge}₴)</span>}
-                    {customPriceAmt == null && discountAmt > 0 && !successData.packageName && <span style={{fontSize:11, color:'var(--ok)', marginLeft:4}}>−{discountAmt * (successData.baseHours ?? successData.durationHours)}₴</span>}
+                    {successData.price != null ? successData.price : lessonPrice(successData.durationHours, successData.surcharge || 0)} {curSym()}
+                    {successData.surcharge > 0 && !successData.packageName && <span style={{fontSize:11, color:'var(--gold)'}}> (+{successData.surcharge}{curSym()})</span>}
+                    {customPriceAmt == null && discountAmt > 0 && !successData.packageName && <span style={{fontSize:11, color:'var(--ok)', marginLeft:4}}>−{discountAmt * (successData.baseHours ?? successData.durationHours)}{curSym()}</span>}
                   </span>
                 </div>
               )}
@@ -1406,21 +1407,21 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 <>
                   <div className="dialog-info-row">
                     <span className="lbl">Базова ціна</span>
-                    <span className="val">{lessonBase(dialogSlot.slotDurHours || baseDurationHours)}₴</span>
+                    <span className="val">{lessonBase(dialogSlot.slotDurHours || baseDurationHours)}{curSym()}</span>
                   </div>
                   <div className="dialog-info-row">
                     <span className="lbl" style={{color:'var(--gold)'}}>⚡ Надбавка</span>
-                    <span className="val" style={{color:'var(--gold)'}}>+{dialogSlot.surcharge}₴</span>
+                    <span className="val" style={{color:'var(--gold)'}}>+{dialogSlot.surcharge}{curSym()}</span>
                   </div>
                   {customPriceAmt == null && discountAmt > 0 && (
                     <div className="dialog-info-row">
                       <span className="lbl" style={{color:'var(--ok)'}}>Знижка</span>
-                      <span className="val" style={{color:'var(--ok)'}}>−{discountAmt * (dialogSlot.slotDurHours || baseDurationHours)}₴</span>
+                      <span className="val" style={{color:'var(--ok)'}}>−{discountAmt * (dialogSlot.slotDurHours || baseDurationHours)}{curSym()}</span>
                     </div>
                   )}
                   <div className="dialog-info-row" style={{borderTop:'1px solid rgba(255,255,255,0.07)', marginTop:4, paddingTop:4}}>
                     <span className="lbl" style={{fontWeight:700}}>Разом</span>
-                    <span className="val" style={{fontWeight:800}}>{lessonPrice(dialogSlot.slotDurHours || baseDurationHours, dialogSlot.surcharge)}₴</span>
+                    <span className="val" style={{fontWeight:800}}>{lessonPrice(dialogSlot.slotDurHours || baseDurationHours, dialogSlot.surcharge)}{curSym()}</span>
                   </div>
                 </>
               )}

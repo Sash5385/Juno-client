@@ -7,6 +7,7 @@ import { db } from '../firebase/config'
 import { getInitials } from '../utils/format'
 import { salonMasters } from '../salon'
 import { APP_VERSION } from '../version.js'
+import { CURRENCIES } from '../currency'
 
 const SERVICE_COLORS = {
   green: '#7ed957', yellow: '#f7c948', blue: '#5b9bff', purple: '#c084fc', red: '#ff5a3c',
@@ -14,9 +15,10 @@ const SERVICE_COLORS = {
 }
 
 async function loadMaster(iid) {
-  const [profile, services] = await Promise.all([
+  const [profile, services, currency] = await Promise.all([
     get(ref(db, `instructors/${iid}/admin_settings/profile`)).then(s => s.val()).catch(() => null),
     get(ref(db, `instructors/${iid}/admin_data/services`)).then(s => s.val()).catch(() => null),
+    get(ref(db, `instructors/${iid}/admin_settings/currency`)).then(s => s.val()).catch(() => null),
   ])
   const list = Array.isArray(services) ? services : Object.values(services || {})
   return {
@@ -25,6 +27,7 @@ async function loadMaster(iid) {
     slug: profile?.slug || null,
     photo: profile?.photo || null,
     city: profile?.city || '',
+    sym: (CURRENCIES.find(c => c[0] === currency) || CURRENCIES[0])[1],
     services: list.filter(s => s && s.active && !s.archived).slice(0, 6),
   }
 }
@@ -86,7 +89,7 @@ export default function SalonPage({ slug }) {
                     <span key={s.id} style={{
                       fontSize: 12, fontWeight: 700, padding: '5px 10px', borderRadius: 99,
                       background: `${SERVICE_COLORS[s.colorId] || SERVICE_COLORS.green}22`, border: `1px solid ${SERVICE_COLORS[s.colorId] || SERVICE_COLORS.green}55`,
-                    }}>{s.name}{s.price > 0 ? ` · ${s.price} ₴` : ''}</span>
+                    }}>{s.name}{s.price > 0 ? ` · ${s.price} ${m.sym}` : ''}</span>
                   ))}
                 </div>
               )}
