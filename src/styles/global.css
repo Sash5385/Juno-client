@@ -183,3 +183,15 @@ button { font-family: inherit; touch-action: manipulation; }
   animation: spin .7s linear infinite;
   flex-shrink: 0;
 }
+
+/* Вікна (шторки, модалки, діалоги): пара кнопок однакової ширини, на ПК — по центру.
+   .win-cols — вміст вікна на ПК у колонках; .win-gap — вертикальний список блоків із проміжком. */
+.modal-footer{display:grid!important;grid-auto-flow:column;grid-auto-columns:minmax(0,1fr);gap:8px}
+.win-cols>*{break-inside:avoid}
+.win-gap{display:flex;flex-direction:column;gap:10px}
+@media (min-width:900px){
+  .modal-footer{grid-auto-columns:minmax(0,240px);justify-content:center}
+  .win-cols{columns:3 260px;column-gap:20px}
+  .win-cols.win-gap{display:block}
+  .win-cols.win-gap>*{margin-bottom:10px}
+}
