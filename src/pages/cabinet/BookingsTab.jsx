@@ -208,12 +208,14 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
     <div className="dialog-backdrop show" onClick={e => e.target.classList.contains('dialog-backdrop') && onClose()} ref={el => el && (el.scrollTop = 0)}>
       {ModalToastEl}
       <div className="dialog">
+        <button type="button" className="dialog-close" aria-label="Закрити" onClick={onClose}>✕</button>
         <div className="dialog-handle" />
         <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}>📅 Перенести запис</div>
         <div style={{ fontSize: 12, color: 'var(--dim)', marginBottom: 14, textAlign: 'center' }}>
           {[booking.serviceName, `${fmtLongDate(booking.date)}, ${booking.time}`].filter(Boolean).join(' · ')}
         </div>
 
+        <div className="win-cols">
         {/* CALENDAR */}
         <div className="cal-card" style={{ marginBottom: 14 }}>
           <div className="cal-head">
@@ -277,8 +279,9 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
             )}
           </>
         )}
+        </div>
 
-        <div className="dialog-actions">
+        <div className="dialog-actions modal-footer">
           <button className="dialog-btn secondary" onClick={onClose}>Скасувати</button>
           <button
             className="dialog-btn primary"

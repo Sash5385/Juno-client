@@ -15,7 +15,7 @@ export default function ConfirmDialog({ open, title, text, confirmLabel = "Та�
       <div className="cfm-box" role="alertdialog" aria-modal="true" aria-label={title} onClick={e => e.stopPropagation()}>
         <div className="cfm-title">{title}</div>
         {text && <div className="cfm-text">{text}</div>}
-        <div className="cfm-actions">
+        <div className="cfm-actions modal-footer">
           <button type="button" className="cfm-btn" onClick={onCancel}>{cancelLabel}</button>
           <button type="button" className={`cfm-btn ${danger ? "cfm-btn--danger" : "cfm-btn--primary"}`} onClick={onConfirm} autoFocus>{confirmLabel}</button>
         </div>

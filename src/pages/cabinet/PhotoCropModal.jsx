@@ -76,8 +76,9 @@ export default function PhotoCropModal({ file, round, outSize, title, onCancel, 
   const circBtn = { width:48, height:48, borderRadius:14, border:"none", cursor:"pointer", fontFamily:"inherit", fontSize:24, fontWeight:800, color:TEXT, background:`linear-gradient(145deg,${SURF_HI},${SURFACE})`, display:"flex", alignItems:"center", justifyContent:"center", padding:0, flexShrink:0 };
   return createPortal(
     <div style={{ position:"fixed", inset:0, zIndex:9700, background:"rgba(0,0,0,0.88)", display:"flex", alignItems:"center", justifyContent:"center", padding:16, boxSizing:"border-box" }}>
-      <div style={{ width:"100%", maxWidth:400, background:BG_DEEP, borderRadius:20, border:`1px solid ${BORDER}`, padding:"16px 16px 18px", boxSizing:"border-box", maxHeight:"96dvh", overflowY:"auto" }}>
-        <div style={{ fontSize:16, fontWeight:800, color:TEXT, textAlign:"center", marginBottom:4 }}>{title}</div>
+      <div style={{ width:"100%", position:"relative", background:BG_DEEP, borderRadius:20, border:`1px solid ${BORDER}`, padding:"16px 16px 18px", boxSizing:"border-box", maxHeight:"96dvh", overflowY:"auto" }}>
+        <button type="button" aria-label="Закрити" onClick={onCancel} disabled={saving} style={{ position:"absolute", top:12, right:14, width:32, height:32, borderRadius:"50%", border:"none", background:"rgba(255,255,255,0.08)", color:DIM, fontSize:14, cursor:"pointer" }}>✕</button>
+        <div style={{ fontSize:16, fontWeight:800, color:TEXT, textAlign:"center", marginBottom:4, padding:"0 36px" }}>{title}</div>
         <div style={{ fontSize:12.5, color:DIM, textAlign:"center", marginBottom:14, lineHeight:1.4 }}>Перетягніть фото і збільште двома пальцями — що в рамці, те й побачать інструктор і ви</div>
         {err ? (
           <div style={{ color:"#fca5a5", fontSize:13, textAlign:"center", padding:"30px 0" }}>Не вдалося відкрити фото. Спробуйте інший файл.</div>
@@ -97,7 +98,7 @@ export default function PhotoCropModal({ file, round, outSize, title, onCancel, 
             <button onClick={() => setZ(zoom + 0.25)} aria-label="Збільшити" style={circBtn}>+</button>
           </div>
         )}
-        <div style={{ display:"flex", gap:10 }}>
+        <div className="modal-footer">
           <button onClick={onCancel} disabled={saving} style={{ flex:1, padding:"14px", borderRadius:14, border:`1px solid ${BORDER}`, background:"rgba(255,255,255,0.05)", color:TEXT, fontSize:15, fontWeight:700, cursor:"pointer", fontFamily:"inherit" }}>Скасувати</button>
           <button onClick={save} disabled={!img || saving || err} style={{ flex:1, padding:"14px", borderRadius:14, border:"none", background:GOLD, color:"var(--on-gold, #1a1a1a)", fontSize:15, fontWeight:800, cursor:"pointer", fontFamily:"inherit", opacity:(!img||err)?0.5:1 }}>{saving ? "Зберігаю…" : "Зберегти"}</button>
         </div>

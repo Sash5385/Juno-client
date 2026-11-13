@@ -1245,11 +1245,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         <Portal>
         <div className="dialog-backdrop show" onClick={e => e.target.classList.contains('dialog-backdrop') && !intakeBusy && setIntakeOpen(false)}>
           <div className="dialog" style={{maxHeight:'88vh', overflowY:'auto'}}>
+            <button type="button" className="dialog-close" aria-label="Закрити" onClick={() => !intakeBusy && setIntakeOpen(false)}>✕</button>
             <div className="dialog-handle"></div>
             <div className="dialog-icon">📋</div>
             <div className="dialog-title">Коротка анкета</div>
             <div className="dialog-sub">Відповісте один раз — майстер побачить це в вашій картці.</div>
-            <div style={{display:'flex', flexDirection:'column', gap:12, padding:'4px 4px 8px'}}>
+            <div className="win-cols win-gap" style={{padding:'4px 0 8px'}}>
               {intakeForm.fields.map(f => {
                 const val = intakeAnswers[f.id] || ''
                 const set = (v) => setIntakeAnswers(a => ({ ...a, [f.id]: v }))
@@ -1273,7 +1274,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 )
               })}
             </div>
-            <div className="dialog-actions">
+            <div className="dialog-actions modal-footer">
               <button className="dialog-btn secondary" onClick={() => setIntakeOpen(false)} disabled={intakeBusy}>Скасувати</button>
               <button className="dialog-btn primary" onClick={submitIntake} disabled={intakeBusy}>{intakeBusy ? '...' : 'Зберегти й записатись'}</button>
             </div>
@@ -1287,6 +1288,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         <Portal>
         <div className="dialog-backdrop show" onClick={e => e.target.classList.contains('dialog-backdrop') && setSuccessData(null)}>
           <div className="dialog">
+            <button type="button" className="dialog-close" aria-label="Закрити" onClick={() => setSuccessData(null)}>✕</button>
             <div className="dialog-handle"></div>
             <div className="dialog-icon" style={{
               background: successData.type === 'booking'
@@ -1307,7 +1309,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             <div className="dialog-title">
               {successData.type === 'booking'
                 ? (successData.pending ? 'Запит надіслано!' : 'Запис заброньовано!')
-                : 'Ти в черзі!'}
+                : 'Ви в черзі!'}
             </div>
             {successData.type === 'booking' && successData.pending && (
               <div className="dialog-sub">Очікуйте підтвердження від майстра.</div>
@@ -1315,7 +1317,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             {successData.type === 'queue' && (
               <div className="dialog-sub">Як тільки слот звільниться — отримаєте сповіщення.</div>
             )}
-            <div className="dialog-info-card">
+            <div className="dialog-info-card win-cols">
               <div className="dialog-info-row">
                 <span className="lbl">Дата</span>
                 <span className="val">
@@ -1366,7 +1368,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               )}
             </div>
             {successData.type === 'booking' && (
-              <div style={{display:'flex', gap:8, padding:'0 4px 4px'}}>
+              <div className="modal-footer" style={{marginBottom:4}}>
                 <a
                   href={googleCalendarLink({ date:successData.date, time:successData.time, durationHours:successData.durationHours, serviceName:successData.service?.name || successData.service })}
                   target="_blank"
@@ -1382,11 +1384,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               </div>
             )}
             {successData.type === 'booking' && (
-              <div style={{fontSize:11, color:'var(--dim)', textAlign:'center', padding:'0 8px 8px', lineHeight:1.4}}>
+              <div style={{fontSize:11, color:'var(--dim)', textAlign:'center', padding:'6px 0 12px', lineHeight:1.4}}>
                 Google відкриє подію з уже заповненими полями — натисніть там «Зберегти». «Apple» завантажить файл, який відкривається в будь-якому календарі.
               </div>
             )}
-            <div className="dialog-actions">
+            <div className="dialog-actions modal-footer">
               <button className="dialog-btn primary" onClick={() => setSuccessData(null)}>Закрити</button>
             </div>
           </div>
@@ -1399,15 +1401,16 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         <Portal>
         <div className="dialog-backdrop show" onClick={(e) => e.target.classList.contains('dialog-backdrop') && setDialogSlot(null)}>
           <div className="dialog">
+            <button type="button" className="dialog-close" aria-label="Закрити" onClick={() => setDialogSlot(null)}>✕</button>
             <div className="dialog-handle"></div>
             <div className="dialog-icon">{dialogSlot.vipOnly ? '👑' : '⏰'}</div>
             <div className="dialog-title">{dialogSlot.vipOnly ? 'VIP черга' : 'Стати в чергу?'}</div>
             <div className="dialog-sub">
               {dialogSlot.vipOnly
-                ? 'Коли адмін відкриє цей VIP слот — ти отримаєш сповіщення'
+                ? 'Коли майстер відкриє цей VIP-слот — ви отримаєте сповіщення'
                 : 'Якщо клієнт скасує — отримаєте сповіщення, запис стане вашим'}
             </div>
-            <div className="dialog-info-card">
+            <div className="dialog-info-card win-cols">
               <div className="dialog-info-row">
                 <span className="lbl">Дата</span>
                 <span className="val">{selectedDate?.toLocaleDateString('uk-UA', { weekday:'short', day:'numeric', month:'long' })}</span>
@@ -1445,14 +1448,14 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 </span>
               </div>
               <div className="dialog-info-row">
-                <span className="lbl">Твоя позиція</span>
+                <span className="lbl">Ваша позиція</span>
                 <span className="val" style={{color:'var(--gold)'}}>{dialogSlot.queueCount + 1}-й</span>
               </div>
             </div>
-            <div className="dialog-actions">
+            <div className="dialog-actions modal-footer">
               <button className="dialog-btn secondary" onClick={() => setDialogSlot(null)}>Скасувати</button>
               <button className="dialog-btn primary" onClick={handleJoinQueue} disabled={submitting}>
-                {submitting ? '...' : '✓ В чергу'}
+                {submitting ? '...' : 'В чергу'}
               </button>
             </div>
           </div>

@@ -397,12 +397,13 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
             }}
           >
             <div style={{
-              width:'100%', maxWidth:480,
+              width:'100%',
               background:'linear-gradient(180deg,var(--surface),var(--bg))',
-              borderRadius:'24px 24px 0 0', padding:'20px 18px 40px',
+              borderRadius:'24px 24px 0 0', padding:'20px 18px calc(24px + env(safe-area-inset-bottom, 0px))', position:'relative', boxSizing:'border-box',
               boxShadow:'0 -8px 40px rgba(0,0,0,0.5)',
               maxHeight:'92dvh', overflowY:'auto',
             }}>
+              <button type="button" aria-label="Закрити" onClick={() => setSelectedOffer(null)} style={{position:'absolute',top:12,right:14,width:32,height:32,borderRadius:'50%',border:'none',background:'var(--surf-lo)',color:'var(--dim)',fontSize:14,cursor:'pointer'}}>✕</button>
               <div style={{width:36,height:4,borderRadius:2,background:'rgba(255,255,255,0.12)',margin:'0 auto 20px'}}/>
               <div style={{
                 width:64, height:64, borderRadius:20, margin:'0 auto 16px',
@@ -435,7 +436,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
                   </div>
                 ))}
               </div>
-              <div style={{display:'grid', gridTemplateColumns:'1fr 1fr', gap:10}}>
+              <div className="modal-footer">
                 <button
                   onClick={handleDeclineOffer}
                   disabled={offerSubmitting}
