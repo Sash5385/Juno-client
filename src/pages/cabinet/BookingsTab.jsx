@@ -281,7 +281,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
         )}
         </div>
 
-        <div className="dialog-actions modal-footer">
+        <div className="dialog-actions modal-footer" style={{ marginTop: 14 }}>
           <button className="dialog-btn secondary" onClick={onClose}>Скасувати</button>
           <button
             className="dialog-btn primary"
