@@ -1274,7 +1274,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 )
               })}
             </div>
-            <div className="dialog-actions modal-footer">
+            <div className="dialog-actions modal-footer" style={{marginTop:12}}>
               <button className="dialog-btn secondary" onClick={() => setIntakeOpen(false)} disabled={intakeBusy}>Скасувати</button>
               <button className="dialog-btn primary" onClick={submitIntake} disabled={intakeBusy}>{intakeBusy ? '...' : 'Зберегти й записатись'}</button>
             </div>
@@ -1373,11 +1373,11 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   href={googleCalendarLink({ date:successData.date, time:successData.time, durationHours:successData.durationHours, serviceName:successData.service?.name || successData.service })}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="dialog-btn"
+                  className="dialog-btn secondary"
                   style={{flex:1, textDecoration:'none', textAlign:'center', fontSize:13}}
                 >📅 Google</a>
                 <button
-                  className="dialog-btn"
+                  className="dialog-btn secondary"
                   style={{flex:1, fontSize:13}}
                   onClick={() => downloadICS({ date:successData.date, time:successData.time, durationHours:successData.durationHours, serviceName:successData.service?.name || successData.service })}
                 >🍎 Apple</button>
