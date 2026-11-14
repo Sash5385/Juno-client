@@ -40,7 +40,7 @@ export default function About() {
 
       <div style={{ maxWidth: 480, width: '100%', textAlign: 'left', display: 'flex', flexDirection: 'column', gap: 14 }}>
         <p style={{ fontSize: 14, lineHeight: 1.6, color: 'var(--dim)', margin: 0 }}>
-          Juno — сервіс онлайн-запису для майстрів та автошкіл.
+          Juno — сервіс онлайн-запису для майстрів і салонів.
           Кожен майстер отримує власний кабінет для ведення розкладу та персональне
           посилання, яке роздає своїм клієнтам — клієнти записуються самостійно,
           без дзвінків і листування.

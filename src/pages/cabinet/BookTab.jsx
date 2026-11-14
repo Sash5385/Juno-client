@@ -1449,7 +1449,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               </div>
               <div className="dialog-info-row">
                 <span className="lbl">Ваша позиція</span>
-                <span className="val" style={{color:'var(--gold)'}}>{dialogSlot.queueCount + 1}-й</span>
+                <span className="val" style={{color:'var(--gold)'}}>№{dialogSlot.queueCount + 1}</span>
               </div>
             </div>
             <div className="dialog-actions modal-footer">

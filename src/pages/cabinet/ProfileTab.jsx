@@ -1,4 +1,5 @@
 import LangSwitch from "../../i18n/LangSwitch";
+import { tr } from "../../i18n";
 import { useState, useEffect } from "react";
 import { updateUserProfile, getAdminSettings, getCurrentSlug } from "../../firebase/db";
 import { useTheme, PALETTES, UI_SCALES } from "../../hooks/useTheme";
@@ -344,7 +345,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
             </div>
             <input value={delText} onChange={e => setDelText(e.target.value)} placeholder="ВИДАЛИТИ" className="edit-input" style={{marginBottom:10}}/>
             <div style={{display:"flex",gap:8}}>
-              <button className="pf-btn pf-btn--danger-solid" onClick={handleDeleteAccount} disabled={deleting || delText.trim().toUpperCase() !== "ВИДАЛИТИ"}>
+              <button className="pf-btn pf-btn--danger-solid" onClick={handleDeleteAccount} disabled={deleting || ![ "ВИДАЛИТИ", tr("ВИДАЛИТИ").toUpperCase() ].includes(delText.trim().toUpperCase())}>
                 {deleting ? "Видалення…" : "Видалити"}
               </button>
               <button className="pf-btn" onClick={() => { setDelOpen(false); setDelText(""); }} disabled={deleting}>Скасувати</button>

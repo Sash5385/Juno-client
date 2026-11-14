@@ -79,7 +79,7 @@ export default function PhotoCropModal({ file, round, outSize, title, onCancel, 
       <div style={{ width:"100%", position:"relative", background:BG_DEEP, borderRadius:20, border:`1px solid ${BORDER}`, padding:"16px 16px 18px", boxSizing:"border-box", maxHeight:"96dvh", overflowY:"auto" }}>
         <button type="button" aria-label="Закрити" onClick={onCancel} disabled={saving} style={{ position:"absolute", top:12, right:14, width:32, height:32, borderRadius:"50%", border:"none", background:"rgba(255,255,255,0.08)", color:DIM, fontSize:14, cursor:"pointer" }}>✕</button>
         <div style={{ fontSize:16, fontWeight:800, color:TEXT, textAlign:"center", marginBottom:4, padding:"0 36px" }}>{title}</div>
-        <div style={{ fontSize:12.5, color:DIM, textAlign:"center", marginBottom:14, lineHeight:1.4 }}>Перетягніть фото і збільште двома пальцями — що в рамці, те й побачать інструктор і ви</div>
+        <div style={{ fontSize:12.5, color:DIM, textAlign:"center", marginBottom:14, lineHeight:1.4 }}>Перетягніть фото і збільште двома пальцями — що в рамці, те й побачать майстер і ви</div>
         {err ? (
           <div style={{ color:"#fca5a5", fontSize:13, textAlign:"center", padding:"30px 0" }}>Не вдалося відкрити фото. Спробуйте інший файл.</div>
         ) : (
