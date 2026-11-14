@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useContext } from 'react'
+import CalLegend from './CalLegend'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
 import { useBackClose } from '../../hooks/useBackButton'
@@ -247,6 +248,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
               )
             })}
           </div>
+          <CalLegend />
         </div>
 
         {/* TIME SLOTS */}

@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import CalLegend from './CalLegend'
 import { createPortal } from 'react-dom'
 import { mergeMasterSchedule, mergeMasterServices } from '../../masterSettings'
 import { subscribeSlotsForDate, createBooking, joinQueue, leaveQueue, subscribeQueueForSlot, getAdminSettings, getAdminServices, subscribeMasterSettings, claimSlot, claimReservedSlot, subscribeGroupSeats, joinGroupSeat, newBookingId, getMyIntake, saveMyIntake, getMyPackages, setViewingSlot, clearViewingSlot, subscribeMonthAvailability, subscribeMasters, setClientMaster, getCurrentIid } from '../../firebase/db'
@@ -961,6 +962,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
             )
           })}
         </div>
+        <CalLegend />
       </div>
 
       {/* 2. ПОСЛУГА (і допуслуги) — показуємо, коли є з чого обирати */}
