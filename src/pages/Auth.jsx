@@ -10,7 +10,8 @@ import { useToast } from '../hooks/useToast'
 import { normalizePhone, formatPhone } from '../utils/format'
 import { consumeRedirectAfterLogin } from '../utils/redirectAfterLogin'
 import './Auth.css'
-import { COUNTRIES, getCountry } from '../phoneCountries'
+import { getCountry } from '../phoneCountries'
+import CountrySelect from '../CountrySelect'
 
 const iosDevice = isIOSDevice()
 const inAppBrowser = isInAppBrowser()
@@ -514,7 +515,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
               </div>
             )}
             <div className="phone-card">
-              <select className="phone-code" value={phoneIso} onChange={e=>{setPhoneIso(e.target.value);setPhoneInput(v=>v.slice(0,getCountry(e.target.value).max))}} aria-label="Країна" style={{background:'transparent',border:'none',outline:'none',fontFamily:'inherit',cursor:'pointer',padding:0,maxWidth:96,flexShrink:0}}>{COUNTRIES.map(c=><option key={c.iso} value={c.iso}>{c.flag} {c.code}</option>)}</select>
+              <CountrySelect className="phone-code" value={phoneIso} onChange={iso=>{setPhoneIso(iso);setPhoneInput(v=>v.slice(0,getCountry(iso).max))}}/>
               <input
                 className="phone-input"
                 type="tel"
@@ -708,7 +709,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
             <div className="field">
               <div className="field-label">Телефон *</div>
               <div className="phone-card" style={{marginTop:0}}>
-                <select className="phone-code" value={surveyIso} onChange={e=>{setSurveyIso(e.target.value);setSurveyPhone(v=>v.slice(0,getCountry(e.target.value).max))}} aria-label="Країна" style={{background:'transparent',border:'none',outline:'none',fontFamily:'inherit',cursor:'pointer',padding:0,maxWidth:96,flexShrink:0}}>{COUNTRIES.map(c=><option key={c.iso} value={c.iso}>{c.flag} {c.code}</option>)}</select>
+                <CountrySelect className="phone-code" value={surveyIso} onChange={iso=>{setSurveyIso(iso);setSurveyPhone(v=>v.slice(0,getCountry(iso).max))}}/>
                 <input
                   className="phone-input"
                   type="tel"
