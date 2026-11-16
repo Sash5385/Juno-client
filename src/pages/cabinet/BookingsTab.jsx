@@ -1,4 +1,5 @@
 import { useState, useEffect, useMemo, useContext } from 'react'
+import Hint from './Hint'
 import CalLegend from './CalLegend'
 import { createPortal } from 'react-dom'
 import { useToast } from '../../hooks/useToast'
@@ -580,7 +581,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               <div style={{fontSize:22,flexShrink:0}}>💳</div>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,fontWeight:800,color:'var(--bad)'}}>Заборгованість: {money(totalDebt, ' ')}</div>
-                <div style={{fontSize:11,color:'var(--dim)',marginTop:2}}>Зверніться до майстра для оплати</div>
+                <Hint tone="warn" style={{marginTop:2}}>Зверніться до майстра для оплати</Hint>
               </div>
             </div>
           )}

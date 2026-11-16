@@ -1,4 +1,5 @@
 import LangSwitch from "../../i18n/LangSwitch";
+import Hint from './Hint'
 import { tr } from "../../i18n";
 import { useState, useEffect } from "react";
 import { updateUserProfile, getAdminSettings, getCurrentSlug } from "../../firebase/db";
@@ -252,9 +253,9 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
 
       <div className="profile-section">
         <div className="section-title">🎁 Запросити друга</div>
-        <div style={{fontSize:13,color:"var(--dim)",marginBottom:10,lineHeight:1.5}}>
+        <Hint style={{marginBottom:10}}>
           Поділіться посиланням — коли друг запишеться на перший запис, ви отримаєте бонусний запис!
-        </div>
+        </Hint>
         <div style={{display:"flex",gap:8,marginBottom:8}}>
           <button
             onClick={() => {
@@ -314,9 +315,9 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
             </button>
           ))}
         </div>
-        <div style={{fontSize:12,color:"var(--faint)",marginTop:8,lineHeight:1.5}}>
+        <Hint style={{marginTop:8}}>
           Темний або світлий режим перемикає кнопка в шапці.
-        </div>
+        </Hint>
         <div className="section-title" style={{marginTop:16}}>🔎 Розмір інтерфейсу</div>
         <div className="edit-tiles">
           {UI_SCALES.map(sc => (

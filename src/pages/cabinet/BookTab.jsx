@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useMemo } from 'react'
+import Hint from './Hint'
 import CalLegend from './CalLegend'
 import { createPortal } from 'react-dom'
 import { mergeMasterSchedule, mergeMasterServices } from '../../masterSettings'
@@ -1126,21 +1127,13 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   в черзі
                 </div>
               </div>
-              <div style={{
-                marginTop:8, padding:'8px 12px', borderRadius:10,
-                background:'rgba(247,201,72,0.06)', border:'1px solid rgba(247,201,72,0.18)',
-                fontSize:11, color:'var(--dim)', textAlign:'center', lineHeight:1.4,
-              }}>
-                ⏳ Якщо ваш бажаний час зайнятий — ви можете стати на нього в чергу. Як тільки він звільниться, ви зможете записатися.
-              </div>
+              <Hint style={{marginTop:8}}>
+                Якщо ваш бажаний час зайнятий — ви можете стати на нього в чергу. Як тільки він звільниться, ви зможете записатися.
+              </Hint>
               {baseDurationHours === 1 && (
-                <div style={{
-                  marginTop:8, padding:'8px 12px', borderRadius:10,
-                  background:'rgba(74,222,128,0.06)', border:'1px solid rgba(74,222,128,0.2)',
-                  fontSize:11, color:'var(--dim)', textAlign:'center', lineHeight:1.4,
-                }}>
-                  🕐 Щоб записатись на 2 години поспіль — оберіть два сусідні вільні слоти.
-                </div>
+                <Hint style={{marginTop:8}}>
+                  Щоб записатись на 2 години поспіль — оберіть два сусідні вільні слоти.
+                </Hint>
               )}
             </>
           )}
@@ -1386,9 +1379,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               </div>
             )}
             {successData.type === 'booking' && (
-              <div style={{fontSize:11, color:'var(--dim)', textAlign:'center', padding:'6px 0 12px', lineHeight:1.4}}>
+              <Hint style={{margin:'6px 0 12px'}}>
                 Google відкриє подію з уже заповненими полями — натисніть там «Зберегти». «Apple» завантажить файл, який відкривається в будь-якому календарі.
-              </div>
+              </Hint>
             )}
             <div className="dialog-actions modal-footer">
               <button className="dialog-btn primary" onClick={() => setSuccessData(null)}>Закрити</button>

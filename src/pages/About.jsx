@@ -5,6 +5,7 @@
 // відвідувач просто вперше на домені — потрібен опис сервісу як такого
 // (напр. для перевірки мерчанта платіжними системами LiqPay/Monobank).
 import { useState } from 'react'
+import Hint from './cabinet/Hint'
 import { APP_VERSION } from '../version.js'
 
 // Витягує slug з введеного коду або повного посилання (…/i/{slug}, …?i={slug}, {slug})
@@ -68,10 +69,10 @@ export default function About() {
           ))}
         </div>
 
-        <p style={{ fontSize: 12, lineHeight: 1.6, color: 'var(--dim)', margin: 0 }}>
+        <Hint style={{margin: 0}}>
           Якщо у вас є персональне посилання від свого майстра — перейдіть за ним,
           щоб побачити вільні записи саме в нього.
-        </p>
+        </Hint>
 
         {/* Ярлик на екрані Домой (iPhone) має власне сховище і може відкритись без
             посилання майстра — тут його можна ввести вручну один раз. */}
