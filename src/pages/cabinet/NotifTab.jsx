@@ -82,7 +82,7 @@ export default function NotifTab({ user, onSeen }) {
             <div key={n.id} className={`notif-card notif-accent-${meta.accent}`}>
               <div className="notif-left">
                 <div className="metal3d notif-metal" style={{ '--ic': ACC_COLOR[meta.accent] || ACC_COLOR.dim }}>
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round">{meta.icon}</svg>
+                  <svg width="27" height="27" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round">{meta.icon}</svg>
                 </div>
               </div>
               <div className="notif-body">

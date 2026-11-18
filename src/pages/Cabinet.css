@@ -243,7 +243,7 @@
   box-shadow:0 2px 5px rgba(0,0,0,.4),inset 0 1px 0 #fff,inset 0 -2px 3px rgba(0,0,0,.2);
 }
 .botnav-ico.botnav-metal::before{content:"";position:absolute;left:6%;right:6%;top:4%;height:46%;border-radius:40% 40% 60% 60%/60% 60% 40% 40%;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.05));pointer-events:none}
-.botnav-ico.botnav-metal svg{position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.9))}
+.botnav-ico.botnav-metal svg{width:72%;height:72%;position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.9))}
 .botnav-btn.active .botnav-ico.botnav-metal{
   color:var(--ic,#2563eb)!important;
   box-shadow:0 0 0 2px var(--ic,#2563eb),0 0 12px color-mix(in srgb,var(--ic,#2563eb) 60%,transparent),0 3px 7px rgba(0,0,0,.45),inset 0 1px 0 #fff,inset 0 -2px 3px rgba(0,0,0,.2);
