@@ -4,6 +4,7 @@ import { subscribeSlotsForDate, getAdminSettings, subscribeMonthAvailability } f
 import { getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay, formatDateLabel } from '../utils/date'
 import { useTheme } from '../hooks/useTheme'
 import './cabinet/BookTab.css'
+import { MetalIcon } from '../MetalIcon'
 
 export default function PublicSchedule({ onBook }) {
   const { theme, toggle } = useTheme()
@@ -133,7 +134,7 @@ export default function PublicSchedule({ onBook }) {
               cursor:'pointer', color:'var(--text)', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center',
               boxShadow:'var(--shadow)' }}
           >
-            {theme==='dark' ? '🌙' : '☀️'}
+            {theme==='dark' ? <MetalIcon name="moon" size={22}/> : <MetalIcon name="sun" size={22}/>}
           </button>
           <button
             onClick={() => navigate('/auth')}
@@ -151,12 +152,12 @@ export default function PublicSchedule({ onBook }) {
       <div className="section-title">1. Тип запису</div>
       <div className="service-grid">
         <div className={`svc-tile ${serviceType==='school'?'selected':''}`} onClick={() => setServiceType('school')}>
-          <div className="ico bk-ico-school">🎓</div>
+          <div className="ico bk-ico-school"><MetalIcon name="school" size={28}/></div>
           <div className="svc-title">Стандарт</div>
           <div className="svc-dur">Повний курс</div>
         </div>
         <div className={`svc-tile ${serviceType==='private'?'selected':''}`} onClick={() => setServiceType('private')}>
-          <div className="ico bk-ico-private">🚙</div>
+          <div className="ico bk-ico-private"><MetalIcon name="car" size={28}/></div>
           <div className="svc-title">Індивідуальний запис</div>
           <div className="svc-dur">Індивідуально</div>
         </div>

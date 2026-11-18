@@ -12,6 +12,7 @@ import { consumeRedirectAfterLogin } from '../utils/redirectAfterLogin'
 import './Auth.css'
 import { getCountry } from '../phoneCountries'
 import CountrySelect from '../CountrySelect'
+import { MetalIcon } from '../MetalIcon'
 
 const iosDevice = isIOSDevice()
 const inAppBrowser = isInAppBrowser()
@@ -433,7 +434,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
             </svg>
           </button>
           <button className="back-btn" aria-label="Тема" onClick={toggle} style={{border:'none',cursor:'pointer',fontSize:16}}>
-            {theme==='dark'?'🌙':'☀️'}
+            {theme==='dark'?<MetalIcon name="moon" size={22}/>:<MetalIcon name="sun" size={22}/>}
           </button>
         </div>
       </div>
@@ -450,8 +451,8 @@ export default function Auth({ user, profile, onProfileSaved }) {
           {/* Вкладки */}
           <div style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:6,marginBottom:20,background:'var(--auth-bg, rgba(255,255,255,0.07))',border:'1px solid var(--auth-bd, rgba(255,255,255,0.16))',backdropFilter:'blur(18px)',WebkitBackdropFilter:'blur(18px)',borderRadius:14,padding:4}}>
             {[
-              {id:'sms', label:'📱 SMS'},
-              {id:'email-login', label:'✉️ Email'},
+              {id:'sms', label:<span style={{display:'inline-flex',alignItems:'center',gap:6}}><MetalIcon name="phone" size={18}/>SMS</span>},
+              {id:'email-login', label:<span style={{display:'inline-flex',alignItems:'center',gap:6}}><MetalIcon name="mail" size={18}/>Email</span>},
             ].map(tab => {
               const isActive = tab.id === 'sms' ? authMode === 'sms' : (authMode === 'email-login' || authMode === 'email-register')
               return (
@@ -511,7 +512,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
             <p className="auth-sub">Надішлемо SMS-код для підтвердження.</p>
             {inAppBrowser && (
               <div style={{background:'#fff3cd',border:'1px solid #ffc107',borderRadius:10,padding:'10px 14px',marginBottom:12,fontSize:13,color:'#856404',lineHeight:1.5}}>
-                ⚠️ Viber-браузер може блокувати SMS. Відкрий у <b>Safari</b> або скористайся <b>Email</b>.
+                <span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="warn" size={18}/>Viber-браузер може блокувати SMS. Відкрий у <b>Safari</b> або скористайся <b>Email</b>.</span>
               </div>
             )}
             <div className="phone-card">
@@ -545,7 +546,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
               <h1 className="auth-h1">{resetDone ? <>Лист <span className="acc">надіслано</span></> : <>Відновлення <span className="acc">паролю</span></>}</h1>
               {resetDone ? (<>
                 <div style={{textAlign:'center',marginTop:24}}>
-                  <div style={{fontSize:56,marginBottom:16}}>📬</div>
+                  <div style={{marginBottom:16}}><MetalIcon name="mail" size={56}/></div>
                   <p className="auth-sub">Перевір <b>{resetEmail}</b><br/>і перейди за посиланням у листі.</p>
                 </div>
                 <div style={{marginTop:'auto'}}>
@@ -724,7 +725,7 @@ export default function Auth({ user, profile, onProfileSaved }) {
           )}
 
           <button className={`terms-survey-btn${termsAgreed?' agreed':''}`} onClick={()=>termsAgreed?setTermsAgreed(false):setTermsOpen(v=>!v)}>
-            <div className="terms-survey-ico">{termsAgreed?'✓':'📋'}</div>
+            <div className="terms-survey-ico">{termsAgreed?'✓':<MetalIcon name="clipboard" size={28}/>}</div>
             <div className="terms-survey-text">
               <div className="lbl">{termsAgreed?'Прийнято':'Обовʼязково'}</div>
               <div>{termsAgreed?'Умови прийнято':'Переглянути умови'}</div>

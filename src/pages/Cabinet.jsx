@@ -22,6 +22,7 @@ import QueueTab from './cabinet/QueueTab'
 import { formatDateLabel, parseYMD } from '../utils/date'
 import { useMosaicSwitch, MosaicOverlay } from '../mosaic'
 import './Cabinet.css'
+import { MetalIcon } from '../MetalIcon'
 
 const TAB_COMPONENT_KEYS = ['book', 'bookings', 'progress', 'queue', 'chat', 'notifications', 'profile']
 
@@ -288,7 +289,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
               border:'1.5px solid rgba(99,211,120,0.5)',
               display:'flex', alignItems:'center', gap:10,
             }}>
-            <span style={{fontSize:20}}>🎉</span>
+            <MetalIcon name="sparkle" size={26}/>
             <div style={{flex:1}}>
               <div style={{fontSize:13, fontWeight:800, color:'var(--green)'}}>Слот зарезервовано для вас!</div>
               <div style={{fontSize:11, color:'var(--dim)', marginTop:2}}>
@@ -410,7 +411,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
                 background:'linear-gradient(165deg,#4ade80,#16a34a)',
                 display:'flex', alignItems:'center', justifyContent:'center',
                 fontSize:30, boxShadow:'0 6px 20px rgba(74,222,128,0.4)',
-              }}>🎉</div>
+              }}><MetalIcon name="sparkle" size={44}/></div>
               <div style={{fontSize:18, fontWeight:900, color:'var(--text)', textAlign:'center', marginBottom:6}}>
                 Слот зарезервовано!
               </div>

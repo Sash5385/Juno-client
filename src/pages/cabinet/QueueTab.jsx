@@ -3,6 +3,7 @@ import { subscribeUserQueue, leaveQueue, claimQueueOffer, declineQueueOffer } fr
 import { formatDateLabel, parseYMD } from '../../utils/date'
 import { useToast } from '../../hooks/useToast'
 import './NotifTab.css'
+import { MetalIcon } from '../../MetalIcon'
 
 function formatSlotDate(dateStr) {
   try {
@@ -75,7 +76,7 @@ export default function QueueTab({ user, profile }) {
   if (active.length === 0) {
     return (
       <div style={{ textAlign:'center', padding:'60px 20px' }}>
-        <div style={{ fontSize:40, marginBottom:14 }}>⏳</div>
+        <div style={{ marginBottom:14 }}><MetalIcon name="hourglass" size={48}/></div>
         <div style={{ fontSize:15, fontWeight:700, color:'var(--text)', marginBottom:6 }}>Черга порожня</div>
         <div style={{ fontSize:13, color:'var(--dim)', lineHeight:1.5 }}>
           Коли слот зайнятий — натисни на нього<br/>і стань у чергу. Ми повідомимо, коли місце звільниться.
@@ -117,7 +118,7 @@ export default function QueueTab({ user, profile }) {
                   background:'rgba(126,217,87,0.15)', color:'var(--ok)',
                   borderRadius:8, padding:'4px 10px',
                   fontSize:11, fontWeight:700,
-                }}>🎉 Запрошено</div>
+                }}><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="sparkle" size={16}/>Запрошено</span></div>
               ) : (
                 <div style={{
                   background:'rgba(247,201,72,0.15)', color:'var(--gold)',

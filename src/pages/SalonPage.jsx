@@ -9,6 +9,7 @@ import { getInitials } from '../utils/format'
 import { salonMasters } from '../salon'
 import { APP_VERSION } from '../version.js'
 import { CURRENCIES } from '../currency'
+import { MetalIcon } from '../MetalIcon'
 
 const SERVICE_COLORS = {
   green: '#7ed957', yellow: '#f7c948', blue: '#5b9bff', purple: '#c084fc', red: '#ff5a3c',
@@ -59,7 +60,7 @@ export default function SalonPage({ slug }) {
   if (!state.salon) {
     return (
       <div style={{ ...wrap, justifyContent: 'center', textAlign: 'center' }}>
-        <div style={{ fontSize: 40, marginBottom: 12 }}>🔗</div>
+        <div style={{ marginBottom: 12 }}><MetalIcon name="link" size={48}/></div>
         <p>Салон не знайдено. Перевірте посилання.</p>
       </div>
     )

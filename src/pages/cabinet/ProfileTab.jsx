@@ -15,6 +15,7 @@ import PhotoCropModal from "./PhotoCropModal";
 import ConfirmDialog from "./ConfirmDialog";
 import "./ProfileTab.css";
 import { money } from '../../currency'
+import { MetalIcon } from '../../MetalIcon'
 
 export default function ProfileTab({ user, profile, onProfileUpdate }) {
   const { palette, setPalette, uiScale, setUiScale } = useTheme();
@@ -144,7 +145,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       <div className="profile-banner">
         <label className={`profile-avatar profile-avatar--edit${profile.photo ? ' has-photo' : ''}`} title="Змінити фото">
           {profile.photo ? <img src={profile.photo} alt="" /> : getInitials(profile.name)}
-          <span className="profile-avatar-cam" aria-hidden="true">📷</span>
+          <span className="profile-avatar-cam" aria-hidden="true"><MetalIcon name="camera" size={22}/></span>
           <input type="file" accept="image/*" hidden disabled={photoBusy} onChange={onPhotoPick} />
         </label>
         {profile.photo && <button type="button" className="profile-photo-del" onClick={removePhoto} disabled={photoBusy}>Видалити фото</button>}
@@ -155,7 +156,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       {(profile?.discount || 0) > 0 && (
         <div style={{textAlign:'center',padding:'0 16px 12px'}}>
           <div style={{display:'inline-flex',alignItems:'center',gap:6,padding:'5px 14px',borderRadius:10,background:'rgba(246,178,27,0.1)',border:'1px solid rgba(246,178,27,0.25)',fontSize:13,fontWeight:700,color:'var(--warn)'}}>
-            🏷️ Ваша знижка: {`${money(profile.discount)}/год`}
+            <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="tag" size={18}/>Ваша знижка: {`${money(profile.discount)}/год`}</span>
           </div>
         </div>
       )}
@@ -163,7 +164,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         <div className="section-head">
           <div className="section-title">Анкета</div>
           {!editing && (
-            <button className="edit-btn" onClick={startEdit}>✏️ Редагувати</button>
+            <button className="edit-btn" onClick={startEdit}><span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="edit" size={20}/>Редагувати</span></button>
           )}
         </div>
 
@@ -199,7 +200,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         <div className="profile-section">
         {instructorProfile?.name && (
           <>
-          <div className="section-title">{salonOn ? "🏠 Салон" : "👤 Мій майстер"}</div>
+          <div className="section-title">{salonOn ? <span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="home" size={28}/>Салон</span> : <span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="user" size={28}/>Мій майстер</span>}</div>
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             {(instructorProfile.photoUrl || instructorProfile.photo)
               ? <img src={instructorProfile.photoUrl || instructorProfile.photo} alt="" style={{width:52,height:52,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
@@ -239,7 +240,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               rel="noopener noreferrer"
               className="contact-link"
             >
-              <div className="ico">📍</div>
+              <div className="ico"><MetalIcon name="pin" size={28}/></div>
               <div className="info">
                 <div className="lbl">Адреса</div>
                 <div className="val">{iAddress}</div>
@@ -252,7 +253,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
       )}
 
       <div className="profile-section">
-        <div className="section-title">🎁 Запросити друга</div>
+        <div className="section-title"><span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="gift" size={28}/>Запросити друга</span></div>
         <Hint style={{marginBottom:10}}>
           Поділіться посиланням — коли друг запишеться на перший запис, ви отримаєте бонусний запис!
         </Hint>
@@ -269,7 +270,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
             className="edit-save"
             style={{flex:1}}
           >
-            📋 Копіювати
+            <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="copy" size={20}/>Копіювати</span>
           </button>
           {typeof navigator !== 'undefined' && navigator.share && (
             <button
@@ -282,29 +283,29 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
               className="edit-save"
               style={{flex:1,background:'color-mix(in srgb, var(--info) 18%, transparent)',color:'var(--info)',boxShadow:'none'}}
             >
-              📤 Поділитись
+              <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="share" size={20}/>Поділитись</span>
             </button>
           )}
         </div>
         {(profile.referralBonusLessons || 0) > 0 && (
           <div style={{textAlign:"center",fontSize:13,color:"var(--warn)",fontWeight:700,padding:"6px 0"}}>
-            🎁 Ваш бонус: {profile.referralBonusLessons} бонусний запис{profile.referralBonusLessons > 1 ? "и" : ""}
+            <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="gift" size={18}/>Ваш бонус: {profile.referralBonusLessons} бонусний запис{profile.referralBonusLessons > 1 ? "и" : ""}</span>
           </div>
         )}
         {(profile.lessonBalance || 0) > 0 && (
           <div style={{textAlign:"center",fontSize:13,color:"var(--ok)",fontWeight:700,padding:"6px 0"}}>
-            🎓 Залишок записів: {profile.lessonBalance}
+            <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="school" size={18}/>Залишок записів: {profile.lessonBalance}</span>
           </div>
         )}
       </div>
 
       <div className="profile-section">
-        <div className="section-title">🌐 Мова</div>
+        <div className="section-title"><span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="globe" size={28}/>Мова</span></div>
         <LangSwitch style={{ width: "100%" }} />
       </div>
 
       <div className="profile-section">
-        <div className="section-title">🎨 Оформлення</div>
+        <div className="section-title"><span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="paint" size={28}/>Оформлення</span></div>
         <div className="edit-tiles">
           {PALETTES.map(p => (
             <button key={p.id} type="button" className={`edit-tile${palette === p.id ? " selected" : ""}`} onClick={() => setPalette(p.id)}>
@@ -318,7 +319,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         <Hint style={{marginTop:8}}>
           Темний або світлий режим перемикає кнопка в шапці.
         </Hint>
-        <div className="section-title" style={{marginTop:16}}>🔎 Розмір інтерфейсу</div>
+        <div className="section-title" style={{marginTop:16}}><span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="zoom" size={28}/>Розмір інтерфейсу</span></div>
         <div className="edit-tiles">
           {UI_SCALES.map(sc => (
             <button key={sc.id} type="button" className={`edit-tile${uiScale === sc.id ? " selected" : ""}`} onClick={() => setUiScale(sc.id)}>

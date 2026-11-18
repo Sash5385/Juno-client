@@ -7,6 +7,7 @@ import {
 import { useToast } from '../../hooks/useToast'
 import { useSalonMode } from '../../hooks/useSalonMode'
 import './ChatTab.css'
+import { MetalIcon } from '../../MetalIcon'
 
 // Редагувати можна свої повідомлення протягом доби
 const EDIT_WINDOW = 24 * 60 * 60 * 1000
@@ -74,7 +75,7 @@ function DirectChat({ user, profile, mid, title }) {
     <div className="chat-inner fade-up">
       {ToastEl}
       <div className="chat-header">
-        <div className="chat-instructor-avatar">{salonOn ? "👤" : "🚗"}</div>
+        <div className="chat-instructor-avatar">{salonOn ? <MetalIcon name="user" size={34}/> : <MetalIcon name="car" size={34}/>}</div>
         <div className="chat-instructor-info">
           <div className="chat-instructor-name">{title || (salonOn ? "Салон" : "Майстер")}</div>
           <div className="chat-instructor-status">Відповідає протягом дня</div>
@@ -107,7 +108,7 @@ function DirectChat({ user, profile, mid, title }) {
       <div className="chat-messages">
         {messages.length === 0 && (
           <div className="chat-empty">
-            <div className="chat-empty-icon">💬</div>
+            <div className="chat-empty-icon"><MetalIcon name="chat" size={48}/></div>
             <div className="chat-empty-title">Почніть розмову</div>
             <div className="chat-empty-sub">Напишіть майстру будь-яке питання</div>
           </div>
@@ -117,9 +118,9 @@ function DirectChat({ user, profile, mid, title }) {
           const isBroadcast = m.broadcast
           return (
             <div key={m.id} className={`chat-msg-row ${isMe ? 'out' : 'in'}`}>
-              {!isMe && <div className="chat-msg-avatar instructor">{salonOn ? "👤" : "🚗"}</div>}
+              {!isMe && <div className="chat-msg-avatar instructor">{salonOn ? <MetalIcon name="user" size={22}/> : <MetalIcon name="car" size={22}/>}</div>}
               <div className={`chat-bubble ${isMe ? 'bubble-out' : isBroadcast ? 'bubble-broadcast' : 'bubble-in'}`}>
-                {isBroadcast && <div className="bubble-broadcast-label">📢 Оголошення</div>}
+                {isBroadcast && <div className="bubble-broadcast-label"><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="mega" size={16}/>Оголошення</span></div>}
                 {/* ім'я майстра салону, якщо написав він, а не власник */}
                 {!isMe && !isBroadcast && m.senderName && <div className="bubble-broadcast-label">{m.senderName}</div>}
                 <div className="bubble-text">{m.text}</div>

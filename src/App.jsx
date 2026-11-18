@@ -33,6 +33,7 @@ import PublicSchedule from './pages/PublicSchedule'
 import About from './pages/About'
 import SalonPage from './pages/SalonPage'
 import { setCurrency } from './currency'
+import { MetalIcon } from './MetalIcon'
 
 // ─── PWA INSTALL PROMPT (пропонуємо зберегти застосунок лише при
 // першому вході — раз показали (banner з'явився), більше не пропонуємо,
@@ -170,7 +171,7 @@ function InstallBanner() {
       boxShadow:'0 10px 30px rgba(0,0,0,0.4)',
       display:'flex', alignItems:'center', gap:10,
     }}>
-      <div style={{fontSize:24, flexShrink:0}}>📲</div>
+      <div style={{flexShrink:0}}><MetalIcon name="phone" size={28}/></div>
       <div style={{flex:1, minWidth:0}}>
         <div style={{fontSize:13, fontWeight:800, color:'var(--text)'}}>Встановіть застосунок</div>
         <div style={{fontSize:11, color:'var(--dim)', marginTop:2}}>
@@ -448,7 +449,7 @@ export default function App() {
         paddingTop:'calc(20px + env(safe-area-inset-top, 0px))', paddingBottom:'calc(20px + env(safe-area-inset-bottom, 0px))'
       }}>
         <div>
-          <div style={{ fontSize:40, marginBottom:12 }}>🔗</div>
+          <div style={{ marginBottom:12 }}><MetalIcon name="link" size={48}/></div>
           <p>Це посилання недійсне або застаріле.</p>
           <p>Зверніться до вашого майстра за коректним посиланням для запису.</p>
         </div>

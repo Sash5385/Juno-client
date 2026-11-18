@@ -7,6 +7,7 @@ import { getAdminSettings, getApprovedReviews, getAdminServices, getUpcomingFree
 import { parseYMD, getDayName, getMonthShort, formatDateYMD } from '../utils/date'
 import './Landing.css'
 import { cur as curSym, money } from '../currency'
+import { MetalIcon } from '../MetalIcon'
 
 // Та сама палітра, що й у виборі кольору послуги в адмінці (colorId) —
 // бабл ціни на лендингу тонується в колір, обраний для послуги там.
@@ -203,7 +204,7 @@ export default function Landing({ user, profile }) {
             </div>
           )}
           <h1>Записи</h1>
-          <button className="hero-cta" onClick={goAuth}>📅 Записатись</button>
+          <button className="hero-cta" onClick={goAuth}><span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="calendar" size={20}/>Записатись</span></button>
         </section>
 
         {/* INSTRUCTOR */}
@@ -213,7 +214,7 @@ export default function Landing({ user, profile }) {
             <div className="instructor-avatar" style={{display:'flex',alignItems:'center',justifyContent:'center',fontSize:32,background:'var(--accent-bg, #eee)',overflow:'hidden'}}>
               {instructorPhoto
                 ? <img src={instructorPhoto} alt={instructorName} style={{width:'100%',height:'100%',objectFit:'cover'}}/>
-                : '🧑‍🏫'}
+                : <MetalIcon name="user" size={40}/>}
             </div>
             <div className="instructor-info">
               <div className="instructor-name">{instructorName}</div>
@@ -261,7 +262,7 @@ export default function Landing({ user, profile }) {
           <div className="pricing-bubbles">
             {schoolService && (
               <div className="pricing-bubble" style={{ '--c': colorOfService(schoolService.colorId) }}>
-                <div className="pricing-bubble-icon">🎓</div>
+                <div className="pricing-bubble-icon"><MetalIcon name="school" size={28}/></div>
                 <div className="pricing-bubble-lbl">Стандарт</div>
                 <div className="pricing-bubble-num">{schoolService.price}<span>{`${curSym()}/год`}</span></div>
                 {schoolService2h && <div className="pricing-bubble-sub">2 год — <b>{money(schoolService2h.price)}</b></div>}
@@ -269,7 +270,7 @@ export default function Landing({ user, profile }) {
             )}
             {privateService && (
               <div className="pricing-bubble" style={{ '--c': colorOfService(privateService.colorId) }}>
-                <div className="pricing-bubble-icon">🚙</div>
+                <div className="pricing-bubble-icon"><MetalIcon name="car" size={28}/></div>
                 <div className="pricing-bubble-lbl">Індивідуальні</div>
                 <div className="pricing-bubble-num">{privateService.price}<span>{`${curSym()}/год`}</span></div>
                 {privateService2h && <div className="pricing-bubble-sub">2 год — <b>{money(privateService2h.price)}</b></div>}
@@ -294,7 +295,7 @@ export default function Landing({ user, profile }) {
                 ? `Ще ${upcomingSlots.length - 1} вільних варіантів цього тижня`
                 : 'Встигни записатись, поки є місце'}
             </div>
-            <button className="next-slot-cta" onClick={goBookSlot}>📅 Забронювати</button>
+            <button className="next-slot-cta" onClick={goBookSlot}><span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="calendar" size={20}/>Забронювати</span></button>
           </div>
 
           {upcomingSlots.length > 1 && (
@@ -383,7 +384,7 @@ export default function Landing({ user, profile }) {
               title="Карта"
             ></iframe>
             <div className="map-overlay">
-              <div className="map-pin">📍</div>
+              <div className="map-pin"><MetalIcon name="pin" size={28}/></div>
               <div>
                 <div className="contact-label">Адреса</div>
                 <div className="contact-val">{instructorAddress || 'Точка зустрічі на карті'}</div>
@@ -400,7 +401,7 @@ export default function Landing({ user, profile }) {
         <Reveal>
         <section className="lsection">
           <button className="terms-btn" onClick={() => setTermsOpen(o => !o)}>
-            <div className="terms-ico">📄</div>
+            <div className="terms-ico"><MetalIcon name="note" size={28}/></div>
             <div className="terms-btn-label">Умови відвідування записів</div>
             <div className={`terms-chevron${termsOpen ? ' open' : ''}`}>›</div>
           </button>
@@ -415,7 +416,7 @@ export default function Landing({ user, profile }) {
 
         {/* FOOTER */}
         <div className="footer">
-          <button className="footer-cta" onClick={goAuth}>{salonOn ? 'Записатись зараз' : '🚗 Записатись зараз'}</button>
+          <button className="footer-cta" onClick={goAuth}>{salonOn ? 'Записатись зараз' : <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="car" size={20}/>Записатись зараз</span>}</button>
           <div>© 2026 Juno.</div>
           <div className="devby">
             <small>Розробка та дизайн</small>

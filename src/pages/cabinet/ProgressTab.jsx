@@ -1,6 +1,7 @@
 import { useMemo } from "react";
 import "./ProgressTab.css";
 import { cur as curSym, money } from '../../currency'
+import { MetalIcon } from '../../MetalIcon'
 
 const getWeekStart = dateStr => {
   const d = new Date(dateStr + 'T12:00:00');
@@ -64,7 +65,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             border:'1px solid rgba(99,155,255,0.3)',
           }}>
             <div style={{display:'flex',alignItems:'center',gap:10}}>
-              <span style={{fontSize:28,lineHeight:1}}>📅</span>
+              <MetalIcon name="calendar" size={28}/>
               <div style={{flex:1}}>
                 <div style={{fontSize:11,color:'var(--info)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Наступний запис</div>
                 <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>{dayLabel}{next.time ? ` · ${next.time}` : ''}</div>
@@ -81,7 +82,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           border:'1px solid rgba(74,222,128,0.3)',
         }}>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <span style={{fontSize:28,lineHeight:1}}>🎓</span>
+            <MetalIcon name="school" size={28}/>
             <div style={{flex:1}}>
               <div style={{fontSize:11,color:'var(--ok)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Залишок записів</div>
               <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>
@@ -102,7 +103,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
             border:'1px solid rgba(168,85,247,0.22)',
           }}>
             <div style={{display:'flex',alignItems:'center',gap:10}}>
-              <span style={{fontSize:28,lineHeight:1}}>🏁</span>
+              <MetalIcon name="medal" size={28}/>
               <div style={{flex:1,minWidth:0}}>
                 <div style={{fontSize:11,color:'var(--violet)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Останній запис</div>
                 <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>{parseInt(dd)}.{parseInt(mm)}{last.time ? ` · ${last.time}` : ''}</div>
@@ -143,7 +144,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
 
       {(totalSpent > 0 || totalDebt > 0) && (
         <div className="progress-hero" style={{ marginTop: 14 }}>
-          <div className="progress-title" style={{ marginBottom: 10 }}>💰 Фінанси</div>
+          <div className="progress-title" style={{ marginBottom: 10 }}><span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="coin" size={28}/>Фінанси</span></div>
           <div className="stat-row">
             {totalSpent > 0 && (
               <div className="stat-btn">

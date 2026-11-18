@@ -15,6 +15,7 @@ import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, buff
 import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
 import { cur as curSym, money } from '../../currency'
+import { MetalIcon } from '../../MetalIcon'
 
 const FALLBACK_SERVICES = [
   { id:'sv1', name:'Стандарт', type:'school',  duration:60, price:0, colorId:'blue'   },
@@ -834,7 +835,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           <div className="banner-greet">Привіт,</div>
           <div className="banner-name">{profile?.name?.split(' ')[0] || 'Клієнт'}</div>
           <div className="banner-tag">
-            {salonOn ? (selectedService?.name || '') : (selectedService?.type === 'school' ? '🎓 Стандарт' : '🚙 Індивідуальний')}
+            {salonOn ? (selectedService?.name || '') : (selectedService?.type === 'school' ? <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="school" size={16}/>Стандарт</span> : <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="car" size={16}/>Індивідуальний</span>)}
           </div>
         </div>
       </div>
@@ -847,7 +848,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           borderRadius:12, padding:'10px 14px',
           display:'flex', alignItems:'center', gap:10, marginTop:8, marginBottom:8,
         }}>
-          <span style={{fontSize:22}}>📅</span>
+          <MetalIcon name="calendar" size={26}/>
           <div style={{flex:1, minWidth:0}}>
             <div className="nl-title" style={{fontWeight:700, fontSize:13}}>Найближчий запис</div>
             <div style={{color:'var(--text)', fontSize:12, marginTop:2}}>{nextLessonLabel}</div>
@@ -864,7 +865,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           background:'linear-gradient(135deg,rgba(247,201,72,0.14),rgba(247,201,72,0.05))', border:'1px solid rgba(247,201,72,0.3)',
           borderRadius:12, padding:'9px 14px', display:'flex', alignItems:'center', gap:10, marginTop:8, marginBottom:4,
         }}>
-          <span style={{fontSize:20}}>🎫</span>
+          <MetalIcon name="ticket" size={26}/>
           <div style={{minWidth:0}}>
             <div style={{fontWeight:700, fontSize:13, color:'var(--text)'}}>{`${p.name}: лишилось ${p.left} з ${p.total}`}</div>
             <div style={{fontSize:11, color:'var(--dim)'}}>{expiresLabel(p)}</div>
@@ -885,7 +886,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           marginTop: nextLesson && nextLessonLabel ? 0 : 8,
           marginBottom:8,
         }}>
-          <span style={{fontSize:22}}>🎫</span>
+          <MetalIcon name="ticket" size={26}/>
           <div>
             <div style={{color:'var(--ok)', fontWeight:600, fontSize:14}}>
               Передоплачено {profile.lessonBalance} {profile.lessonBalance === 1 ? 'запис' : profile.lessonBalance < 5 ? 'записи' : 'записів'}
@@ -1076,7 +1077,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                         ) : isLunch ? (
                           <div style={{fontSize:11, opacity:0.75}}>обід</div>
                         ) : isVipLocked ? (
-                          <div style={{fontSize:11, opacity:0.75}}>👑</div>
+                          <div style={{fontSize:11, opacity:0.75}}><MetalIcon name="crown" size={16}/></div>
                         ) : isTakenByOthers || isOverlap ? (
                           <div style={{fontSize:11, opacity:0.85}}>зайнято</div>
                         ) : slot.totalSurcharge ? (
@@ -1096,7 +1097,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                               <div className="slot-price" style={{fontSize:11, fontWeight:700}}>{money(slot.totalPrice)}</div>
                             )}
                             {isGroup && (
-                              <div style={{fontSize:11, fontWeight:700, color:'var(--info)'}}>👥 {slot.joinGroup ? seatsLabel(slot.groupLeft) : `до ${capacityOf(selectedService)}`}</div>
+                              <div style={{fontSize:11, fontWeight:700, color:'var(--info)'}}><span style={{display:'inline-flex',alignItems:'center',gap:4}}><MetalIcon name="users" size={16}/>{slot.joinGroup ? seatsLabel(slot.groupLeft) : `до ${capacityOf(selectedService)}`}</span></div>
                             )}
                           </div>
                         )}
@@ -1174,7 +1175,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 display:'flex', flexDirection:'column', gap:4,
               }}>
                 <div style={{fontSize:13, color:'var(--warn)', fontWeight:700}}>
-                  ⚠️ Ціна за цей час: <strong>{money(servicePrice)}</strong>
+                  <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="warn" size={18}/>Ціна за цей час: <strong>{money(servicePrice)}</strong></span>
                 </div>
                 <div style={{fontSize:11, color:'var(--warn)'}}>
                   {customPriceAmt != null ? 'Індивідуальна' : 'Стандартна'} {money(baseP)} + надбавка +{money(surcharge)}{customPriceAmt == null && discountAmt > 0 ? ` − знижка ${money(discountAmt * baseHours)}` : ''}
@@ -1197,7 +1198,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 border: pkgOn ? '1px solid rgba(74,222,128,0.35)' : '1px solid var(--field-bd)',
                 fontSize:13, fontWeight:700, color: pkgOn ? 'var(--ok)' : 'var(--dim)',
               }}>
-                <span style={{fontSize:18}}>🎫</span>
+                <MetalIcon name="ticket" size={18}/>
                 <span style={{flex:1}}>Списати з пакета «{pkgAvail.name}» <span style={{fontWeight:600, color:'var(--dim)'}}>(лишилось {pkgAvail.left}, {expiresLabel(pkgAvail)})</span></span>
                 <span>{pkgOn ? '✓' : '○'}</span>
               </button>
@@ -1208,7 +1209,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 background:'var(--field-bg)', border:'1px solid var(--field-bd)',
                 fontSize:12, color:'var(--dim)', textAlign:'center', lineHeight:1.5,
               }}>
-                ➕ {addonsLabel(chosenAddons)}: <strong style={{color:'var(--text)'}}>+{money(addonTot.price)}</strong>{addonTot.minutes > 0 ? ` · +${addonTot.minutes} хв` : ''}
+                <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="plus" size={16}/>{addonsLabel(chosenAddons)}: <strong style={{color:'var(--text)'}}>+{money(addonTot.price)}</strong>{addonTot.minutes > 0 ? ` · +${addonTot.minutes} хв` : ''}</span>
                 <div>Разом: <strong style={{color:'var(--text)'}}>{money(totalPrice)}</strong> · {formatDurShort(Math.round(durationHours * 60))}</div>
               </div>
             )}
@@ -1242,7 +1243,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           <div className="dialog" style={{maxHeight:'88vh', overflowY:'auto'}}>
             <button type="button" className="dialog-close" aria-label="Закрити" onClick={() => !intakeBusy && setIntakeOpen(false)}>✕</button>
             <div className="dialog-handle"></div>
-            <div className="dialog-icon">📋</div>
+            <div className="dialog-icon"><MetalIcon name="clipboard" size={30}/></div>
             <div className="dialog-title">Коротка анкета</div>
             <div className="dialog-sub">Відповісте один раз — майстер побачить це в вашій картці.</div>
             <div className="win-cols win-gap" style={{padding:'4px 0 8px'}}>
@@ -1336,7 +1337,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
               {successData.packageName && (
                 <div className="dialog-info-row">
                   <span className="lbl">Пакет</span>
-                  <span className="val">🎫 {successData.packageName}</span>
+                  <span className="val"><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="ticket" size={16}/>{successData.packageName}</span></span>
                 </div>
               )}
               {successData.addons?.length > 0 && (
@@ -1370,12 +1371,12 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   rel="noopener noreferrer"
                   className="dialog-btn secondary"
                   style={{flex:1, textDecoration:'none', textAlign:'center', fontSize:13}}
-                >📅 Google</a>
+                ><span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="calendar" size={20}/>Google</span></a>
                 <button
                   className="dialog-btn secondary"
                   style={{flex:1, fontSize:13}}
                   onClick={() => downloadICS({ date:successData.date, time:successData.time, durationHours:successData.durationHours, serviceName:successData.service?.name || successData.service })}
-                >🍎 Apple</button>
+                ><span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="apple" size={20}/>Apple</span></button>
               </div>
             )}
             {successData.type === 'booking' && (
@@ -1398,7 +1399,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           <div className="dialog">
             <button type="button" className="dialog-close" aria-label="Закрити" onClick={() => setDialogSlot(null)}>✕</button>
             <div className="dialog-handle"></div>
-            <div className="dialog-icon">{dialogSlot.vipOnly ? '👑' : '⏰'}</div>
+            <div className="dialog-icon">{dialogSlot.vipOnly ? <MetalIcon name="crown" size={30}/> : <MetalIcon name="clock" size={30}/>}</div>
             <div className="dialog-title">{dialogSlot.vipOnly ? 'VIP черга' : 'Стати в чергу?'}</div>
             <div className="dialog-sub">
               {dialogSlot.vipOnly
@@ -1421,7 +1422,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                     <span className="val">{money(lessonBase(dialogSlot.slotDurHours || baseDurationHours))}</span>
                   </div>
                   <div className="dialog-info-row">
-                    <span className="lbl" style={{color:'var(--gold)'}}>⚡ Надбавка</span>
+                    <span className="lbl" style={{color:'var(--gold)'}}><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="bolt" size={16}/>Надбавка</span></span>
                     <span className="val" style={{color:'var(--gold)'}}>+{money(dialogSlot.surcharge)}</span>
                   </div>
                   {customPriceAmt == null && discountAmt > 0 && (

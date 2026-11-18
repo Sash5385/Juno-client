@@ -14,6 +14,7 @@ import { useSalonMode } from '../../hooks/useSalonMode'
 import './BookingsTab.css'
 import './BookTab.css'
 import { cur as curSym, money } from '../../currency'
+import { MetalIcon } from '../../MetalIcon'
 
 // Мінімальний час до запису, коли клієнт ще може самостійно скасувати (год)
 const CANCEL_WINDOW_HOURS = 24
@@ -212,7 +213,7 @@ function RescheduleModal({ booking, user, profile, onClose, onDone }) {
       <div className="dialog">
         <button type="button" className="dialog-close" aria-label="Закрити" onClick={onClose}>✕</button>
         <div className="dialog-handle" />
-        <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}>📅 Перенести запис</div>
+        <div className="dialog-title" style={{ fontSize: 16, marginBottom: 4 }}><span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="calendar" size={20}/>Перенести запис</span></div>
         <div style={{ fontSize: 12, color: 'var(--dim)', marginBottom: 14, textAlign: 'center' }}>
           {[booking.serviceName, `${fmtLongDate(booking.date)}, ${booking.time}`].filter(Boolean).join(' · ')}
         </div>
@@ -399,7 +400,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {salonOn ? '' : (b.serviceType === 'school' ? '🎓 ' : '🚙 ')}{b.serviceName} · {formatDurHours(b.durationHours || 1)}{' '}
+            {salonOn ? '' : (b.serviceType === 'school' ? <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="school" size={16}/></span> : <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="car" size={16}/></span>)}{b.serviceName} · {formatDurHours(b.durationHours || 1)}{' '}
             {masterOf(b) && (
               <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masterOf(b).name}</span>
             )}
@@ -409,9 +410,9 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               </span>
             )}
           </div>
-          {b.packageId && !b.packageError && <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}>🎫 З пакета «{b.packageName}»</div>}
+          {b.packageId && !b.packageError && <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="ticket" size={16}/>З пакета «{b.packageName}»</span></div>}
           {normAddons(b.addons).length > 0 && (
-            <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}>➕ {addonsLabel(normAddons(b.addons))}</div>
+            <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="plus" size={16}/>{addonsLabel(normAddons(b.addons))}</span></div>
           )}
           <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
             {(b.status === 'confirmed' || b.status === 'cancelled') && (
@@ -435,7 +436,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             <div style={{marginTop:6,padding:'7px 10px',borderRadius:9,
               background:'rgba(59,130,246,0.08)',border:'1px solid rgba(59,130,246,0.2)',
               fontSize:11,color:'var(--text)',lineHeight:1.5}}>
-              <span style={{fontSize:11,fontWeight:700,color:'var(--info)',display:'block',marginBottom:2}}>📝 Нотатка майстра</span>
+              <span style={{fontSize:11,fontWeight:700,color:'var(--info)',display:'block',marginBottom:2}}><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="note" size={16}/>Нотатка майстра</span></span>
               {b.instructorNote}
             </div>
           )}
@@ -479,13 +480,13 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             )
             if (rv) return (
               <div style={{marginTop:6,fontSize:12,color:'var(--dim)',lineHeight:1.45}}>
-                {`✍️ Ваш відгук${rv.status === 'hidden' ? ' (прихований майстром)' : ''}: `}{rv.text ? `«${rv.text}»` : ''}
+                <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="edit" size={16}/>{`Ваш відгук${rv.status === 'hidden' ? ' (прихований майстром)' : ''}: `}</span>{rv.text ? `«${rv.text}»` : ''}
                 {rv.status !== 'hidden' && <button onClick={() => setReviewDraft({ id: b.id, rating: rv.rating || 5, text: rv.text || '' })} style={{marginLeft:6,border:'none',background:'none',color:'var(--info)',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:'pointer',padding:0}}>Змінити</button>}
               </div>
             )
             return (
               <button onClick={() => setReviewDraft({ id: b.id, rating: b.rating || 0, text: '' })} style={{marginTop:6,padding:'7px 12px',borderRadius:10,border:'1px solid rgba(251,191,36,0.45)',background:'rgba(251,191,36,0.1)',color:'var(--text)',fontFamily:'inherit',fontSize:12,fontWeight:700,cursor:'pointer'}}>
-                {masterName ? `✍️ Залишити відгук майстру ${masterName}` : '✍️ Залишити відгук'}
+                <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="edit" size={16}/>{masterName ? `Залишити відгук майстру ${masterName}` : 'Залишити відгук'}</span>
               </button>
             )
           })()}
@@ -501,7 +502,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
           )}
           {!isPast && b.status !== 'cancelled' && cancelLocked && cancelAllowed && (
             <div className="booking-meta" style={{ color: 'var(--dim)', marginTop: 4 }}>
-              ⏳ Скасування — не пізніше ніж за {cancelCutoff} год
+              <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="hourglass" size={16}/>Скасування — не пізніше ніж за {cancelCutoff} год</span>
             </div>
           )}
           {!isPast && b.status !== 'cancelled' && (
@@ -533,7 +534,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 </div>
               ) : (
                 <button onClick={()=>{setNoteOpenId(b.id);setNoteDraft(b.studentNote||'');}} style={{fontSize:11,padding:'3px 10px',borderRadius:9,border:'1px dashed rgba(99,211,120,0.25)',background:'none',color:'var(--dim)',cursor:'pointer',fontFamily:'inherit'}}>
-                  {b.studentNote ? `💬 ${b.studentNote}` : '💬 Нотатка майстру'}
+                  <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="chat" size={16}/>{b.studentNote ? b.studentNote : 'Нотатка майстру'}</span>
                 </button>
               )}
             </div>
@@ -541,7 +542,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" aria-label="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}>📅</button>}
+            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" aria-label="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}><MetalIcon name="calendar" size={20}/></button>}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: 'var(--bad)', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
@@ -570,7 +571,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
     <div className="fade-up">
       {upcoming.length === 0 && completed.length === 0 ? (
         <div className="empty-state">
-          <div className="empty-state-emoji">📅</div>
+          <div className="empty-state-emoji"><MetalIcon name="calendar" size={48}/></div>
           <div className="empty-state-title">Поки нема записів</div>
           <div className="empty-state-desc">Перейди на вкладку Запис і вибери час запису</div>
         </div>
@@ -578,7 +579,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         <>
           {totalDebt > 0 && (
             <div style={{borderRadius:14,background:'rgba(239,68,68,0.07)',border:'1px solid rgba(239,68,68,0.2)',padding:'12px 14px',marginBottom:12,display:'flex',alignItems:'center',gap:10}}>
-              <div style={{fontSize:22,flexShrink:0}}>💳</div>
+              <div style={{flexShrink:0}}><MetalIcon name="card" size={28}/></div>
               <div style={{flex:1}}>
                 <div style={{fontSize:13,fontWeight:800,color:'var(--bad)'}}>Заборгованість: {money(totalDebt, ' ')}</div>
                 <Hint tone="warn" style={{marginTop:2}}>Зверніться до майстра для оплати</Hint>
@@ -600,7 +601,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 </div>
                 <div style={{fontSize:28,fontWeight:900,color:'var(--text)',lineHeight:1}}>{next.time}</div>
                 <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())}{next.serviceName ? ` · ${next.serviceName}` : ''}</div>
-                <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{formatDurHours(next.durationHours || 1)}{normAddons(next.addons).length > 0 ? ` · ➕ ${addonsLabel(normAddons(next.addons))}` : ''}</div>
+                <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{formatDurHours(next.durationHours || 1)}{normAddons(next.addons).length > 0 ? ` · +${addonsLabel(normAddons(next.addons))}` : ''}</div>
                 <div className="booking-cal-row">
                   <a href={googleCalendarLink(next)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">Google Calendar</a>
                   <button className="cal-add-btn" onClick={() => downloadICS(next)}>Apple Calendar</button>
