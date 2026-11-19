@@ -830,7 +830,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
 
       {/* USER BANNER */}
       <div className="user-banner">
-        <div className="banner-avatar">{getInitials(profile?.name)}</div>
+        <MetalIcon square size={28} color="#c2410c">{getInitials(profile?.name)}</MetalIcon>
         <div className="banner-info">
           <div className="banner-greet">Привіт,</div>
           <div className="banner-name">{profile?.name?.split(' ')[0] || 'Клієнт'}</div>

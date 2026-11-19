@@ -265,3 +265,17 @@ html[data-palette="fog"] body[data-theme="dark"] .chat-bubble .bubble-time{text-
 html[data-palette="fog"] body[data-theme="dark"] .chat-sender-name{text-align:center;width:100%;padding-left:0}
 
 @media (min-width: 360px) { html[data-palette="neon"] body[data-theme="dark"] .cab-icon-btn { width: 32px; height: 32px; } }
+
+/* === Метал + глянець: кнопки верхньої панелі (всі палітри) === */
+html body[data-theme] .cab-topbar .cab-icon-btn{width:30px!important;height:30px!important;border-radius:50%!important;border:0!important;overflow:visible!important;position:relative!important;padding:0!important;background:linear-gradient(145deg,#fbfcfe,#a3abba 45%,#eef1f6 55%,#7a8394)!important;box-shadow:0 2px 5px rgba(0,0,0,.4),inset 0 1px 0 #fff,inset 0 -2px 3px rgba(0,0,0,.2)!important;backdrop-filter:none!important;-webkit-backdrop-filter:none!important;color:#475569!important}
+@media (min-width:360px){html body[data-theme] .cab-topbar .cab-icon-btn{width:32px!important;height:32px!important}}
+html body[data-theme] .cab-topbar .cab-icon-btn::before{display:block!important;content:''!important;position:absolute!important;left:6%!important;right:6%!important;top:4%!important;bottom:auto!important;width:auto!important;height:46%!important;border-radius:50%!important;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.05))!important;pointer-events:none!important}
+html body[data-theme] .cab-topbar .cab-icon-btn svg{position:relative;z-index:1;width:72%!important;height:72%!important;filter:drop-shadow(0 1px 0 rgba(255,255,255,.9))}
+html body[data-theme] .cab-topbar .cab-icon-btn .badge{z-index:2}
+html body[data-theme] .cab-topbar .cab-icon-btn:active{filter:brightness(.95)}
+html body[data-theme] .cab-topbar .cab-ic-back,html body[data-theme] .cab-topbar .cab-ic-fwd,html body[data-theme] .cab-topbar .cab-ic-theme{color:#475569!important}
+html body[data-theme] .cab-topbar .cab-ic-home,html body[data-theme] .cab-topbar .cab-ic-profile{color:#2563eb!important}
+html body[data-theme] .cab-topbar .cab-ic-refresh{color:#0891b2!important}
+html body[data-theme] .cab-topbar .cab-ic-bell{color:#b7860b!important}
+html body[data-theme] .cab-topbar .cab-ic-logout{color:#dc2626!important}
+html body[data-theme] .cab-topbar .cab-icon-btn.cab-ic-active{box-shadow:0 0 0 2px #2563eb,0 2px 5px rgba(0,0,0,.4)!important}

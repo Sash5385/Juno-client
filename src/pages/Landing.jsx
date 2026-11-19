@@ -331,7 +331,7 @@ export default function Landing({ user, profile }) {
                 <div className="review-stars">{'★'.repeat(rv.rating || 0)}{'☆'.repeat(5 - (rv.rating || 0))}</div>
                 {rv.text && <div className="review-text">{rv.text}</div>}
                 <div className="review-author">
-                  <div className="review-avatar">{(rv.studentName || 'У').trim()[0].toUpperCase()}</div>
+                  <MetalIcon square size={34} color="#15803d">{(rv.studentName || 'У').trim()[0].toUpperCase()}</MetalIcon>
                   <div>
                     <div className="review-name">{rv.studentName || 'Клієнт'}</div>
                     {rv.createdAt && <div className="review-date">{new Date(rv.createdAt).toLocaleDateString('uk-UA')}</div>}

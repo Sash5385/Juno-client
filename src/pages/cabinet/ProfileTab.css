@@ -474,3 +474,5 @@
   display: block; margin: -6px auto 10px; background: none; border: 0; padding: 10px 14px; min-height: 40px;
   color: var(--dim); font-size: 12px; font-family: inherit; cursor: pointer; text-decoration: underline;
 }
+.profile-avatar--edit:not(.has-photo) { background: none; box-shadow: none; text-shadow: none; }
+.profile-avatar--edit:not(.has-photo)::after { display: none; }

@@ -144,7 +144,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
     <div className="profile-tab">
       <div className="profile-banner">
         <label className={`profile-avatar profile-avatar--edit${profile.photo ? ' has-photo' : ''}`} title="Змінити фото">
-          {profile.photo ? <img src={profile.photo} alt="" /> : getInitials(profile.name)}
+          {profile.photo ? <img src={profile.photo} alt="" /> : <MetalIcon square size={84} color="#c2410c">{getInitials(profile.name)}</MetalIcon>}
           <span className="profile-avatar-cam" aria-hidden="true"><MetalIcon name="camera" size={22}/></span>
           <input type="file" accept="image/*" hidden disabled={photoBusy} onChange={onPhotoPick} />
         </label>
@@ -204,7 +204,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
           <div style={{display:'flex',alignItems:'center',gap:12}}>
             {(instructorProfile.photoUrl || instructorProfile.photo)
               ? <img src={instructorProfile.photoUrl || instructorProfile.photo} alt="" style={{width:52,height:52,borderRadius:'50%',objectFit:'cover',flexShrink:0}} />
-              : <div className="profile-avatar" style={{width:52,height:52,fontSize:18,margin:0,flexShrink:0}}>{getInitials(instructorProfile.name)}</div>}
+              : <MetalIcon square size={52} color="#2563eb">{getInitials(instructorProfile.name)}</MetalIcon>}
             <div style={{minWidth:0}}>
               <div style={{fontSize:15,fontWeight:800,color:'var(--text)',wordBreak:'break-word'}}>{instructorProfile.name}</div>
               {Number(instructorProfile.experience) > 0 && (

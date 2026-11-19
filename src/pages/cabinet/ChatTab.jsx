@@ -131,7 +131,7 @@ function DirectChat({ user, profile, mid, title }) {
                     )}
                   </div>
               </div>
-              {isMe && <div className="chat-msg-avatar me">{initials}</div>}
+              {isMe && <MetalIcon square size={28} color="#c2410c">{initials}</MetalIcon>}
             </div>
           )
         })}
