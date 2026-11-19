@@ -103,6 +103,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const [selectedTime, setSelectedTime] = useState(notifParams?.time || null)
   // Другий обраний годинний слот: два сусідні вільні години об'єднуються в один запис на 2 години
   const [selectedTime2, setSelectedTime2] = useState(null)
+  const [showTaken, setShowTaken] = useState(false) // розгорнути зайняті слоти (для черги)
   const [loading, setLoading] = useState(() => !!notifParams?.date)
   const initialDateSet = useRef(true)
   useEffect(() => {
@@ -1054,6 +1055,8 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   const isTaken = !isAvailable && !isMyReserved
                   const isTakenByOthers = isTaken && !isPartOfMyBooking
                   const isUnavailable = isLunch || isOverlap || isVipLocked || isTaken || isMyBooked
+                  // зайняті слоти зведені в «Зайняті (N)»: лишаються видимими свої, у черзі, обрані
+                  if (isUnavailable && !showTaken && !isMyQueue && !isMyReserved && !isMyBooked && !isPartOfMyBooking && !isSelected) return null
                   return (
                     <div key={slot.time} style={{position:'relative'}}>
                       <button
@@ -1115,6 +1118,17 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                   )
                 })}
               </div>
+              {(() => {
+                const busyN = slotsList.filter(sl => {
+                  const un = sl.lunchBlocked || sl.overlapBlocked || sl.vipBlocked || (sl.available === false && !sl.offeredTo?.[user?.uid]) || sl.isMyBooked
+                  return un && !queueMap[sl.time]?.mine && !sl.offeredTo?.[user?.uid] && !sl.isMyBooked && !sl.isPartOfMyBooking && selectedTime !== sl.time && selectedTime2 !== sl.time
+                }).length
+                return busyN > 0 || showTaken ? (
+                  <button className="cal-add-btn" style={{margin:'8px auto 0', display:'flex', minHeight:32}} onClick={() => setShowTaken(v => !v)}>
+                    {showTaken ? 'Сховати зайняті' : `Зайняті (${busyN}) — стати в чергу`}
+                  </button>
+                ) : null
+              })()}
               <div className="slot-legend">
                 <div className="leg-item"><div className="leg-dot free"></div> Вільно</div>
                 <div className="leg-item"><div className="leg-dot taken"></div> Зайнято</div>

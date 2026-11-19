@@ -341,6 +341,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
   }
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
   const [noteOpenId, setNoteOpenId] = useState(null)
+  const [calOpenId, setCalOpenId] = useState(null) // яка картка розгорнула вибір календаря
   const [noteDraft, setNoteDraft] = useState('')
   const [toast, setToast] = useState(null)
   const [adminCfg, setAdminCfg] = useState({ bookCutoffHours: 24, studentCanCancel: true })
@@ -508,14 +509,22 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             </div>
           )}
           {!isPast && b.status !== 'cancelled' && (
-            <div className="booking-cal-row">
-              <a href={googleCalendarLink(b)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">
-                <MetalIcon name="calendar" size={18}/>Google Calendar
-              </a>
-              <button className="cal-add-btn" onClick={() => downloadICS(b)}>
-                <MetalIcon name="apple" size={18}/>Apple Calendar
-              </button>
-            </div>
+            calOpenId === b.id ? (
+              <div className="booking-cal-row">
+                <a href={googleCalendarLink(b)} target="_blank" rel="noopener noreferrer" className="cal-add-btn" onClick={() => setCalOpenId(null)}>
+                  <MetalIcon name="calendar" size={18}/>Google Calendar
+                </a>
+                <button className="cal-add-btn" onClick={() => { downloadICS(b); setCalOpenId(null) }}>
+                  <MetalIcon name="apple" size={18}/>Apple Calendar
+                </button>
+              </div>
+            ) : (
+              <div className="booking-cal-row">
+                <button className="cal-add-btn" onClick={() => setCalOpenId(b.id)}>
+                  <MetalIcon name="calendar" size={18}/>Додати в календар
+                </button>
+              </div>
+            )
           )}
           {!isPast && b.status !== 'cancelled' && (
             <div style={{marginTop:6}}>
