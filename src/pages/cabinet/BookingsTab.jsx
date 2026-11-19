@@ -19,6 +19,8 @@ import { MetalIcon } from '../../MetalIcon'
 // Мінімальний час до запису, коли клієнт ще може самостійно скасувати (год)
 const CANCEL_WINDOW_HOURS = 24
 // «пн, 30 листопада» — родовий відмінок; для іншої мови інтерфейсу toLocaleDateString підмінено в i18n
+// назва послуги вже закінчується тривалістю («Стандарт 1 год») — не дублюємо її
+const nameHasDur = (name, hours) => { const d = formatDurHours(hours || 1); return typeof name === 'string' && name.trim().endsWith(d) }
 const fmtLongDate = (d) => { const x = typeof d === 'string' ? parseYMD(d) : new Date(d); return isNaN(x) ? String(d || '') : x.toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' }) }
 
 function hoursUntilLesson(booking) {
@@ -334,7 +336,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
     try {
       await saveReview(user.uid, b, reviewDraft.rating, reviewDraft.text, profile?.name || b.studentName || '')
       setReviewDraft(null)
-    } catch { alert('Не вдалося надіслати відгук. Спробуйте ще раз.') }
+    } catch { showToast('Не вдалося надіслати відгук. Спробуйте ще раз.', 'error') }
     setReviewSaving(false)
   }
   const [cancelConfirmId, setCancelConfirmId] = useState(null)
@@ -400,7 +402,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {salonOn ? '' : (b.serviceType === 'school' ? <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="school" size={16}/></span> : <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="car" size={16}/></span>)}{b.serviceName} · {formatDurHours(b.durationHours || 1)}{' '}
+            {salonOn ? '' : (b.serviceType === 'school' ? <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="school" size={16}/></span> : <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="car" size={16}/></span>)}{b.serviceName}{nameHasDur(b.serviceName, b.durationHours) ? null : <>{' · '}{formatDurHours(b.durationHours || 1)}</>}{' '}
             {masterOf(b) && (
               <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masterOf(b).name}</span>
             )}
