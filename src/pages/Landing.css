@@ -527,8 +527,6 @@
   filter: brightness(0.95);
 }
 
-[data-theme="light"] .map-iframe { filter: none; }
-
 .map-overlay {
   padding: 14px;
   display: flex;
@@ -667,27 +665,6 @@
 }
 
 /* LIGHT THEME OVERRIDES */
-[data-theme="light"] .icon-btn, [data-theme="light"] .instructor-card, [data-theme="light"] .review-card, [data-theme="light"] .map-card, [data-theme="light"] .terms-btn {
-  background: var(--surface);
-  backdrop-filter: none;
-  -webkit-backdrop-filter: none;
-}
-
-[data-theme="light"] .terms-content {
-  background: var(--surf-lo);
-}
-
-[data-theme="light"] .terms-btn-label {
-  color: var(--text);
-}
-
-[data-theme="light"] .terms-text {
-  color: var(--dim);
-}
-
-[data-theme="light"] .terms-chevron {
-  color: var(--faint);
-}
 
 /* FOOTER */
 .footer {
@@ -769,11 +746,6 @@
   animation: devshine 7s linear infinite;
 }
 
-[data-theme="light"] .devby b {
-  background-image: linear-gradient(100deg, var(--accent), #d97706 40%, #7c3aed 75%, var(--accent));
-  filter: none;
-}
-
 .devby span {
   font-size: 11px;
   font-weight: 600;
@@ -812,23 +784,6 @@
   cursor: pointer;
   padding: 6px 10px;
   font-family: inherit;
-}
-
-/* Світла тема: картки «ціни / найближче вікно / слоти» були темним склом з світлим текстом на світлому тлі */
-[data-theme="light"] .pricing-bubble {
-  background: linear-gradient(155deg, color-mix(in srgb, var(--c) 28%, #fff) 0%, #fff 100%);
-  box-shadow: 0 6px 18px rgba(60,80,120,0.14);
-}
-[data-theme="light"] .pricing-bubble-num { color: color-mix(in srgb, var(--c) 45%, #000); }
-[data-theme="light"] .next-slot-card {
-  background: linear-gradient(165deg, rgba(34,197,94,0.16), var(--surface));
-  box-shadow: 0 6px 18px rgba(60,80,120,0.14);
-}
-[data-theme="light"] .next-slot-big,
-[data-theme="light"] .slot-chip-time { color: #15803d; }
-[data-theme="light"] .slot-chip {
-  background: var(--surface);
-  box-shadow: 0 4px 14px rgba(60,80,120,0.12);
 }
 
 .devby a { text-decoration: none; color: inherit; }

@@ -124,12 +124,6 @@
   color: var(--text);
 }
 
-[data-theme="light"] .cal-add-btn {
-  border-color: var(--border);
-  background: var(--surf-lo);
-  color: var(--text);
-}
-
 .action-btn {
   width: 32px;
   height: 32px;
@@ -148,24 +142,10 @@
   background: transparent; box-shadow: none;
   display: inline-flex; align-items: center; justify-content: center;
 }
-[data-theme="light"] .action-btn.action-btn--metal { background: transparent; }
+
 .action-btn.action-btn--metal:active { filter: brightness(0.92); transform: scale(0.94); }
 
 /* ─── LIGHT THEME ──────────────────────────────────────────────── */
-[data-theme="light"] .booking-card {
-  background: var(--surface);
-  border-color: var(--border);
-  box-shadow: var(--shadow);
-}
-
-[data-theme="light"] .booking-date {
-  background: var(--surf-lo);
-  border-color: var(--border);
-}
-
-[data-theme="light"] .action-btn {
-  background: var(--surf-lo);
-}
 
 .empty-state {
   text-align: center;

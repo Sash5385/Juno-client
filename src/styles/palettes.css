@@ -1,6 +1,5 @@
-/* Палітри клієнта: «Туман» (fog), «Неон-ніч» (neon) і «Океан» (ocean), у темному й світлому режимі.
-   Активна палітра — атрибут data-palette на <html> (див. hooks/useTheme.js), режим — data-theme на <body>.
-   Селектори мають вищу специфічність, ніж базові правила з [data-theme="light"] у компонентних CSS. */
+/* Палітри клієнта: «Туман» (fog), «Неон-ніч» (neon) і «Океан» (ocean), у темному режимі.
+   Активна палітра — атрибут data-palette на <html> (див. hooks/useTheme.js), режим — data-theme на <body>. */
 
 /* ── Неон-ніч · dark ── */
 html[data-palette="neon"] body[data-theme="dark"]{
@@ -14,17 +13,6 @@ html[data-palette="neon"] body[data-theme="dark"]{
 }
 html[data-palette="neon"] body[data-theme="dark"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(255,61,154,0.2), transparent 45%), radial-gradient(circle at 95% 30%, rgba(34,211,238,0.17), transparent 45%), radial-gradient(circle at 20% 95%, rgba(139,92,246,0.15), transparent 45%)}
 
-/* ── Неон-ніч · light ── */
-html[data-palette="neon"] body[data-theme="light"]{
-  --bg:#f6f0ff;--bg-deep:#ece3ff;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#f0f0f0;
-  --border:rgba(0,0,0,0.07);--text:#1d1038;--dim:#695e7e;--faint:#6a6476;
-  --accent:#d61f7e;--acc-hi:#e0579e;--green:#10b981;--blue:#5b9bff;--gold:#f7c948;
-  --shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9);
-    --pm-blur:16px;--pm-r:20px;--pm-nr:28px;--pm-slot-r:16px;--pm-card-mix:90%;--pm-nav-mix:88%;--pm-nav-c:#ffffff;--pm-bd:rgba(0,0,0,0.08);
-  --pm-free:#10b981;--pm-part:#f59e0b;--pm-full:#ef4444;--pm-slot-a:14%;--pm-slot-ba:40%;--pm-sel-a:#8b5cf6;--pm-sel-b:#6d28d9;--pm-sel-c:#7c3aed;--pm-sel-fg:#ffffff;
-  color-scheme:light;
-}
-html[data-palette="neon"] body[data-theme="light"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(255,61,154,0.22), transparent 45%), radial-gradient(circle at 95% 30%, rgba(34,211,238,0.2), transparent 45%), radial-gradient(circle at 20% 95%, rgba(139,92,246,0.18), transparent 45%)}
 
 /* ── Океан · dark ── */
 html[data-palette="ocean"] body[data-theme="dark"]{
@@ -38,25 +26,11 @@ html[data-palette="ocean"] body[data-theme="dark"]{
 }
 html[data-palette="ocean"] body[data-theme="dark"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(20,184,166,0.2), transparent 45%), radial-gradient(circle at 95% 30%, rgba(14,165,233,0.17), transparent 45%), radial-gradient(circle at 20% 95%, rgba(99,102,241,0.15), transparent 45%)}
 
-/* ── Океан · light ── */
-html[data-palette="ocean"] body[data-theme="light"]{
-  --bg:#eaf6fb;--bg-deep:#d9edf6;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#f0f0f0;
-  --border:rgba(0,0,0,0.07);--text:#0b2a3a;--dim:#59717e;--faint:#5d6b72;
-  --accent:#0e9488;--acc-hi:#4aafa6;--green:#14b8a6;--blue:#5b9bff;--gold:#f7c948;
-  --shadow:8px 8px 22px rgba(120,120,140,0.25), -4px -4px 12px rgba(255,255,255,0.9);
-    --pm-blur:14px;--pm-r:16px;--pm-nr:26px;--pm-slot-r:12px;--pm-card-mix:90%;--pm-nav-mix:88%;--pm-nav-c:#ffffff;--pm-bd:rgba(0,0,0,0.08);
-  --pm-free:#14b8a6;--pm-part:#f59e0b;--pm-full:#ef4444;--pm-slot-a:14%;--pm-slot-ba:40%;--pm-sel-a:#0ea5e9;--pm-sel-b:#0369a1;--pm-sel-c:#0369a1;--pm-sel-fg:#ffffff;
-  color-scheme:light;
-}
-html[data-palette="ocean"] body[data-theme="light"] #root::before{background:radial-gradient(circle at 10% 5%, rgba(20,184,166,0.22), transparent 45%), radial-gradient(circle at 95% 30%, rgba(14,165,233,0.2), transparent 45%), radial-gradient(circle at 20% 95%, rgba(99,102,241,0.18), transparent 45%)}
 
 /* ── Туман · dark (скло як в адмінці) ── */
 html[data-palette="fog"] body[data-theme="dark"]{--bg:#10141c;--bg-deep:#0b0f16;--surface:#171d2a;--surf-hi:#1f2738;--surf-lo:#0f141d;--border:rgba(255,255,255,0.1);--text:#e8edf6;--on-accent:#06182e;--link:#93c5fd;--dim:#c6cfde;--faint:#aab5c8;--accent:#60a5fa;--acc-hi:#93c5fd;--green:#4ade80;--blue:#60a5fa;--gold:#fbbf24;--shadow:none;--fg-card:rgba(255,255,255,.06);--fg-nav:rgba(14,19,29,.88);--pm-on:#06182e;--fg-free:#4ade80;--fg-part:#fbbf24;--fg-full:#f87171;--fg-free-t:#bbf7d0;--fg-part-t:#fde68a;--fg-full-t:#fecaca;--fg-a:20%;--fg-ba:45%;--fg-fa:16%;--fg-fba:38%;color-scheme:dark;}
 html[data-palette="fog"] body[data-theme="dark"] #root::before{background:radial-gradient(circle at 0% 0%,rgba(96,165,250,.35),transparent 48%),radial-gradient(circle at 100% 80%,rgba(129,140,248,.3),transparent 50%)}
 
-/* ── Туман · light (скло як в адмінці) ── */
-html[data-palette="fog"] body[data-theme="light"]{--bg:#e9eef8;--bg-deep:#dfe7f5;--surface:#ffffff;--surf-hi:#ffffff;--surf-lo:#eef2fa;--border:rgba(23,35,58,0.1);--text:#17233a;--dim:#3f4c66;--faint:#4f5d78;--accent:#1d4ed8;--acc-hi:#2f6fee;--green:#15803d;--blue:#3b82f6;--gold:#a3480a;--on-gold:#fff;--link:#1e40af;--shadow:0 4px 18px rgba(60,80,120,.12);--fg-card:rgba(255,255,255,.72);--fg-nav:rgba(255,255,255,.92);--fg-free:#16a34a;--fg-part:#d97706;--fg-full:#dc2626;--fg-free-t:#166534;--fg-part-t:#92400e;--fg-full-t:#b91c1c;--fg-a:14%;--fg-ba:40%;--fg-fa:10%;--fg-fba:34%;color-scheme:light;}
-html[data-palette="fog"] body[data-theme="light"] #root::before{background:radial-gradient(circle at 0% 0%,rgba(96,165,250,.3),transparent 48%),radial-gradient(circle at 100% 80%,rgba(129,140,248,.22),transparent 50%)}
 
 /* ── Неон-ніч і Океан: спільні правила (кольори/радіуси — змінні --pm-* у блоках палітр вище) ── */
 html:is([data-palette="neon"],[data-palette="ocean"]) body[data-theme] .cab-topbar{background:linear-gradient(180deg,var(--bg) 60%,color-mix(in srgb,var(--bg) 88%,transparent));border-bottom:1px solid var(--border)}
@@ -102,21 +76,16 @@ html:is([data-palette="neon"],[data-palette="ocean"],[data-palette="fog"]) body[
 /* ── Туман: читабельність і контраст (аудит клієнта 320–768px) ── */
 /* темний режим: світлі акцентні заливки отримують темний текст, як вже зроблено для .btn-primary */
 html[data-palette="fog"] body[data-theme="dark"] :is(.edit-tile.selected,.edit-save,.chat-tab-btn.active,.dialog-btn.primary,.hero-cta,.footer-cta,.next-slot-cta,.map-route-btn){color:#06182e;box-shadow:none}
-html[data-palette="fog"] body[data-theme="light"] :is(.edit-save,.chat-tab-btn.active,.dialog-btn.primary){box-shadow:0 4px 12px rgba(37,99,235,.25)}
+
 html[data-palette="fog"] body[data-theme] .dialog-btn.primary::before{display:none}
 /* календар: недоступні дні й «зайняті» читаються (раніше ~1.6:1 і прозорість .75) */
 html[data-palette="fog"] body[data-theme] .cal-day.disabled{color:var(--faint);font-weight:500}
 html[data-palette="fog"] body[data-theme] .cal-day.day-full{opacity:1}
-html[data-palette="fog"] body[data-theme="light"] .cal-day.today:not(.selected){color:#92400e !important}
-/* слоти у світлому режимі: підписи темні, не білі/світло-зелені на світлому тлі */
-html[data-palette="fog"] body[data-theme="light"] :is(.slot.my-queue,.slot.my-booked){color:var(--text)}
-html[data-palette="fog"] body[data-theme="light"] .slot:not(.selected) :is(.slot-dur,.slot-mine){color:#166534}
-html[data-palette="fog"] body[data-theme="light"] .slot:not(.selected) .slot-sur{color:#92400e}
-html[data-palette="fog"] body[data-theme="light"] :is(.nl-title,.nl-pill){color:#1e40af}
+
+
 /* неактивна головна кнопка: читабельний підпис замість білого на ледь помітному градієнті */
 html[data-palette="fog"] body[data-theme] :is(.btn-primary,.btn-login):disabled{background:var(--surf-lo);color:var(--faint);opacity:1;border:1px solid var(--border);box-shadow:none}
-/* світла тема: білий «блік» поверх підписів головних кнопок знижував контраст */
-html[data-palette="fog"] body[data-theme="light"] :is(.hero-cta,.footer-cta,.next-slot-cta,.map-route-btn,.btn-login)::after{display:none}
+
 html[data-palette="fog"] body[data-theme="dark"] .booking-time{color:var(--acc-hi)}
 
 /* Локалізація: довгі підписи нижньої навігації (de/fr/pl) не вилазять за кнопку */

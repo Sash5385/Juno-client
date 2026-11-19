@@ -41,6 +41,58 @@ for (const tab of TABS[kind]) {
   check(`tab «${tab}» fits 320px`, await noOverflow());
 }
 
+if (kind === "client") {
+  const nav = (t) => page.locator(".botnav-btn", { hasText: t }).first();
+  // (1) верхня панель: без перемикача теми; (5) усі круглі кнопки ≥ 32px
+  check("top bar has no theme toggle", (await page.locator('button[aria-label="Тема"]').count()) === 0);
+  const sizes = await page.$$eval(".cab-icon-btn", (els) => els.map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.width), Math.round(r.height)]; }));
+  check("top bar .cab-icon-btn all >= 32px", sizes.length > 0 && sizes.every(([w, h]) => w >= 32 && h >= 32), JSON.stringify(sizes));
+
+  // (2) Профіль → «Оформлення»: рівно 3 палітри, клік по «Неон-ніч» ставить data-palette="neon"
+  await page.locator('button[aria-label="Профіль"]').first().click();
+  await page.waitForTimeout(700);
+  const tiles = page.locator(".profile-section", { hasText: "Оформлення" }).first().locator(".edit-tiles").first().locator(".edit-tile");
+  const names = (await tiles.allInnerTexts()).map((t) => t.trim());
+  check("profile: 3 palette tiles", names.length === 3 && ["Стандартна", "Неон-ніч", "Океан"].every((n, i) => names[i] === n), JSON.stringify(names));
+  if (names.length === 3) {
+    await tiles.nth(1).click();
+    await page.waitForTimeout(300);
+    check('palette click sets html[data-palette="neon"]', (await page.evaluate(() => document.documentElement.dataset.palette)) === "neon");
+  }
+
+  // (3) Записатись: перший доступний день; «Зайняті (N)» розкриває додаткові слоти
+  await page.locator(".botnav-fab").click();
+  await page.waitForTimeout(700);
+  const day = page.locator("button.cal-day:not([disabled])").first();
+  const hasDay = (await day.count()) > 0;
+  check("book: has an enabled day", hasDay);
+  if (hasDay) {
+    await day.click();
+    await page.waitForTimeout(900);
+    const busy = page.locator("button", { hasText: /^\s*Зайняті \(\d+\)/ }).first();
+    if ((await busy.count()) > 0) {
+      const before = await page.locator(".slot").count();
+      await busy.click();
+      await page.waitForTimeout(400);
+      const after = await page.locator(".slot").count();
+      check("book: «Зайняті» reveals more slots", after > before, `${before} -> ${after}`);
+      check("book: button becomes «Сховати зайняті»", (await page.locator("button", { hasText: "Сховати зайняті" }).count()) > 0);
+    } else console.log("skip «Зайняті» (no busy slots on first day)");
+  }
+
+  // (4) Записи: «Додати в календар» → Google Calendar
+  await nav("Записи").click();
+  await page.waitForTimeout(700);
+  const add = page.locator("button.cal-add-btn", { hasText: "Додати в календар" });
+  const nAdd = await add.count();
+  check("bookings: «Додати в календар» shown", nAdd > 0);
+  if (nAdd > 0) {
+    await add.first().click();
+    await page.waitForTimeout(300);
+    check("bookings: click reveals Google Calendar", (await page.locator("a.cal-add-btn", { hasText: "Google Calendar" }).count()) > 0);
+  }
+}
+
 check("no JS errors", errors.length === 0, "\n    " + errors.join("\n    "));
 await browser.close();
 console.log(fails ? `\n${fails} FAILED` : "\nSMOKE OK");

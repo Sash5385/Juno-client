@@ -50,12 +50,4 @@
 /* ─── INTERNAL EXAM ────────────────────────────────────────────── */
 
 /* ─── LIGHT THEME ──────────────────────────────────────────────── */
-[data-theme="light"] .progress-hero {
-  background: var(--surface);
-  border-color: var(--border);
-}
 
-[data-theme="light"] .stat-btn {
-  background: var(--surface);
-  border-color: var(--border);
-}

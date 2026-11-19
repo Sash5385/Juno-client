@@ -70,9 +70,6 @@
   color: rgba(255,255,255,0.65);
 }
 
-[data-theme="light"] .notif-text { color: var(--dim); }
-[data-theme="light"] .notif-time { color: var(--dim); }
-
 /* ─── TOOLBAR ──────────────────────────────────────────────────── */
 .notif-toolbar {
   display: flex;
@@ -114,10 +111,5 @@
 .notif-dismiss:hover { opacity: 0.9; }
 
 /* ─── LIGHT THEME ──────────────────────────────────────────────── */
-[data-theme="light"] .notif-card {
-  background: var(--surface);
-  border-color: var(--border);
-  box-shadow: var(--shadow);
-}
 
 /* ─── «Метал + глянець» іконка типу події ─────────────────────── */

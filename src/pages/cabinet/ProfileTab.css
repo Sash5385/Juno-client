@@ -301,23 +301,6 @@
 .contact-btn--wa    { background: #25d366; box-shadow: 0 3px 10px rgba(37,211,102,0.4); }
 
 /* ─── LIGHT THEME ──────────────────────────────────────────────── */
-[data-theme="light"] .profile-banner {
-  background: var(--surface);
-  border-color: var(--border);
-}
-
-[data-theme="light"] .profile-section {
-  background: var(--surface);
-  border-color: var(--border);
-}
-
-[data-theme="light"] .contact-link {
-  background: var(--surf-lo);
-}
-
-[data-theme="light"] .contact-phone-block {
-  background: var(--surf-lo);
-}
 
 /* Фото профілю: тап по аватару — вибір фото */
 .profile-avatar--edit { cursor: pointer; overflow: visible; }
