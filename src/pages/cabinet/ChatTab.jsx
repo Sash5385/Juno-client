@@ -75,7 +75,7 @@ function DirectChat({ user, profile, mid, title }) {
     <div className="chat-inner fade-up">
       {ToastEl}
       <div className="chat-header">
-        <div className="chat-instructor-avatar">{salonOn ? <MetalIcon name="user" size={34}/> : <MetalIcon name="car" size={34}/>}</div>
+        <div className="chat-instructor-avatar">{salonOn ? <MetalIcon name="user" size={34}/> : <MetalIcon name="user" size={34}/>}</div>
         <div className="chat-instructor-info">
           <div className="chat-instructor-name">{title || (salonOn ? "Салон" : "Майстер")}</div>
           <div className="chat-instructor-status">Відповідає протягом дня</div>
@@ -113,7 +113,7 @@ function DirectChat({ user, profile, mid, title }) {
           const isBroadcast = m.broadcast
           return (
             <div key={m.id} className={`chat-msg-row ${isMe ? 'out' : 'in'}`}>
-              {!isMe && <div className="chat-msg-avatar instructor">{salonOn ? <MetalIcon name="user" size={22}/> : <MetalIcon name="car" size={22}/>}</div>}
+              {!isMe && <div className="chat-msg-avatar instructor">{salonOn ? <MetalIcon name="user" size={22}/> : <MetalIcon name="user" size={22}/>}</div>}
               <div className={`chat-bubble ${isMe ? 'bubble-out' : isBroadcast ? 'bubble-broadcast' : 'bubble-in'}`}>
                 {isBroadcast && <div className="bubble-broadcast-label"><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="mega" size={16}/>Оголошення</span></div>}
                 {/* ім'я майстра салону, якщо написав він, а не власник */}

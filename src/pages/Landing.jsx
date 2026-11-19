@@ -262,7 +262,7 @@ export default function Landing({ user, profile }) {
           <div className="pricing-bubbles">
             {schoolService && (
               <div className="pricing-bubble" style={{ '--c': colorOfService(schoolService.colorId) }}>
-                <div className="pricing-bubble-icon"><MetalIcon name="school" size={28}/></div>
+                <div className="pricing-bubble-icon"><MetalIcon name="calendar" size={28}/></div>
                 <div className="pricing-bubble-lbl">Стандарт</div>
                 <div className="pricing-bubble-num">{schoolService.price}<span>{`${curSym()}/год`}</span></div>
                 {schoolService2h && <div className="pricing-bubble-sub">2 год — <b>{money(schoolService2h.price)}</b></div>}
@@ -270,7 +270,7 @@ export default function Landing({ user, profile }) {
             )}
             {privateService && (
               <div className="pricing-bubble" style={{ '--c': colorOfService(privateService.colorId) }}>
-                <div className="pricing-bubble-icon"><MetalIcon name="car" size={28}/></div>
+                <div className="pricing-bubble-icon"><MetalIcon name="user" size={28}/></div>
                 <div className="pricing-bubble-lbl">Індивідуальні</div>
                 <div className="pricing-bubble-num">{privateService.price}<span>{`${curSym()}/год`}</span></div>
                 {privateService2h && <div className="pricing-bubble-sub">2 год — <b>{money(privateService2h.price)}</b></div>}
@@ -416,7 +416,7 @@ export default function Landing({ user, profile }) {
 
         {/* FOOTER */}
         <div className="footer">
-          <button className="footer-cta" onClick={goAuth}>{salonOn ? 'Записатись зараз' : <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="car" size={20}/>Записатись зараз</span>}</button>
+          <button className="footer-cta" onClick={goAuth}>{salonOn ? 'Записатись зараз' : <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="user" size={20}/>Записатись зараз</span>}</button>
           <div>© 2026 Juno.</div>
           <div className="devby">
             <small>Розробка та дизайн</small>

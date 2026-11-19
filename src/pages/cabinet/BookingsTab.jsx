@@ -403,7 +403,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {salonOn ? '' : (b.serviceType === 'school' ? <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="school" size={16}/></span> : <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="car" size={16}/></span>)}{b.serviceName}{nameHasDur(b.serviceName, b.durationHours) ? null : <>{' · '}{formatDurHours(b.durationHours || 1)}</>}{' '}
+            {salonOn ? '' : (b.serviceType === 'school' ? <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="calendar" size={16}/></span> : <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="user" size={16}/></span>)}{b.serviceName}{nameHasDur(b.serviceName, b.durationHours) ? null : <>{' · '}{formatDurHours(b.durationHours || 1)}</>}{' '}
             {masterOf(b) && (
               <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masterOf(b).name}</span>
             )}

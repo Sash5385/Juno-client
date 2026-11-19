@@ -833,7 +833,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
           <div className="banner-greet">Привіт,</div>
           <div className="banner-name">{profile?.name?.split(' ')[0] || 'Клієнт'}</div>
           <div className="banner-tag">
-            {salonOn ? (selectedService?.name || '') : (selectedService?.type === 'school' ? <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="school" size={16}/>Стандарт</span> : <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="car" size={16}/>Індивідуальний</span>)}
+            {salonOn ? (selectedService?.name || '') : (selectedService?.type === 'school' ? <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="calendar" size={16}/>Стандарт</span> : <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="user" size={16}/>Індивідуальний</span>)}
           </div>
         </div>
       </div>

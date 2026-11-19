@@ -82,7 +82,7 @@ export default function ProgressTab({ user, profile, bookingsData }) {
           border:'1px solid rgba(74,222,128,0.3)',
         }}>
           <div style={{display:'flex',alignItems:'center',gap:10}}>
-            <MetalIcon name="school" size={28}/>
+            <MetalIcon name="medal" size={28}/>
             <div style={{flex:1}}>
               <div style={{fontSize:11,color:'var(--ok)',fontWeight:700,textTransform:'uppercase',letterSpacing:1,marginBottom:3}}>Залишок записів</div>
               <div style={{fontSize:18,fontWeight:900,color:'var(--text)'}}>

@@ -294,7 +294,7 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
         )}
         {(profile.lessonBalance || 0) > 0 && (
           <div style={{textAlign:"center",fontSize:13,color:"var(--ok)",fontWeight:700,padding:"6px 0"}}>
-            <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="school" size={18}/>Залишок записів: {profile.lessonBalance}</span>
+            <span style={{display:'inline-flex',alignItems:'center',gap:7}}><MetalIcon name="ticket" size={18}/>Залишок записів: {profile.lessonBalance}</span>
           </div>
         )}
       </div>
