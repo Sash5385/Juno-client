@@ -6,13 +6,6 @@
   overflow-x: hidden;
 }
 
-.auth-header {
-  padding: 14px 0;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-}
-
 .back-btn {
   width: 40px;
   height: 40px;
@@ -112,22 +105,6 @@
   align-items: center;
   gap: 12px;
   margin-bottom: 18px;
-}
-
-.phone-flag {
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  background: linear-gradient(180deg, #005bbb 50%, #ffd500 50%);
-  display: flex;
-  align-items: flex-start; /* підпис лишається в синій половині — білий на жовтому не читався */
-  justify-content: center;
-  padding-top: 5px;
-  font-size: 12px;
-  font-weight: 900;
-  color: white;
-  flex-shrink: 0;
-  box-shadow: -2px 2px 6px rgba(0,0,0,0.3), inset 2px 2px 0 rgba(255,255,255,0.3);
 }
 
 .phone-code {
@@ -232,75 +209,6 @@
 }
 
 /* SURVEY */
-.choice-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 12px;
-  margin-bottom: 20px;
-}
-
-.tile-pick {
-  background: rgba(0,0,0,0.52);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 18px;
-  padding: 20px 14px;
-  box-shadow: var(--shadow);
-  text-align: center;
-  cursor: pointer;
-  border: 2px solid transparent;
-  transition: transform .15s, border-color .2s;
-}
-
-.tile-pick:active { transform: scale(0.97); }
-
-.tile-pick.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 3px rgba(255,90,60,0.2), var(--shadow);
-}
-
-.tile-pick .ico {
-  width: 56px;
-  height: 56px;
-  border-radius: 18px;
-  margin: 0 auto 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 28px;
-  color: white;
-  box-shadow: -2px 3px 8px rgba(0,0,0,0.3), inset 2px 2px 0 rgba(255,255,255,0.4);
-  position: relative;
-  overflow: hidden;
-}
-
-.tile-pick .ico::after {
-  content: '';
-  position: absolute;
-  top: -10%;
-  right: -10%;
-  width: 70%;
-  height: 60%;
-  background: radial-gradient(ellipse at top right, rgba(255,255,255,0.7), transparent 75%);
-}
-
-.tile-title { font-size: 15px; font-weight: 800; margin-bottom: 4px; }
-.tile-desc { font-size: 12px; color: var(--dim); line-height: 1.4; }
-
-.warning-card {
-  background: linear-gradient(135deg, rgba(247,201,72,0.15), rgba(247,201,72,0.05));
-  border: 1px solid rgba(247,201,72,0.3);
-  border-radius: 14px;
-  padding: 12px 14px;
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-  margin-bottom: 24px;
-}
-
-.warning-ico { color: var(--gold); font-size: 18px; flex-shrink: 0; }
-.warning-text { font-size: 12px; color: var(--text); line-height: 1.5; }
-.warning-text b { color: var(--gold); }
 
 .field { margin-bottom: 16px; }
 
@@ -333,94 +241,6 @@
   box-shadow: 0 0 0 3px rgba(255,90,60,0.15), var(--shadow-in);
 }
 
-.select-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  margin-bottom: 16px;
-}
-
-.select-item {
-  background: rgba(0,0,0,0.52);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 14px;
-  padding: 14px;
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  cursor: pointer;
-  border: 2px solid transparent;
-}
-
-.select-item.selected {
-  border-color: var(--accent);
-  box-shadow: 0 0 0 2px rgba(255,90,60,0.15), var(--shadow);
-}
-
-.select-radio {
-  width: 22px;
-  height: 22px;
-  border-radius: 50%;
-  background: var(--surf-lo);
-  box-shadow: var(--shadow-in);
-  flex-shrink: 0;
-  position: relative;
-}
-
-.select-item.selected .select-radio {
-  background: linear-gradient(165deg, var(--acc-hi), var(--accent));
-  box-shadow: 0 2px 6px rgba(255,90,60,0.4), inset 1px 1px 0 rgba(255,255,255,0.3);
-}
-
-.select-item.selected .select-radio::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  width: 8px;
-  height: 8px;
-  border-radius: 50%;
-  background: white;
-}
-
-.select-info { flex: 1; min-width: 0; }
-.select-title { font-size: 14px; font-weight: 700; }
-.select-sub { font-size: 12px; color: var(--dim); margin-top: 2px; }
-
-.toggle-row {
-  background: rgba(0,0,0,0.52);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
-  border-radius: 14px;
-  padding: 14px;
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-bottom: 16px;
-}
-
-.toggle-ico {
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  background: linear-gradient(165deg, #c084fc, #7c3aed);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
-  color: white;
-  flex-shrink: 0;
-  box-shadow: -2px 2px 6px rgba(0,0,0,0.3), inset 2px 2px 0 rgba(255,255,255,0.4);
-}
-
-.toggle-info { flex: 1; }
-.toggle-title { font-size: 13px; font-weight: 800; }
-.toggle-desc { font-size: 12px; color: var(--dim); margin-top: 2px; line-height: 1.4; }
-
 .switch {
   width: 46px;
   height: 26px;
@@ -436,20 +256,6 @@
 }
 
 .switch.on { background: linear-gradient(90deg, #34d399, #059669); }
-
-.switch-knob {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: white;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.4);
-  transition: left .2s;
-}
-
-.switch.on .switch-knob { left: 23px; }
 
 .terms-survey-btn {
   width: 100%;
@@ -528,7 +334,7 @@
     radial-gradient(30vmax 30vmax at 38% 104%, rgba(155,227,215,0.95), transparent 68%),
     #e9e4f5;
 }
-.phone-card, .text-input, .tile-pick, .select-item, .toggle-row, .terms-survey-btn, .warning-card, .code-cell {
+.phone-card, .text-input, .terms-survey-btn, .code-cell {
   background: rgba(255,255,255,0.07);
   border: 1px solid rgba(255,255,255,0.16);
   backdrop-filter: blur(18px);
@@ -538,9 +344,8 @@
 .text-input { border-width: 1px; }
 .text-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(255,90,60,0.18); }
 .code-cell.filled { background: linear-gradient(165deg, var(--acc-hi), var(--accent)); border-color: transparent; }
-.code-cell.active, .tile-pick.selected { border-color: var(--accent); }
-[data-theme="light"] .phone-card, [data-theme="light"] .text-input, [data-theme="light"] .tile-pick, [data-theme="light"] .select-item,
-[data-theme="light"] .toggle-row, [data-theme="light"] .terms-survey-btn, [data-theme="light"] .warning-card, [data-theme="light"] .code-cell {
+.code-cell.active { border-color: var(--accent); }
+[data-theme="light"] .phone-card, [data-theme="light"] .text-input, [data-theme="light"] .terms-survey-btn, [data-theme="light"] .code-cell {
   background: rgba(255,255,255,0.55);
   border-color: rgba(255,255,255,0.85);
 }

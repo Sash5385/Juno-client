@@ -37,24 +37,6 @@
 /* ─── ICON — colored per notification type so the type still reads at a glance ── */
 .notif-left { flex-shrink: 0; }
 
-.notif-icon-wrap {
-  width: 38px;
-  height: 38px;
-  border-radius: 11px;
-  background: rgba(0,0,0,0.25);
-  box-shadow: var(--shadow-in);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.notif-accent-green .notif-icon-wrap { background: rgba(126,217,87,0.16); }
-.notif-accent-red   .notif-icon-wrap { background: rgba(239,68,68,0.16); }
-.notif-accent-gold  .notif-icon-wrap { background: rgba(247,201,72,0.16); }
-.notif-accent-blue  .notif-icon-wrap { background: rgba(91,155,255,0.16); }
-
-.notif-icon { font-size: 18px; line-height: 1; }
-
 /* ─── BODY ─────────────────────────────────────────────────────── */
 .notif-body { flex: 1; min-width: 0; }
 
@@ -138,14 +120,4 @@
   box-shadow: var(--shadow);
 }
 
-[data-theme="light"] .notif-icon-wrap { background: var(--surf-lo); box-shadow: var(--shadow-in); }
-
-[data-theme="light"] .notif-accent-green .notif-icon-wrap { background: rgba(90,184,58,0.12); }
-[data-theme="light"] .notif-accent-red   .notif-icon-wrap { background: rgba(220,38,38,0.10); }
-[data-theme="light"] .notif-accent-gold  .notif-icon-wrap { background: rgba(212,160,16,0.12); }
-[data-theme="light"] .notif-accent-blue  .notif-icon-wrap { background: rgba(37,99,235,0.10); }
-
 /* ─── «Метал + глянець» іконка типу події ─────────────────────── */
-.metal3d.notif-metal{width:38px;height:38px;border-radius:11px;display:flex;align-items:center;justify-content:center;position:relative;overflow:hidden;color:var(--ic,#2563eb);background:linear-gradient(145deg,#fbfcfe,#a3abba 45%,#eef1f6 55%,#7a8394);box-shadow:0 4px 9px rgba(0,0,0,.35),inset 0 1px 0 #fff,inset 0 -2px 4px rgba(0,0,0,.2)}
-.metal3d.notif-metal::before{content:'';position:absolute;left:6%;right:6%;top:4%;height:46%;border-radius:40% 40% 60% 60%/60% 60% 40% 40%;background:linear-gradient(180deg,rgba(255,255,255,.85),rgba(255,255,255,.05));pointer-events:none}
-.metal3d.notif-metal svg{position:relative;z-index:1;filter:drop-shadow(0 1px 0 rgba(255,255,255,.9)) drop-shadow(0 2px 2px rgba(0,0,0,.25))}

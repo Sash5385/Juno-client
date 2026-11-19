@@ -63,19 +63,6 @@ button { font-family: inherit; touch-action: manipulation; }
 @keyframes spin { to { transform: rotate(360deg); } }
 
 /* Common 3D shine */
-.shine-3d {
-  position: relative;
-  overflow: hidden;
-  box-shadow: -2px 3px 8px rgba(0,0,0,0.3), inset 2px 2px 0 rgba(255,255,255,0.4), inset -1px -1px 0 rgba(0,0,0,0.2);
-}
-.shine-3d::after {
-  content: '';
-  position: absolute;
-  top: -10%; right: -10%;
-  width: 70%; height: 60%;
-  background: radial-gradient(ellipse at top right, rgba(255,255,255,0.65), transparent 75%);
-  pointer-events: none;
-}
 
 /* Container */
 .container {
@@ -92,17 +79,6 @@ button { font-family: inherit; touch-action: manipulation; }
 .fade-up { animation: fade-up .25s ease both; }
 
 /* icon3d — як в адмінці */
-.icon3d {
-  display: inline-flex; align-items: center; justify-content: center;
-  border-radius: 14px; position: relative; overflow: hidden; flex-shrink: 0;
-  box-shadow: -2px 4px 10px rgba(0,0,0,0.5), inset 1px 1px 0 rgba(255,255,255,0.25), inset -1px -1px 0 rgba(0,0,0,0.3);
-}
-.icon3d::before {
-  content: ''; position: absolute; top: 0; right: 0;
-  width: 60%; height: 50%;
-  background: radial-gradient(ellipse at top right, rgba(255,255,255,0.4) 0%, transparent 70%);
-  pointer-events: none;
-}
 
 /* Buttons */
 .btn-primary {

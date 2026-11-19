@@ -88,11 +88,9 @@
 
 .bk-ico-school { background: linear-gradient(165deg, #5b9bff, #2563eb); }
 .bk-ico-private { background: linear-gradient(165deg, #c084fc, #7c3aed); }
-.bk-ico-locked { background: linear-gradient(135deg, #4a4d54, #2e3034); }
 
 .svc-title { font-size: 13px; font-weight: 800; margin-bottom: 3px; }
 .svc-dur { font-size: 11px; color: var(--dim); }
-.svc-lock { font-size: 11px; color: var(--faint); margin-top: 4px; font-style: italic; }
 
 .dur-switch {
   display: grid;
