@@ -7,7 +7,7 @@ import './cabinet/BookTab.css'
 import { MetalIcon } from '../MetalIcon'
 
 export default function PublicSchedule({ onBook }) {
-  const { theme, toggle } = useTheme()
+  useTheme() // завжди темна тема; перемикача немає
   const navigate = useNavigate()
   const [serviceType, setServiceType] = useState('school')
   const [duration, setDuration] = useState(1)
@@ -126,15 +126,6 @@ export default function PublicSchedule({ onBook }) {
               <polyline points="23 4 23 10 17 10"/>
               <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
             </svg>
-          </button>
-          <button
-            onClick={toggle}
-            aria-label="Тема"
-            style={{ width:34, height:34, borderRadius:10, background:'var(--surface)', border:'none',
-              cursor:'pointer', color:'var(--text)', fontSize:16, display:'flex', alignItems:'center', justifyContent:'center',
-              boxShadow:'var(--shadow)' }}
-          >
-            {theme==='dark' ? <MetalIcon name="moon" size={22}/> : <MetalIcon name="sun" size={22}/>}
           </button>
           <button
             onClick={() => navigate('/auth')}

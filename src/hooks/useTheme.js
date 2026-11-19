@@ -2,11 +2,9 @@ import { useEffect, useState } from 'react'
 
 // Палітри оформлення (styles/palettes.css). Режим (темний/світлий) — окремо, кнопка в шапці.
 export const PALETTES = [
-  { id: 'fog',   name: 'Туман',    colors: ['#60a5fa', '#818cf8', '#93c5fd'], bg: { dark: '#10141c', light: '#e9eef8' } },
+  { id: 'fog',   name: 'Стандартна',    colors: ['#60a5fa', '#818cf8', '#93c5fd'], bg: { dark: '#10141c', light: '#e9eef8' } },
   { id: 'neon',  name: 'Неон-ніч', colors: ['#ff3d9a', '#22d3ee', '#8b5cf6'], bg: { dark: '#0a0614', light: '#f6f0ff' } },
   { id: 'ocean', name: 'Океан',    colors: ['#14b8a6', '#0ea5e9', '#6366f1'], bg: { dark: '#04121c', light: '#eaf6fb' } },
-  // Початкове оформлення: без перекриттів, діють базові стилі (tokens.css) і скляні кнопки шапки
-  { id: 'classic', name: 'Класична', colors: ['#ff5a3c', '#7ed957', '#5b9bff'], bg: { dark: '#1c1d21', light: '#f0f1f5' } },
 ]
 const DEFAULT_PALETTE = 'fog'
 const PALETTE_EVENT = 'dp-palette'
@@ -40,9 +38,7 @@ function readPalette() {
 
 export function useTheme() {
   const [theme, setTheme] = useState(() => {
-    const saved = localStorage.getItem('theme')
-    if (saved === 'dark' || saved === 'light') return saved
-    return 'dark'
+    return 'dark' // світлу тему вимкнено: застосунок завжди темний
   })
   const [palette, setPaletteState] = useState(readPalette)
   const [uiScale, setUiScaleState] = useState(readScale)
@@ -73,7 +69,7 @@ export function useTheme() {
     try { localStorage.setItem('theme', theme); localStorage.setItem('palette', palette) } catch { /* сховище недоступне */ }
   }, [theme, palette])
 
-  const toggle = () => setTheme(t => t === 'dark' ? 'light' : 'dark')
+  const toggle = () => {} // перемикача теми немає (завжди темна)
   const setPalette = (id) => {
     if (!PALETTES.some(x => x.id === id)) return
     setPaletteState(id)

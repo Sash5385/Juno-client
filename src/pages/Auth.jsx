@@ -48,7 +48,7 @@ const TERMS_TEXT = `Умови відвідування записів
 Запис означає повну згоду з даними умовами.`
 
 export default function Auth({ user, profile, onProfileSaved }) {
-  const { theme, toggle } = useTheme()
+  useTheme() // завжди темна тема; перемикача немає
   const { showToast, ToastEl } = useToast()
   const nav = useNavigate()
   const loc = useLocation()
@@ -432,9 +432,6 @@ export default function Auth({ user, profile, onProfileSaved }) {
               <polyline points="23 4 23 10 17 10"/>
               <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
             </svg>
-          </button>
-          <button className="back-btn" aria-label="Тема" onClick={toggle} style={{border:'none',cursor:'pointer',fontSize:16}}>
-            {theme==='dark'?<MetalIcon name="moon" size={22}/>:<MetalIcon name="sun" size={22}/>}
           </button>
         </div>
       </div>

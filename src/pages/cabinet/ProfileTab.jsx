@@ -316,9 +316,6 @@ export default function ProfileTab({ user, profile, onProfileUpdate }) {
             </button>
           ))}
         </div>
-        <Hint style={{marginTop:8}}>
-          Темний або світлий режим перемикає кнопка в шапці.
-        </Hint>
         <div className="section-title" style={{marginTop:16}}><span style={{display:'inline-flex',alignItems:'center',gap:8}}><MetalIcon name="zoom" size={28}/>Розмір інтерфейсу</span></div>
         <div className="edit-tiles">
           {UI_SCALES.map(sc => (

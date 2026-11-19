@@ -102,7 +102,7 @@ function PhotoCollageSlot({ photos, phase, className }) {
 }
 
 export default function Landing({ user, profile }) {
-  const { theme, toggle } = useTheme()
+  useTheme() // завжди темна тема; перемикача немає
   const nav = useNavigate()
   const [termsOpen, setTermsOpen] = useState(false)
   const [aboutOpen, setAboutOpen] = useState(false)
