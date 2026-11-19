@@ -547,3 +547,12 @@
 .back-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.18); box-shadow: none; }
 .auth-logo-icon { box-shadow: 0 8px 26px rgba(0,0,0,0.45), 0 0 0 4px rgba(255,255,255,0.1); }
 .auth-page { width: 100%; box-sizing: border-box; min-width: 0; }
+
+/* Метал + глянець: круглі кнопки назад/вперед/оновити (як .cab-icon-btn у кабінеті) */
+html body .back-btn.back-btn--metal {
+  border-radius: 50%; border: 0; color: #475569;
+  background: linear-gradient(145deg,#fbfcfe,#a3abba 45%,#eef1f6 55%,#7a8394);
+  box-shadow: 0 2px 5px rgba(0,0,0,0.4), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(0,0,0,0.2);
+  backdrop-filter: none; -webkit-backdrop-filter: none;
+}
+html body .back-btn.back-btn--metal:active { filter: brightness(0.95); box-shadow: 0 2px 5px rgba(0,0,0,0.4), inset 0 1px 0 #fff, inset 0 -2px 3px rgba(0,0,0,0.2); }

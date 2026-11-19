@@ -94,12 +94,7 @@ function DirectChat({ user, profile, mid, title }) {
             </div>
           ) : (
             <button className="chat-clear-btn" onClick={handleClear} aria-label="Очистити чат">
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <polyline points="3 6 5 6 21 6"/>
-                <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
-                <path d="M10 11v6M14 11v6"/>
-                <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
-              </svg>
+              <MetalIcon name="trash" size={32}/>
             </button>
           )
         )}
@@ -127,7 +122,7 @@ function DirectChat({ user, profile, mid, title }) {
                 <div className="bubble-time">
                     {m.editedAt ? `ред. ${fmtTime(m.editedAt)} · ` : ''}{m.time}
                     {isMe && !m.broadcast && Date.now() - (m.ts || 0) < EDIT_WINDOW && (
-                      <button className="bubble-edit" onClick={() => startEdit(m)} aria-label="Редагувати">✎</button>
+                      <button className="bubble-edit" onClick={() => startEdit(m)} aria-label="Редагувати"><MetalIcon name="edit" size={14} color="currentColor"/></button>
                     )}
                   </div>
               </div>
@@ -142,7 +137,7 @@ function DirectChat({ user, profile, mid, title }) {
         <div style={{display:'flex',gap:5,padding:'0 0 7px',overflowX:'auto',scrollbarWidth:'none'}}>
           {['Підтверджую ✅','Скасовую ❌','Запізнюся ⏱','Дякую! 🙏','Коли наступний запис?'].map(q => (
             <button key={q} onClick={() => setText(q)} style={{
-              flexShrink:0,fontSize:11,padding:'5px 11px',borderRadius:20,
+              flexShrink:0,fontSize:11,padding:'5px 11px',minHeight:32,borderRadius:20,
               border:'1px solid var(--field-bd)',background:'var(--field-bg)',
               color:'var(--dim)',cursor:'pointer',fontFamily:'inherit',whiteSpace:'nowrap',
             }}>{q}</button>
@@ -150,7 +145,7 @@ function DirectChat({ user, profile, mid, title }) {
         </div>
         {editing && (
           <div className="chat-edit-bar">
-            <span>✎ Редагування повідомлення</span>
+            <span style={{display:'inline-flex',alignItems:'center',gap:6}}><MetalIcon name="edit" size={16}/>Редагування повідомлення</span>
             <button onClick={cancelEdit} aria-label="Скасувати">✕</button>
           </div>
         )}

@@ -15,8 +15,8 @@
   display: flex;
   flex-direction: column;
   padding: 0 16px;
-  /* Нижня навігація ≈60px + кругла кнопка «Записатись» виступає ще на 24px: з запасом, щоб останній елемент не ховався під нею */
-  padding-bottom: calc(100px + 2 * env(safe-area-inset-bottom));
+  /* Нижня навігація ≈80px + кругла кнопка «Записатись» виступає ще на 24px + safe-area; ділимо на zoom, бо zoom масштабує й відступ (панель — ні) */
+  padding-bottom: calc((120px + env(safe-area-inset-bottom)) / var(--ui-zoom, 1));
   zoom: var(--ui-zoom, 1);
 }
 
@@ -81,7 +81,7 @@
 }
 
 .cab-icon-btn {
-  width: 28px; height: 28px; border-radius: 9px;
+  width: 32px; height: 32px; border-radius: 9px;
   background: rgba(0,0,0,0.52);
   backdrop-filter: blur(12px);
   -webkit-backdrop-filter: blur(12px);
@@ -232,8 +232,7 @@
   .book-cols { display: grid; grid-template-columns: minmax(360px, 1fr) minmax(360px, 1fr); gap: 28px; align-items: start; }
 }
 
-/* Більша зона дотику, де вміщається (на 320px — 8 іконок по 28px) */
-@media (min-width: 360px) { .cab-icon-btn { width: 32px; height: 32px; } }
+/* Зона дотику ≥32px на всіх ширинах */
 
 /* ─── Нижнє меню: круглі іконки «метал + глянець» (у всіх палітрах) ─── */
 .botnav-ico.botnav-metal{

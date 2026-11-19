@@ -105,13 +105,14 @@
 .booking-cal-row .cal-add-btn { flex: 1 1 0; min-width: 0; text-align: center; }
 
 .cal-add-btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
   font-size: 12px;
   font-weight: 700;
   padding: 8px 8px;
   border-radius: 7px;
   border: 1px solid rgba(255,255,255,0.12);
   background: rgba(255,255,255,0.06);
-  color: var(--dim);
+  color: var(--text);
   cursor: pointer;
   text-decoration: none;
   line-height: 1.4;
@@ -126,7 +127,7 @@
 [data-theme="light"] .cal-add-btn {
   border-color: var(--border);
   background: var(--surf-lo);
-  color: var(--dim);
+  color: var(--text);
 }
 
 .action-btn {
@@ -140,6 +141,15 @@
   color: var(--text);
   font-size: 14px;
 }
+
+/* Круглі металеві кнопки дій (перенести / скасувати): іконка MetalIcon 32px сама є кнопкою */
+.action-btn.action-btn--metal {
+  width: 32px; height: 32px; padding: 0; border-radius: 50%;
+  background: transparent; box-shadow: none;
+  display: inline-flex; align-items: center; justify-content: center;
+}
+[data-theme="light"] .action-btn.action-btn--metal { background: transparent; }
+.action-btn.action-btn--metal:active { filter: brightness(0.92); transform: scale(0.94); }
 
 /* ─── LIGHT THEME ──────────────────────────────────────────────── */
 [data-theme="light"] .booking-card {

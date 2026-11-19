@@ -814,10 +814,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
     return (
       <div className="slot-queue">
         {Array.from({length: max}).map((_, i) => (
-          <svg key={i} viewBox="0 0 24 24" fill="currentColor">
-            <circle cx="12" cy="7" r="4"/>
-            <path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>
-          </svg>
+          <MetalIcon key={i} name="user" size={10} color="currentColor"/>
         ))}
         {n > 3 && <span className="slot-queue-num">+{n - 3}</span>}
       </div>
@@ -992,9 +989,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                     onClick={() => setSelectedService(svc)}
                   >
                     {isSelected && (
-                      <svg style={{position:'absolute', top:8, right:8}} width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={svcColor} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                        <polyline points="20 6 9 17 4 12"/>
-                      </svg>
+                      <MetalIcon name="check" size={14} color={svcColor} style={{position:'absolute', top:8, right:8}}/>
                     )}
                     <div style={{width:10, height:10, borderRadius:'50%', background:svcColor, margin:'0 auto 6px'}}></div>
                     <div className="svc-title">{stripDurationSuffix(svc.name)}</div>
@@ -1084,7 +1079,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                           <div className="slot-sur" style={{fontSize:11, fontWeight:700}}>{money(slot.totalPrice)}</div>
                         ) : isMyQueue ? (
                           <div className="slot-queue">
-                            <svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                            <MetalIcon name="user" size={10} color="currentColor"/>
                             <span className="slot-queue-num">ти {q.position}-й</span>
                           </div>
                         ) : q?.count > 0 ? (
@@ -1124,7 +1119,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 <div className="leg-item"><div className="leg-dot free"></div> Вільно</div>
                 <div className="leg-item"><div className="leg-dot taken"></div> Зайнято</div>
                 <div className="leg-item">
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="#f7c948"><circle cx="12" cy="7" r="4"/><path d="M4 21c0-4 4-6 8-6s8 2 8 6"/></svg>
+                  <MetalIcon name="user" size={12} color="#f7c948"/>
                   в черзі
                 </div>
               </div>
@@ -1292,14 +1287,9 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
                 : 'linear-gradient(165deg, #fcd34d, #d97706)'
             }}>
               {successData.type === 'booking' ? (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
-                  <polyline points="20 6 9 17 4 12"/>
-                </svg>
+                <MetalIcon name="check" size={28}/>
               ) : (
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="white">
-                  <circle cx="12" cy="7" r="4"/>
-                  <path d="M4 21c0-4 4-6 8-6s8 2 8 6"/>
-                </svg>
+                <MetalIcon name="user" size={28}/>
               )}
             </div>
             <div className="dialog-title">

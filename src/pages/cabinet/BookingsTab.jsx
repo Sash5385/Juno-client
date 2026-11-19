@@ -450,7 +450,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                   aria-label={`Оцінка ${star} з 5`}
                   onClick={() => rateBooking(user.uid, b.id, star).catch(()=>{})}
                   style={{
-                    fontSize:22, cursor:'pointer', lineHeight:1, padding:'4px 2px',
+                    fontSize:22, cursor:'pointer', lineHeight:1, padding:'4px 2px', minWidth:32, minHeight:32, display:'inline-flex', alignItems:'center', justifyContent:'center', boxSizing:'border-box',
                     color: (b.rating || 0) >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)',
                     transition:'color 0.15s',
                   }}
@@ -466,7 +466,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 {masterName && <div style={{fontSize:11,color:'var(--dim)',marginBottom:4}}>{`Відгук для майстра: ${masterName}`}</div>}
                 <div style={{display:'flex',gap:2,marginBottom:6}}>
                   {[1,2,3,4,5].map(star => (
-                    <span key={star} role="button" aria-label={`Оцінка ${star} з 5`} onClick={() => setReviewDraft(d => ({ ...d, rating: star }))} style={{fontSize:26,cursor:'pointer',lineHeight:1,padding:'2px',color: reviewDraft.rating >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)'}}>★</span>
+                    <span key={star} role="button" aria-label={`Оцінка ${star} з 5`} onClick={() => setReviewDraft(d => ({ ...d, rating: star }))} style={{fontSize:26,cursor:'pointer',lineHeight:1,padding:'2px',minWidth:32,minHeight:32,display:'inline-flex',alignItems:'center',justifyContent:'center',color: reviewDraft.rating >= star ? '#fbbf24' : 'rgba(127,127,127,0.35)'}}>★</span>
                   ))}
                 </div>
                 <textarea value={reviewDraft.text} maxLength={1000} rows={3} placeholder="Що сподобалось? (необов'язково)"
@@ -508,10 +508,10 @@ export default function BookingsTab({ user, profile, bookingsData }) {
           {!isPast && b.status !== 'cancelled' && (
             <div className="booking-cal-row">
               <a href={googleCalendarLink(b)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">
-                Google Calendar
+                <MetalIcon name="calendar" size={18}/>Google Calendar
               </a>
               <button className="cal-add-btn" onClick={() => downloadICS(b)}>
-                Apple Calendar
+                <MetalIcon name="apple" size={18}/>Apple Calendar
               </button>
             </div>
           )}
@@ -528,12 +528,12 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                     style={{width:'100%',padding:'8px 10px',borderRadius:10,border:'1px solid rgba(99,211,120,0.25)',background:'rgba(99,211,120,0.05)',color:'var(--text)',fontSize:12,fontFamily:'inherit',resize:'none',boxSizing:'border-box',outline:'none',marginBottom:5}}
                   />
                   <div style={{display:'flex',gap:6}}>
-                    <button onClick={()=>{saveStudentNote(user.uid,b.id,noteDraft.trim()).catch(()=>{});setNoteOpenId(null);}} style={{flex:1,padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'rgba(99,211,120,0.15)',color:'#63d37b',fontSize:12,fontWeight:700,fontFamily:'inherit'}}>Зберегти</button>
-                    <button aria-label="Закрити" onClick={()=>setNoteOpenId(null)} style={{padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'var(--field-bg)',color:'var(--dim)',fontSize:12,fontFamily:'inherit'}}>✕</button>
+                    <button onClick={()=>{saveStudentNote(user.uid,b.id,noteDraft.trim()).catch(()=>{});setNoteOpenId(null);}} style={{flex:1,minHeight:32,padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'rgba(99,211,120,0.15)',color:'#63d37b',fontSize:12,fontWeight:700,fontFamily:'inherit'}}>Зберегти</button>
+                    <button aria-label="Закрити" onClick={()=>setNoteOpenId(null)} style={{minHeight:32,minWidth:32,padding:'5px 10px',borderRadius:10,border:'none',cursor:'pointer',background:'var(--field-bg)',color:'var(--dim)',fontSize:12,fontFamily:'inherit'}}>✕</button>
                   </div>
                 </div>
               ) : (
-                <button onClick={()=>{setNoteOpenId(b.id);setNoteDraft(b.studentNote||'');}} style={{fontSize:11,padding:'3px 10px',borderRadius:9,border:'1px dashed rgba(99,211,120,0.25)',background:'none',color:'var(--dim)',cursor:'pointer',fontFamily:'inherit'}}>
+                <button onClick={()=>{setNoteOpenId(b.id);setNoteDraft(b.studentNote||'');}} style={{fontSize:11,minHeight:32,padding:'3px 10px',borderRadius:9,border:'1px dashed rgba(99,211,120,0.25)',background:'none',color:'var(--dim)',cursor:'pointer',fontFamily:'inherit'}}>
                   <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="chat" size={16}/>{b.studentNote ? b.studentNote : 'Нотатка майстру'}</span>
                 </button>
               )}
@@ -542,7 +542,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            {!licenseReadOnly && !b.groupKey && <button className="action-btn" title="Перенести" aria-label="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}><MetalIcon name="calendar" size={20}/></button>}
+            {!licenseReadOnly && !b.groupKey && <button className="action-btn action-btn--metal" title="Перенести" aria-label="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}><MetalIcon name="calendar" size={32}/></button>}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: 'var(--bad)', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
@@ -550,12 +550,13 @@ export default function BookingsTab({ user, profile, bookingsData }) {
               </>
             ) : (
               <button
-                className="action-btn"
+                className="action-btn action-btn--metal"
+                aria-label="Скасувати"
                 title={cancelLocked ? `Скасування доступне не пізніше ніж за ${cancelCutoff} год` : 'Скасувати'}
                 onClick={() => handleCancel(b)}
                 disabled={cancelLocked}
                 style={cancelLocked ? { opacity: 0.4 } : {}}
-              >✕</button>
+              ><MetalIcon name="cross" size={32}/></button>
             )}
           </div>
         )}
@@ -603,8 +604,8 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 <div style={{fontSize:14,fontWeight:700,color:'var(--text)',margin:'4px 0 2px'}}>{d.getDate()} {getMonthShort(d.getMonth())}{next.serviceName ? ` · ${next.serviceName}` : ''}</div>
                 <div style={{fontSize:12,color:'var(--dim)',marginBottom:12}}>{formatDurHours(next.durationHours || 1)}{normAddons(next.addons).length > 0 ? ` · +${addonsLabel(normAddons(next.addons))}` : ''}</div>
                 <div className="booking-cal-row">
-                  <a href={googleCalendarLink(next)} target="_blank" rel="noopener noreferrer" className="cal-add-btn">Google Calendar</a>
-                  <button className="cal-add-btn" onClick={() => downloadICS(next)}>Apple Calendar</button>
+                  <a href={googleCalendarLink(next)} target="_blank" rel="noopener noreferrer" className="cal-add-btn"><MetalIcon name="calendar" size={18}/>Google Calendar</a>
+                  <button className="cal-add-btn" onClick={() => downloadICS(next)}><MetalIcon name="apple" size={18}/>Apple Calendar</button>
                 </div>
               </div>
             )

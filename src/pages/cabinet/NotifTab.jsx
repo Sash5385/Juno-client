@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react'
+import { MetalIcon } from '../../MetalIcon'
 import { subscribeNotifications, clearNotification, clearAllNotifications } from '../../firebase/db'
 import './NotifTab.css'
 
@@ -63,7 +64,7 @@ export default function NotifTab({ user, onSeen }) {
     <div className="notif-tab fade-up">
       {notifications.length === 0 && (
         <div className="notif-empty">
-          <div className="notif-empty-icon">🔔</div>
+          <div className="notif-empty-icon"><MetalIcon name="bell" size={56}/></div>
           <div className="notif-empty-title">Немає сповіщень</div>
           <div className="notif-empty-sub">Тут з'являться сповіщення про записи</div>
         </div>

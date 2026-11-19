@@ -111,7 +111,7 @@ export default function PublicSchedule({ onBook }) {
           </button>
           <div style={{ minWidth:0 }}>
             <div style={{ fontWeight:900, fontSize:18, color:'var(--text)', lineHeight:1.1, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>Juno</div>
-            <div style={{ fontSize:10, color:'var(--dim)', marginTop:1 }}>Онлайн-запис</div>
+            <div style={{ fontSize:11, color:'var(--dim)', marginTop:1 }}>Онлайн-запис</div>
           </div>
         </div>
         <div style={{ display:'flex', gap:6, alignItems:'center', flexShrink:0 }}>
@@ -235,7 +235,7 @@ export default function PublicSchedule({ onBook }) {
                       title={slot.lunchBlocked ? 'Обідня перерва' : slot.overlapBlocked ? 'Перетин з іншим записом' : undefined}
                     >
                       <div className="slot-time">{slot.time}</div>
-                      {slot.lunchBlocked && <div style={{fontSize:8, opacity:0.5}}>обід</div>}
+                      {slot.lunchBlocked && <div style={{fontSize:11, opacity:0.5}}>обід</div>}
                     </button>
                   )
                 })}
