@@ -157,6 +157,7 @@ function DirectChat({ user, profile, mid, title }) {
             onChange={e => setText(e.target.value)}
             onKeyDown={handleKey}
             placeholder="Напишіть повідомлення…"
+            maxLength={4000}
             rows={1}
           />
           <button
