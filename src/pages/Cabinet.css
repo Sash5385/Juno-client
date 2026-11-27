@@ -61,8 +61,10 @@
 /* Назва не ламає шапку на вузьких екранах (320px): обрізається, а кнопки не стискаються */
 .cab-title { font-size: 13px; font-weight: 800; letter-spacing: -0.3px; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; padding: 0 6px; }
 
-.cab-actions { display: flex; gap: 6px; align-items: center; flex-shrink: 0; }
-.cab-nav-group { display: flex; gap: 4px; flex-shrink: 0; }
+/* Шапка: зліва «головна» + профіль, по центру назва, справа сповіщення; бічні групи однакової ширини — назва рівно по центру */
+.cab-actions { display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-shrink: 0; min-width: 80px; }
+.cab-nav-group { display: flex; gap: 6px; flex-shrink: 0; min-width: 80px; }
+.cab-title { flex: 1; text-align: center; }
 
 /* Вузькі екрани: 8 кнопок шапки забирають майже всю ширину — стискаємо проміжки й кегль, щоб назва вкладки читалась, а не «З…» */
 @media (max-width: 420px) {
@@ -72,7 +74,7 @@
   .cab-title { font-size: 12px; padding: 0 4px; }
 }
 /* ≤359px (320): для назви взагалі немає місця — ховаємо її замість обрізання до «…» (активна вкладка видна в навігації) */
-@media (max-width: 359px) {
+@media (max-width: 299px) {
   .cab-title { display: none; }
 }
 
@@ -183,6 +185,9 @@
   transition: transform .15s;
 }
 .botnav-fab:active { transform: scale(0.94); }
+/* Підпис під центральною кнопкою — на рівні підписів інших вкладок */
+.botnav-fab-lbl { position: absolute; bottom: 9px; left: 0; right: 0; text-align: center; }
+.botnav-fab-lbl.on { color: var(--accent); }
 
 .botnav-fab-glow {
   position: absolute; inset: -14px; border-radius: 50%;

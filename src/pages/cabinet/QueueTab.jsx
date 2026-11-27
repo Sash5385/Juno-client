@@ -110,7 +110,7 @@ export default function QueueTab({ user, profile }) {
                   {formatSlotDate(slot.date)}
                 </div>
                 <div className="notif-time" style={{ fontSize:13, marginTop:2 }}>
-                  {slot.time}
+                  {`${slot.time}${(() => { try { const d = parseYMD(slot.date); const diff = Math.round((d.setHours(0,0,0,0) - new Date().setHours(0,0,0,0)) / 86400000); return diff <= 1 ? ` · ${formatDateLabel(parseYMD(slot.date))}` : '' } catch { return '' } })()}`}
                 </div>
               </div>
               {isOffered ? (
@@ -128,6 +128,11 @@ export default function QueueTab({ user, profile }) {
               )}
             </div>
 
+            {!isOffered && (
+              <div style={{ fontSize:12, color:'var(--dim)', lineHeight:1.45 }}>
+                Щойно місце звільниться — надішлемо сповіщення. На запис буде 30 хвилин.
+              </div>
+            )}
             {isOffered ? (
               <div style={{ display:'flex', gap:8 }}>
                 <button

@@ -2,8 +2,9 @@ import { useState, useEffect, useRef } from 'react'
 import { useLocation } from 'react-router-dom'
 import {
   subscribeStudentChat, sendStudentMessage, markDirectChatRead, clearStudentChat,
-  editStudentMessage,
+  editStudentMessage, iRef,
 } from '../../firebase/db'
+import { get } from 'firebase/database'
 import { useToast } from '../../hooks/useToast'
 import { useSalonMode } from '../../hooks/useSalonMode'
 import './ChatTab.css'
@@ -24,6 +25,12 @@ function DirectChat({ user, profile, mid, title }) {
   const [sending, setSending] = useState(false)
   const bottomRef = useRef(null)
   const taRef = useRef(null)
+  // Ім'я й фото майстра в шапці чату (замість безликого «Майстер»); салон без mid — назва салону з профілю
+  const [who, setWho] = useState(null)
+  useEffect(() => {
+    if (mid) return
+    get(iRef('admin_settings/profile')).then(s => { const p = s.val() || {}; setWho({ name: p.name || '', photo: p.photoUrl || '' }) }).catch(() => {})
+  }, [mid])
 
   useEffect(() => {
     if (!user?.uid) return
@@ -75,9 +82,9 @@ function DirectChat({ user, profile, mid, title }) {
     <div className="chat-inner fade-up">
       {ToastEl}
       <div className="chat-header">
-        <div className="chat-instructor-avatar">{salonOn ? <MetalIcon name="user" size={34}/> : <MetalIcon name="user" size={34}/>}</div>
+        <div className="chat-instructor-avatar">{who?.photo ? <img src={who.photo} alt="" style={{width:34,height:34,borderRadius:'50%',objectFit:'cover',display:'block'}}/> : <MetalIcon name="user" size={34}/>}</div>
         <div className="chat-instructor-info">
-          <div className="chat-instructor-name">{title || (salonOn ? "Салон" : "Майстер")}</div>
+          <div className="chat-instructor-name">{title || who?.name || (salonOn ? "Салон" : "Майстер")}</div>
           <div className="chat-instructor-status">Відповідає протягом дня</div>
         </div>
         {messages.length > 0 && (
@@ -93,9 +100,7 @@ function DirectChat({ user, profile, mid, title }) {
               >Ні</button>
             </div>
           ) : (
-            <button className="chat-clear-btn" onClick={handleClear} aria-label="Очистити чат">
-              <MetalIcon name="trash" size={32}/>
-            </button>
+            <button onClick={handleClear} aria-label="Очистити чат" title="Очистити чат" style={{ background:'none', border:'none', color:'var(--dim)', fontSize:20, lineHeight:1, padding:'6px 8px', cursor:'pointer' }}>⋯</button>
           )
         )}
       </div>

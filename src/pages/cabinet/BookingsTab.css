@@ -92,7 +92,7 @@
 .booking-actions {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
@@ -144,6 +144,9 @@
 }
 
 .action-btn.action-btn--metal:active { filter: brightness(0.92); transform: scale(0.94); }
+/* Підпис під іконкою дії: «Перенести» / «Скасувати» — без підпису значок календаря плутали з «Додати в календар» */
+.action-btn.action-btn--metal:has(.act-cap) { width: 62px; height: auto; flex-direction: column; gap: 2px; border-radius: 10px; padding: 2px 0; }
+.act-cap { font-size: 10px; font-weight: 700; color: var(--dim); white-space: nowrap; }
 
 /* ─── LIGHT THEME ──────────────────────────────────────────────── */
 

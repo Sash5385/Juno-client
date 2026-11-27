@@ -10,7 +10,6 @@ import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { isGroupService, capacityOf, groupKeyOf, seatTimeKey, canJoinGroup, seatsLeft, seatsLabel } from '../../groups'
 import { normPackages, pickPackage, expiresLabel } from '../../packages'
 import { normIntake, answersOf, missingRequired, intakeNeeded, buildItems, YES, NO } from '../../intake'
-import { useSalonMode } from '../../hooks/useSalonMode'
 import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
@@ -135,7 +134,6 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   useEffect(() => { setAddonIds([]) }, [selectedService?.id])
 
   // Салон: майстри простору (публічний список). Їх >1 → клієнт спершу обирає майстра; слоти, запис і скасування йдуть у календар цього майстра.
-  const salonOn = useSalonMode()
   const [masters, setMasters] = useState([])
   const [pickedMaster, setPickedMaster] = useState(null)
   useEffect(() => subscribeMasters(setMasters), [])
@@ -185,6 +183,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const isGroup = isGroupService(selectedService)
   // Групові послуги без допуслуг (час групи однаковий для всіх)
   const svcAddons = useMemo(() => (isGroupService(selectedService) ? [] : normAddons(selectedService?.addons)), [selectedService])
+  const showSvcStep = (services.length > 1 || svcAddons.length > 0) && !!selectedService
   const chosenAddons = useMemo(() => pickAddons(selectedService, addonIds), [selectedService, addonIds])
   const addonTot = addonsTotals(chosenAddons)
   const addonHours = addonTot.minutes / 60
@@ -832,9 +831,7 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         <div className="banner-info">
           <div className="banner-greet">Привіт,</div>
           <div className="banner-name">{profile?.name?.split(' ')[0] || 'Клієнт'}</div>
-          <div className="banner-tag">
-            {salonOn ? (selectedService?.name || '') : (selectedService?.type === 'school' ? <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="calendar" size={16}/>Стандарт</span> : <span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="user" size={16}/>Індивідуальний</span>)}
-          </div>
+          {selectedService?.name && <div className="banner-tag">{selectedService.name}</div>}
         </div>
       </div>
 
@@ -916,59 +913,10 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
       )}
       <div className="book-cols" style={needMaster ? { display: 'none' } : undefined}>
       <div className="book-col">
-      {/* 1. ДАТА */}
-      <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>1. Дата</div>
-      <div className="cal-card" onTouchStart={handleCalTouchStart} onTouchEnd={handleCalTouchEnd}>
-        <div className="cal-head">
-          <button className="cal-nav-btn" aria-label="Попередній місяць" onClick={prevMonth}>‹</button>
-          <div className="cal-month">
-            {getMonthName(viewMonth.getMonth())}
-            <span style={{color:'var(--faint)', fontWeight:600, marginLeft:5}}>{viewMonth.getFullYear()}</span>
-          </div>
-          <button className="cal-nav-btn" aria-label="Наступний місяць" onClick={nextMonth}>›</button>
-        </div>
-        <div className="cal-weekdays">
-          {['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d => <div key={d} className="cal-wd">{d}</div>)}
-        </div>
-        <div
-          key={`${viewMonth.getFullYear()}-${viewMonth.getMonth()}`}
-          className={`cal-days ${calSlideDir === 1 ? 'cal-days-spring-next' : calSlideDir === -1 ? 'cal-days-spring-prev' : ''}`}
-        >
-          {days.map((d, i) => {
-            if (!d) return <div key={i} className="cal-day empty"></div>
-            // Приватні й автошкільні клієнти мають окремі горизонти видимості календаря
-            // (Налаштування → Обмеження). Клієнт зі «Стандартом» — за schoolCalendarOpenDays.
-            const maxDays = canPrivate
-              ? (adminSettings.calendarOpenDays ?? 30)
-              : (adminSettings.schoolCalendarOpenDays ?? 14)
-            const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + maxDays)
-            const disabled = isPast(d) || d > maxDate
-            const isToday = isSameDay(d, today)
-            const selected = selectedDate && isSameDay(d, selectedDate)
-            const dateStr = formatDateYMD(d)
-            const avail = monthAvail[dateStr]      // undefined=loading, null=empty, 'free'/'partial'/'full'
-            const dayClass = disabled ? '' :
-              avail === undefined ? 'has-slots' :  // loading - show neutral
-              avail ? `day-${avail}` : ''          // loaded: colored or plain
-            return (
-              <button
-                key={i}
-                className={`cal-day ${disabled ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${dayClass}`}
-                onClick={() => { if (!disabled) { setLoading(true); setSelectedDate(d) } }}
-                disabled={disabled}
-              >
-                {d.getDate()}
-              </button>
-            )
-          })}
-        </div>
-        <CalLegend />
-      </div>
-
-      {/* 2. ПОСЛУГА (і допуслуги) — показуємо, коли є з чого обирати */}
-      {(services.length > 1 || svcAddons.length > 0) && selectedService && (
+      {/* 1. ПОСЛУГА (і допуслуги) — спершу послуга: від неї залежать тривалість і вільні дні; показуємо, коли є з чого обирати */}
+      {showSvcStep && (
         <>
-          <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>2. Послуга</div>
+          <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>1. Послуга</div>
           {services.length > 1 && (
             <div className="service-grid">
               {services.map(svc => {
@@ -1023,13 +971,62 @@ export default function BookTab({ user, profile, bookingsData, notifParams }) {
         </>
       )}
 
+      {/* 2. ДАТА */}
+      <div className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>{showSvcStep ? '2. Дата' : '1. Дата'}</div>
+      <div className="cal-card" onTouchStart={handleCalTouchStart} onTouchEnd={handleCalTouchEnd}>
+        <div className="cal-head">
+          <button className="cal-nav-btn" aria-label="Попередній місяць" onClick={prevMonth}>‹</button>
+          <div className="cal-month">
+            {getMonthName(viewMonth.getMonth())}
+            <span style={{color:'var(--faint)', fontWeight:600, marginLeft:5}}>{viewMonth.getFullYear()}</span>
+          </div>
+          <button className="cal-nav-btn" aria-label="Наступний місяць" onClick={nextMonth}>›</button>
+        </div>
+        <div className="cal-weekdays">
+          {['Пн','Вт','Ср','Чт','Пт','Сб','Нд'].map(d => <div key={d} className="cal-wd">{d}</div>)}
+        </div>
+        <div
+          key={`${viewMonth.getFullYear()}-${viewMonth.getMonth()}`}
+          className={`cal-days ${calSlideDir === 1 ? 'cal-days-spring-next' : calSlideDir === -1 ? 'cal-days-spring-prev' : ''}`}
+        >
+          {days.map((d, i) => {
+            if (!d) return <div key={i} className="cal-day empty"></div>
+            // Приватні й автошкільні клієнти мають окремі горизонти видимості календаря
+            // (Налаштування → Обмеження). Клієнт зі «Стандартом» — за schoolCalendarOpenDays.
+            const maxDays = canPrivate
+              ? (adminSettings.calendarOpenDays ?? 30)
+              : (adminSettings.schoolCalendarOpenDays ?? 14)
+            const maxDate = new Date(today); maxDate.setDate(maxDate.getDate() + maxDays)
+            const disabled = isPast(d) || d > maxDate
+            const isToday = isSameDay(d, today)
+            const selected = selectedDate && isSameDay(d, selectedDate)
+            const dateStr = formatDateYMD(d)
+            const avail = monthAvail[dateStr]      // undefined=loading, null=empty, 'free'/'partial'/'full'
+            const dayClass = disabled ? '' :
+              avail === undefined ? 'has-slots' :  // loading - show neutral
+              avail ? `day-${avail}` : ''          // loaded: colored or plain
+            return (
+              <button
+                key={i}
+                className={`cal-day ${disabled ? 'disabled' : ''} ${isToday ? 'today' : ''} ${selected ? 'selected' : ''} ${dayClass}`}
+                onClick={() => { if (!disabled) { setLoading(true); setSelectedDate(d) } }}
+                disabled={disabled}
+              >
+                {d.getDate()}
+              </button>
+            )
+          })}
+        </div>
+        <CalLegend />
+      </div>
+
       </div>
       <div className="book-col">
       {/* 3. ЧАС */}
       {selectedDate && (
         <>
           <div ref={timeSectionRef} className="section-title" style={{color:'var(--text)', fontSize:13, textAlign:'center'}}>
-            3. Час ({selectedDate.toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' })})
+            {`${showSvcStep ? 3 : 2}. Час (${selectedDate.toLocaleDateString('uk-UA', { weekday: 'short', day: 'numeric', month: 'long' })})`}
           </div>
           {loading ? (
             <div style={{textAlign:'center', padding:'24px'}}><div className="spinner" style={{margin:'0 auto'}}></div></div>

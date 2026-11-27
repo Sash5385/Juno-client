@@ -10,7 +10,6 @@ import { normAddons, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { parseYMD, getMonthShort, getMonthGrid, getMonthName, formatDateYMD, isPast, isSameDay } from '../../utils/date'
 import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { LicenseContext } from '../../hooks/useLicense'
-import { useSalonMode } from '../../hooks/useSalonMode'
 import './BookingsTab.css'
 import './BookTab.css'
 import { cur as curSym, money } from '../../currency'
@@ -322,7 +321,6 @@ export default function BookingsTab({ user, profile, bookingsData }) {
   const [rescheduleBooking, setRescheduleBooking] = useState(null)
   const [masters, setMasters] = useState([]) // салон: імена майстрів для підпису запису
   useEffect(() => subscribeMasters(setMasters), [])
-  const salonOn = useSalonMode()
   const ownerMaster = masters.find(m => m.owner)
   // Запис до власника не має masterId — у салоні підписуємо його ім'ям власника
   const masterOf = (b) => masters.find(m => m.id === b.masterId) || (masters.length > 1 && !b.masterId ? ownerMaster : null)
@@ -403,7 +401,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             {b.time}{endTime ? ` — ${endTime}` : ''}
           </div>
           <div className="booking-type">
-            {salonOn ? '' : (b.serviceType === 'school' ? <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="calendar" size={16}/></span> : <span style={{display:'inline-flex',alignItems:'center',marginRight:5}}><MetalIcon name="user" size={16}/></span>)}{b.serviceName}{nameHasDur(b.serviceName, b.durationHours) ? null : <>{' · '}{formatDurHours(b.durationHours || 1)}</>}{' '}
+            {b.serviceName}{nameHasDur(b.serviceName, b.durationHours) ? null : <>{' · '}{formatDurHours(b.durationHours || 1)}</>}{' '}
             {masterOf(b) && (
               <span style={{marginLeft:6, color:'var(--dim)', fontWeight:600}}>· {masterOf(b).name}</span>
             )}
@@ -418,9 +416,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
             <div style={{fontSize:11, color:'var(--dim)', margin:'2px 0 4px'}}><span style={{display:'inline-flex',alignItems:'center',gap:5}}><MetalIcon name="plus" size={16}/>{addonsLabel(normAddons(b.addons))}</span></div>
           )}
           <div style={{display:"flex",alignItems:"center",gap:6,flexWrap:"wrap"}}>
-            {(b.status === 'confirmed' || b.status === 'cancelled') && (
-              <div className={`booking-status ${statusClass}`}>{statusText}</div>
-            )}
+            <div className={`booking-status ${statusClass}`}>{b.status === 'confirmed' || b.status === 'cancelled' ? statusText : 'Очікує підтвердження'}</div>
             {b.isPaid && <div style={{fontSize:11,fontWeight:700,color:"var(--ok)",padding:"2px 7px",borderRadius:6,background:"rgba(99,211,120,0.12)"}}>✓ Оплачено</div>}
             {!isPast && b.status === 'confirmed' && lessonCountdown(b) && (
               <div style={{fontSize:11,fontWeight:700,color:'var(--warn)',padding:'2px 7px',borderRadius:6,background:'rgba(251,146,60,0.1)'}}>⏱ {lessonCountdown(b)}</div>
@@ -553,7 +549,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
         </div>
         {!isPast && b.status !== 'cancelled' && (
           <div className="booking-actions">
-            {!licenseReadOnly && !b.groupKey && <button className="action-btn action-btn--metal" title="Перенести" aria-label="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}><MetalIcon name="calendar" size={32}/></button>}
+            {!licenseReadOnly && !b.groupKey && <button className="action-btn action-btn--metal" title="Перенести" aria-label="Перенести" onClick={() => { if (cancelLocked) { showToast(`Перенести запис можна не пізніше ніж за ${cancelCutoff} год до початку. Зверніться до майстра.`, 'error'); return } setRescheduleBooking(b) }}><MetalIcon name="swap" size={30}/><span className="act-cap">Перенести</span></button>}
             {cancelConfirmId === b.id ? (
               <>
                 <button className="action-btn" style={{ color: 'var(--bad)', fontSize: 11, padding: '2px 6px' }} onClick={() => handleCancel(b)}>Так</button>
@@ -567,7 +563,7 @@ export default function BookingsTab({ user, profile, bookingsData }) {
                 onClick={() => handleCancel(b)}
                 disabled={cancelLocked}
                 style={cancelLocked ? { opacity: 0.4 } : {}}
-              ><MetalIcon name="cross" size={32}/></button>
+              ><MetalIcon name="cross" size={30}/><span className="act-cap">Скасувати</span></button>
             )}
           </div>
         )}
