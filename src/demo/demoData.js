@@ -120,6 +120,8 @@ export function buildDemoTree() {
       let st;
       if (forced.length) st = forced.shift();
       else {
+        // Найближчі дні: лишаємо вікна 16:00 і 17:00 вільними, щоб у демо можна було одразу записатись
+        if (d >= 1 && d <= 4 && (start === 16 * 60 || start === 17 * 60)) continue;
         if (rnd() > density) continue;
         const eligible = STUDENTS.filter((s) => !usedToday.has(s.uid) && (s.firstDay === null || d > s.firstDay));
         if (!eligible.length) continue;
@@ -233,6 +235,7 @@ export function buildDemoTree() {
         const sl = day[id];
         if (sl.available !== true) return;
         const mins = Number(sl.time.slice(0, 2)) * 60 + Number(sl.time.slice(3));
+        if (d >= 1 && d <= 4 && (mins === 16 * 60 || mins === 17 * 60)) return; // демо-вікна для запису — звичайні, без обмежень
         const r = flagRnd();
         if (r < 0.07) sl.vipOnly = true;
         else if (r < 0.14) sl.privateOnly = true;

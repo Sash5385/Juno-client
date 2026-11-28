@@ -29,7 +29,11 @@ import { DEMO, DEMO_IID, DEMO_SLUG } from './demo/demoMode'
 
 // Сторінки вантажимо ліниво: на старті — лише потрібна, решта окремими файлами (швидший перший показ)
 const Auth = lazy(() => import('./pages/Auth'))
-const Cabinet = lazy(() => import('./pages/Cabinet'))
+// Кабінет — найчастіша сторінка (повернення вже залогінених клієнтів): починаємо качати його одразу,
+// паралельно з перевіркою входу, а не після неї — без «водоспаду» запитів.
+const loadCabinet = () => import('./pages/Cabinet')
+const cabinetPreload = loadCabinet()
+const Cabinet = lazy(() => cabinetPreload.catch(loadCabinet))
 const Landing = lazy(() => import('./pages/Landing'))
 const PublicSchedule = lazy(() => import('./pages/PublicSchedule'))
 const About = lazy(() => import('./pages/About'))
