@@ -5,10 +5,8 @@ import { useToast } from '../hooks/useToast'
 import { useBookings } from '../hooks/useBookings'
 import { useChatThreads } from '../hooks/useChatThreads'
 import { useBackClose } from '../hooks/useBackButton'
-import { signOut } from '../firebase/auth'
-import { subscribeQueueOffers, clearQueueOffer, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue } from '../firebase/db'
+import { subscribeQueueOffers, claimQueueOffer, declineQueueOffer, subscribeDirectUnread, markDirectChatRead, subscribeNotifications, subscribeUserQueue } from '../firebase/db'
 
-import ConfirmDialog from './cabinet/ConfirmDialog'
 import BookTab from './cabinet/BookTab'
 import BookingPaused from './cabinet/BookingPaused'
 import { LicenseContext } from '../hooks/useLicense'
@@ -210,12 +208,6 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
     else if (dx > 0 && idx > 0) switchTab(SWIPE_TABS[idx - 1])
   }
 
-  const [logoutOpen, setLogoutOpen] = useState(false)
-  const handleLogout = async () => {
-    setLogoutOpen(false)
-    await signOut()
-    nav('/', { replace: true })
-  }
 
   return (
     <div className="cabinet-page">
@@ -431,7 +423,6 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
         )
       })()}
 
-      <ConfirmDialog open={logoutOpen} title="Вийти з акаунту?" confirmLabel="Вийти" danger onConfirm={handleLogout} onCancel={() => setLogoutOpen(false)} />
       {ToastEl}
     </div>
   )

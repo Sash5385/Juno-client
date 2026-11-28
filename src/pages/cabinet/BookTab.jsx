@@ -13,7 +13,7 @@ import { normIntake, answersOf, missingRequired, intakeNeeded, buildItems, YES, 
 import { normAddons, pickAddons, addonsTotals, addonsSnapshot, addonsLabel, bufferOf, rangeTaken } from '../../addons'
 import { useToast } from '../../hooks/useToast'
 import './BookTab.css'
-import { cur as curSym, money } from '../../currency'
+import { money } from '../../currency'
 import { MetalIcon } from '../../MetalIcon'
 
 const FALLBACK_SERVICES = [
@@ -54,7 +54,6 @@ const Portal = ({ children }) => createPortal(children, document.body)
 
 export default function BookTab({ user, profile, bookingsData, notifParams }) {
   const { showToast, ToastEl } = useToast()
-  const isSchool = profile?.studentType === 'school'
   const isPrivateStudent = profile?.studentType === 'private'
   // Індивідуальний клієнт бачить календар і слоти за налаштуваннями «Індивідуальний», «Стандарт» — за своїми
   const canPrivate = isPrivateStudent

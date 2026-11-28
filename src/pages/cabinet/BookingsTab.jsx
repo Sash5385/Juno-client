@@ -12,7 +12,7 @@ import { googleCalendarLink, downloadICS } from '../../utils/calendar'
 import { LicenseContext } from '../../hooks/useLicense'
 import './BookingsTab.css'
 import './BookTab.css'
-import { cur as curSym, money } from '../../currency'
+import { money } from '../../currency'
 import { MetalIcon } from '../../MetalIcon'
 
 // Мінімальний час до запису, коли клієнт ще може самостійно скасувати (год)

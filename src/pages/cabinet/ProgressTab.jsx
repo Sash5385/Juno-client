@@ -1,14 +1,7 @@
 import { useMemo } from "react";
 import "./ProgressTab.css";
-import { cur as curSym, money } from '../../currency'
+import { money } from '../../currency'
 import { MetalIcon } from '../../MetalIcon'
-
-const getWeekStart = dateStr => {
-  const d = new Date(dateStr + 'T12:00:00');
-  const dow = (d.getDay() + 6) % 7;
-  d.setDate(d.getDate() - dow);
-  return d.toISOString().slice(0, 10);
-};
 
 export default function ProgressTab({ user, profile, bookingsData }) {
   const { bookings } = bookingsData || { bookings: [] };
@@ -28,22 +21,6 @@ export default function ProgressTab({ user, profile, bookingsData }) {
   const totalSpent = useMemo(() => completed.filter(b => b.isPaid && b.price > 0).reduce((s, b) => s + (b.price || 0), 0), [completed]);
   const totalDebt = useMemo(() => completed.filter(b => !b.isPaid && b.price > 0).reduce((s, b) => s + (b.price || 0), 0), [completed]);
 
-  const lessonStreak = useMemo(() => {
-    if (!completed.length) return 0;
-    const weeksWithLessons = new Set(completed.map(b => getWeekStart(b.date)));
-    const today = new Date(); today.setHours(0, 0, 0, 0);
-    const dow = (today.getDay() + 6) % 7;
-    const thisWeekMs = today.getTime() - dow * 86400000;
-    const thisWeek = new Date(thisWeekMs).toISOString().slice(0, 10);
-    let streak = 0;
-    const startIdx = weeksWithLessons.has(thisWeek) ? 0 : 1;
-    for (let i = startIdx; i < 52; i++) {
-      const key = new Date(thisWeekMs - i * 7 * 86400000).toISOString().slice(0, 10);
-      if (weeksWithLessons.has(key)) streak++;
-      else break;
-    }
-    return streak;
-  }, [completed]);
 
   return (
     <div className="progress-tab">
