@@ -135,6 +135,8 @@ export default defineConfig({
         skipWaiting: true,
         clientsClaim: true,
         globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+        // Невикористані великі картинки не завантажуємо заздалегідь при встановленні застосунку
+        globIgnores: ['**/instructor.png', '**/logo.png', '**/id4-hero.jpg'],
         runtimeCaching: [
           {
             urlPattern: ({ url }) => url.pathname === BASE + 'manifest.json',

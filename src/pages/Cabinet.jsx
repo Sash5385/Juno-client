@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useRef, useContext } from 'react'
+import { useState, useEffect, useMemo, useRef, useContext, lazy, Suspense } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { useTheme } from '../hooks/useTheme'
 import { useToast } from '../hooks/useToast'
@@ -10,12 +10,12 @@ import { subscribeQueueOffers, claimQueueOffer, declineQueueOffer, subscribeDire
 import BookTab from './cabinet/BookTab'
 import BookingPaused from './cabinet/BookingPaused'
 import { LicenseContext } from '../hooks/useLicense'
-import BookingsTab from './cabinet/BookingsTab'
-import ProgressTab from './cabinet/ProgressTab'
-import ProfileTab from './cabinet/ProfileTab'
-import ChatTab from './cabinet/ChatTab'
-import NotifTab from './cabinet/NotifTab'
-import QueueTab from './cabinet/QueueTab'
+const BookingsTab = lazy(() => import('./cabinet/BookingsTab'))
+const ProgressTab = lazy(() => import('./cabinet/ProgressTab'))
+const ProfileTab = lazy(() => import('./cabinet/ProfileTab'))
+const ChatTab = lazy(() => import('./cabinet/ChatTab'))
+const NotifTab = lazy(() => import('./cabinet/NotifTab'))
+const QueueTab = lazy(() => import('./cabinet/QueueTab'))
 
 import { formatDateLabel, parseYMD } from '../utils/date'
 import { useMosaicSwitch, MosaicOverlay } from '../mosaic'
@@ -266,6 +266,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
         style={{ position: 'relative' }}
       >
         <div className="fade-up" key={displayedTab} style={displayedTab === 'chat' ? { display:'flex', flexDirection:'column', flex:1, minHeight:0 } : undefined}>
+          <Suspense fallback={<div style={{display:'flex',justifyContent:'center',padding:'60px 0'}}><div className="spinner"/></div>}>
           {displayedTab === 'book' && (licenseReadOnly ? <BookingPaused /> : <BookTab user={user} profile={profile} bookingsData={bookingsData} notifParams={notifParams} />)}
           {displayedTab === 'bookings' && <BookingsTab user={user} profile={profile} bookingsData={bookingsData} />}
           {displayedTab === 'progress' && <ProgressTab user={user} profile={profile} bookingsData={bookingsData} />}
@@ -273,6 +274,7 @@ export default function Cabinet({ user, profile, onProfileUpdate }) {
           {displayedTab === 'chat' && <ChatTab user={user} profile={profile} threads={chatThreads} unreadSalon={unreadSalon} />}
           {displayedTab === 'notifications' && <NotifTab user={user} onSeen={markNotifsSeen} />}
           {displayedTab === 'profile' && <ProfileTab user={user} profile={profile} bookingsData={bookingsData} onProfileUpdate={onProfileUpdate} />}
+          </Suspense>
         </div>
         <MosaicOverlay phase={mosaicPhase} tileColor="var(--bg-deep)" speed={0.5}/>
       </div>

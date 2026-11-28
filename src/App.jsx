@@ -7,7 +7,7 @@ function SaveRedirect({ to }) {
   if (location.search) saveRedirectAfterLogin(location.pathname, location.search)
   return <Navigate to={to} replace />
 }
-import { useEffect, useState, useRef } from 'react'
+import { useEffect, useState, useRef, lazy, Suspense } from 'react'
 import { onAuthStateChanged } from 'firebase/auth'
 import { Capacitor } from '@capacitor/core'
 import { App as CapacitorApp } from '@capacitor/app'
@@ -17,7 +17,8 @@ import {
   setCurrentTenant, loadStoredTenant, resolveSlug, getCurrentSlug, getAdminSettings,
 } from './firebase/db'
 import { startTerms } from './terms'
-import { requestNotificationPermission, onForegroundMessage, getFirebaseSwReg } from './firebase/push'
+// Push (firebase/messaging) вантажимо ліниво після входу — не тягнемо його в стартовий файл
+const loadPush = () => import('./firebase/push')
 import { useAppUpdate } from './hooks/useAppUpdate'
 import { useLicense, isLicenseReadOnly, LicenseContext } from './hooks/useLicense'
 import BookingPaused from './pages/cabinet/BookingPaused'
@@ -26,12 +27,14 @@ import { consumeBackHandler } from './hooks/useBackButton'
 import { APP_VERSION } from './version.js'
 import { DEMO, DEMO_IID, DEMO_SLUG } from './demo/demoMode'
 
-import Auth from './pages/Auth'
-import Cabinet from './pages/Cabinet'
-import Landing from './pages/Landing'
-import PublicSchedule from './pages/PublicSchedule'
-import About from './pages/About'
-import SalonPage from './pages/SalonPage'
+// Сторінки вантажимо ліниво: на старті — лише потрібна, решта окремими файлами (швидший перший показ)
+const Auth = lazy(() => import('./pages/Auth'))
+const Cabinet = lazy(() => import('./pages/Cabinet'))
+const Landing = lazy(() => import('./pages/Landing'))
+const PublicSchedule = lazy(() => import('./pages/PublicSchedule'))
+const About = lazy(() => import('./pages/About'))
+const SalonPage = lazy(() => import('./pages/SalonPage'))
+const PageFallback = () => <div style={{display:'flex',justifyContent:'center',padding:'80px 0'}}><div className="spinner"/></div>
 import { setCurrency } from './currency'
 import { MetalIcon } from './MetalIcon'
 
@@ -319,7 +322,7 @@ export default function App() {
       if (u) {
         const p = await getUserProfile(u.uid)
         setProfile(p)
-        requestNotificationPermission(u.uid).catch(() => {})
+        loadPush().then(m => m.requestNotificationPermission(u.uid)).catch(() => {})
         // Зберігаємо реферальний код якщо є ?ref= в URL
         if (!p?.referredBy) {
           const refParam = new URLSearchParams(window.location.search).get('ref')
@@ -337,7 +340,8 @@ export default function App() {
 
   useEffect(() => {
     if (!user) return
-    return onForegroundMessage((payload) => {
+    let unsub = null, cancelled = false
+    loadPush().then(({ onForegroundMessage, getFirebaseSwReg }) => { if (cancelled) return; unsub = onForegroundMessage((payload) => {
       // Data-only push — payload.notification тут завжди undefined, тому
       // title/body бралися з нього ніколи не існуючого поля.
       const title = payload.data?.title || 'Juno'
@@ -362,7 +366,8 @@ export default function App() {
       } else {
         new Notification(title, { body, icon: import.meta.env.BASE_URL + 'icon-192.png' })
       }
-    })
+    }) }).catch(() => {})
+    return () => { cancelled = true; if (typeof unsub === 'function') unsub() }
   }, [user])
 
   // Апаратна кнопка "назад" (Android): спершу закриває відкриту модалку/шторку,
@@ -418,7 +423,7 @@ export default function App() {
 
   // Публічна сторінка салону /s/{slug} — не залежить від майстра й входу
   const salonMatch = location.pathname.match(/^\/s\/([a-z0-9-]{3,40})\/?$/)
-  if (salonMatch) return <SalonPage slug={salonMatch[1]} />
+  if (salonMatch) return <Suspense fallback={<PageFallback/>}><SalonPage slug={salonMatch[1]} /></Suspense>
 
   if (loading) {
     return (
@@ -436,7 +441,7 @@ export default function App() {
     if (!tenantResolveFailed) {
       return (
         <>
-        <About/>
+        <Suspense fallback={<PageFallback/>}><About/></Suspense>
         <InstallBanner/>
         </>
       )
@@ -464,6 +469,7 @@ export default function App() {
   return (
     <LicenseContext.Provider value={{ readOnly: licenseReadOnly }}>
     <>
+    <Suspense fallback={<PageFallback/>}>
     <Routes>
       {/* Лендінг — тільки для не авторизованих */}
       <Route path="/" element={
@@ -498,6 +504,7 @@ export default function App() {
 
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </Suspense>
     {needRefresh && (
       <div className={`update-banner${isUpdating ? ' update-banner--loading' : ''}`} onClick={updateServiceWorker}>
         {isUpdating
